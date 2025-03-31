@@ -1,0 +1,13 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Log files
+logs/
+*.log
+
+# OS specific files
+.DS_Store
+Thumbs.db
