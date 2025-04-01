@@ -1,0 +1,14 @@
+{
+    "name": "Water Elemental",
+    "cost": 4,
+    "attack": 3,
+    "health": 6,
+    "type": 0,
+    "effects": [
+        {
+            "trigger": 2,
+            "action": "freeze_target",
+            "conditions": ["is_character"]
+        }
+    ]
+} 

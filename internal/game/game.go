@@ -1,39 +1,16 @@
 package game
 
+import (
+	"github.com/openhs/internal/card"
+	"github.com/openhs/internal/config"
+	"github.com/openhs/internal/logger"
+)
+
 type Game struct {
-	Players     []Player
+	Players     []*Player
 	CurrentTurn int
 	Phase       GamePhase
 }
-
-type Player struct {
-	Mana       int
-	MaxMana    int
-	Deck       []Card
-	Hand       []Card
-	Board      []Card
-	Hero       Card
-	HeroPower  Card
-}
-
-type Card struct {
-	Name        string
-	Cost        int
-	Attack      int
-	Health      int
-	Type        CardType
-	Effects     []Effect
-}
-
-type CardType int
-
-const (
-	Minion CardType = iota
-	Spell
-	Weapon
-	Hero
-	HeroPower
-)
 
 type GamePhase int
 
@@ -47,39 +24,43 @@ const (
 	EndGame
 )
 
-// Effect represents a card effect or ability
-type Effect struct {
-	Trigger    Trigger
-	Action     Action
-	Conditions []Condition
-}
-
-// Trigger represents when an effect should activate
-type Trigger int
-
-const (
-	OnPlay Trigger = iota
-	OnDeath
-	OnDamage
-	OnHeal
-	OnTurnStart
-	OnTurnEnd
-)
-
-// Action represents what an effect does
-type Action interface {
-	Execute(*Game, *Card)
-}
-
-// Condition represents a requirement for an effect to trigger
-type Condition interface {
-	IsMet(*Game, *Card) bool
-}
-
 func NewGame() *Game {
 	return &Game{
-		Players:     make([]Player, 2),
-		CurrentTurn: 1,
+		Players:     make([]*Player, 0),
+		CurrentTurn: 0,
 		Phase:       StartGame,
 	}
-} 
+}
+
+// LoadGame creates a new game from a configuration
+func LoadGame(config *config.GameConfig) (*Game, error) {
+	g := NewGame()
+	
+	// Create players based on configuration
+	for _, playerConfig := range config.Players {
+		player := NewPlayer(playerConfig)
+		
+		// Load hero card
+		cardManager := card.GetCardManager()
+		heroCard, err := cardManager.CreateCard(playerConfig.Hero)
+		if err != nil {
+			logger.Error("Failed to load hero card: " + err.Error())
+			return nil, err
+		}
+		player.Hero = *heroCard
+		
+		// Load deck cards
+		for _, cardName := range playerConfig.Deck {
+			cardInstance, err := cardManager.CreateCard(cardName)
+			if err != nil {
+				logger.Error("Failed to load card: " + err.Error())
+				return nil, err
+			}
+			player.Deck = append(player.Deck, *cardInstance)
+		}
+		
+		g.Players = append(g.Players, player)
+	}
+	
+	return g, nil
+}

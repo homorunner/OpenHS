@@ -1,0 +1,14 @@
+{
+    "name": "Jaina",
+    "cost": 0,
+    "attack": 0,
+    "health": 30,
+    "type": 3,
+    "effects": [
+        {
+            "trigger": 5,
+            "action": "gain_mana_crystal",
+            "conditions": []
+        }
+    ]
+} 

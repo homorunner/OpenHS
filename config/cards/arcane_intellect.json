@@ -1,0 +1,15 @@
+{
+    "name": "Arcane Intellect",
+    "cost": 3,
+    "attack": 0,
+    "health": 0,
+    "type": 1,
+    "effects": [
+        {
+            "trigger": 0,
+            "action": "draw_cards",
+            "conditions": [],
+            "value": 2
+        }
+    ]
+} 

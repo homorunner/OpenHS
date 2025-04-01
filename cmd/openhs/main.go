@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/openhs/internal/logger"
+	"github.com/openhs/internal/bootstrap"
 )
 
 func main() {
-	// Initialize logger with debug level for development
-	_, err := logger.SetLogger("debug", "logs", "openhs.log", true)
-	if err != nil {
-		logger.Fatal("Failed to initialize logger", logger.Err(err))
+	configPath := filepath.Join("config", "openhs.json")
+	if err := bootstrap.Initialize(configPath); err != nil {
+		fmt.Printf("Failed to initialize global components: %v\n", err)
+		return
 	}
 
 	fmt.Print("OpenHS - Hearthstone Simulator Core")

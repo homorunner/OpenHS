@@ -1,0 +1,22 @@
+{
+    "players": [
+        {
+            "hero": "Jaina",
+            "deck": [
+                "Fireball",
+                "Frostbolt",
+                "Arcane Intellect",
+                "Water Elemental"
+            ]
+        },
+        {
+            "hero": "Jaina",
+            "deck": [
+                "Fireball",
+                "Frostbolt",
+                "Arcane Intellect",
+                "Water Elemental"
+            ]
+        }
+    ]
+}
