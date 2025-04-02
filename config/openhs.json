@@ -1,8 +1,8 @@
 {
-    "card_config_dir": "../cards",
-    "game_config_dir": "../games",
+    "card_config_dir": "cards",
+    "game_config_dir": "games",
     "logging": {
-        "level": "debug",
+        "level": "info",
         "log_dir": "logs",
         "log_file": "openhs.log",
         "dev_mode": true

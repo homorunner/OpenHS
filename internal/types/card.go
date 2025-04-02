@@ -22,6 +22,24 @@ const (
 	HeroPower
 )
 
+// String returns a string representation of the CardType
+func (c CardType) String() string {
+	switch c {
+	case Minion:
+		return "Minion"
+	case Spell:
+		return "Spell"
+	case Weapon:
+		return "Weapon"
+	case Hero:
+		return "Hero"
+	case HeroPower:
+		return "Hero Power"
+	default:
+		return "Unknown"
+	}
+}
+
 // Effect represents a card effect or ability
 type Effect struct {
 	Trigger    Trigger

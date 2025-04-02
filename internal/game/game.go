@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/openhs/internal/card"
 	"github.com/openhs/internal/config"
 	"github.com/openhs/internal/logger"
@@ -39,6 +41,56 @@ const (
 	MainPreAction
 	MainPostAction
 )
+
+// String returns a string representation of the GamePhase
+func (p GamePhase) String() string {
+	switch p {
+	case InvalidPhase:
+		return "Invalid Phase"
+	case BeginFirst:
+		return "Begin First"
+	case BeginShuffle:
+		return "Begin Shuffle"
+	case BeginDraw:
+		return "Begin Draw"
+	case BeginMulligan:
+		return "Begin Mulligan"
+	case MainBegin:
+		return "Main Begin"
+	case MainReady:
+		return "Main Ready"
+	case MainResource:
+		return "Main Resource"
+	case MainDraw:
+		return "Main Draw"
+	case MainStart:
+		return "Main Start"
+	case MainAction:
+		return "Main Action"
+	case MainCombat:
+		return "Main Combat"
+	case MainEnd:
+		return "Main End"
+	case MainNext:
+		return "Main Next"
+	case FinalWrapup:
+		return "Final Wrapup"
+	case FinalGameover:
+		return "Final Gameover"
+	case MainCleanup:
+		return "Main Cleanup"
+	case MainStartTriggers:
+		return "Main Start Triggers"
+	case MainSetActionStepType:
+		return "Main Set Action Step Type"
+	case MainPreAction:
+		return "Main Pre Action"
+	case MainPostAction:
+		return "Main Post Action"
+	default:
+		return fmt.Sprintf("Unknown Phase (%d)", int(p))
+	}
+}
 
 func NewGame() *Game {
 	return &Game{
