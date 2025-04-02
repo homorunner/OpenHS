@@ -42,7 +42,7 @@ func NewGame() *Game {
 	return &Game{
 		Players:     make([]*Player, 0),
 		CurrentTurn: 0,
-		Phase:       BeginFirst,
+		Phase:       InvalidPhase,
 	}
 }
 
