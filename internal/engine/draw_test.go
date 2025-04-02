@@ -53,6 +53,9 @@ func TestDrawCard(t *testing.T) {
 		Hand:      make([]types.Card, 0),
 		Hero:      types.Card{Name: "Test Hero", Health: 30, Type: types.Hero},
 		HandSize:  10,
+		MaxMana:   10,
+		Mana:      0,
+		TotalMana: 0,
 	}
 
 	// Try to draw from empty deck

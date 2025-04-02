@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/openhs/internal/config"
 	"github.com/openhs/internal/types"
 )
 
@@ -12,11 +13,14 @@ type Player struct {
 	Graveyard []types.Card
 	Hero      types.Card
 	HeroPower types.Card
+	Weapon    types.Card
 
 	Mana          int
 	MaxMana       int
+	TotalMana     int
 	FatigueDamage int
 	HandSize      int
+	HasWeapon     bool
 }
 
 // NewPlayer creates a new player from a configuration
@@ -27,5 +31,8 @@ func NewPlayer() *Player {
 		Field:     make([]types.Card, 0),
 		Graveyard: make([]types.Card, 0),
 		HandSize:  10,
+		MaxMana:   config.DefaultMaxMana,
+		Mana:      config.DefaultStartingMana,
+		TotalMana: config.DefaultStartingMana,
 	}
 }

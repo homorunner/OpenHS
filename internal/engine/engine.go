@@ -206,9 +206,9 @@ func (e *Engine) mainReady() error {
 	logger.Info("Phase: Main Ready")
 
 	// Reset player states for new turn
-	// Refresh mana, reset attack counters, etc.
-	// TODO: Implement turn reset logic
-
+	// Reset attack counters, etc.
+	// Note: Mana will be handled in mainResource phase
+	
 	// Set next phase
 	e.nextPhase = game.MainStartTriggers
 	return nil
@@ -229,7 +229,15 @@ func (e *Engine) mainResource() error {
 	logger.Info("Phase: Main Resource")
 
 	// Give mana crystal to current player
-	// TODO: Implement mana logic
+	player := e.game.CurrentPlayer
+	
+	// Increase total mana by 1, but do not exceed MaxMana
+	if player.TotalMana < player.MaxMana {
+		player.TotalMana++
+	}
+	
+	// Restore mana to current total
+	player.Mana = player.TotalMana
 
 	// Set next phase
 	e.nextPhase = game.MainDraw

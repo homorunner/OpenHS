@@ -3,12 +3,12 @@ package types
 // Card represents a card in the game
 // An empty card is a 0/0 minion with no cost and no effects
 type Card struct {
-	Name    string
-	Cost    int
-	Attack  int
-	Health  int
-	Type    CardType
-	Effects []Effect
+	Name      string
+	Cost      int
+	Attack    int
+	Health    int
+	Type      CardType
+	Effects   []Effect
 }
 
 // CardType represents the type of a card

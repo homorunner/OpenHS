@@ -316,3 +316,183 @@ func TestEndPlayerTurn(t *testing.T) {
 		t.Error("Expected an error when ending turn outside of action phase, but got nil")
 	}
 }
+
+// TestManaHandling tests the mana handling functionality
+func TestManaHandling(t *testing.T) {
+	g := createTestGame()
+	e := NewEngine(g)
+
+	// Setup current player
+	g.CurrentPlayerIndex = 0
+	g.CurrentPlayer = g.Players[0]
+
+	// Verify initial mana values (from config.DefaultStartingMana)
+	if g.CurrentPlayer.Mana != 0 {
+		t.Errorf("Expected initial Mana to be 0, got %d", g.CurrentPlayer.Mana)
+	}
+	if g.CurrentPlayer.TotalMana != 0 {
+		t.Errorf("Expected initial TotalMana to be 0, got %d", g.CurrentPlayer.TotalMana)
+	}
+	if g.CurrentPlayer.MaxMana != 10 {
+		t.Errorf("Expected MaxMana to be 10, got %d", g.CurrentPlayer.MaxMana)
+	}
+
+	// Test mana increase in first turn
+	err := e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify mana increased after first turn
+	if g.CurrentPlayer.TotalMana != 1 {
+		t.Errorf("Expected TotalMana to be 1 after first turn, got %d", g.CurrentPlayer.TotalMana)
+	}
+	if g.CurrentPlayer.Mana != 1 {
+		t.Errorf("Expected Mana to be 1 after first turn, got %d", g.CurrentPlayer.Mana)
+	}
+
+	// Simulate spending mana
+	g.CurrentPlayer.Mana = 0
+
+	// Test mana restoration in second turn
+	err = e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify TotalMana increased and Mana restored
+	if g.CurrentPlayer.TotalMana != 2 {
+		t.Errorf("Expected TotalMana to be 2 after second turn, got %d", g.CurrentPlayer.TotalMana)
+	}
+	if g.CurrentPlayer.Mana != 2 {
+		t.Errorf("Expected Mana to be restored to 2, got %d", g.CurrentPlayer.Mana)
+	}
+
+	// Test mana increase up to max
+	// Set TotalMana to 9 (one below max)
+	g.CurrentPlayer.TotalMana = 9
+	g.CurrentPlayer.Mana = 5 // Simulate some spent mana
+
+	err = e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify TotalMana increased to max and Mana restored
+	if g.CurrentPlayer.TotalMana != 10 {
+		t.Errorf("Expected TotalMana to reach 10, got %d", g.CurrentPlayer.TotalMana)
+	}
+	if g.CurrentPlayer.Mana != 10 {
+		t.Errorf("Expected Mana to be restored to 10, got %d", g.CurrentPlayer.Mana)
+	}
+
+	// Test mana doesn't exceed max
+	err = e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify TotalMana doesn't exceed max
+	if g.CurrentPlayer.TotalMana != 10 {
+		t.Errorf("Expected TotalMana to remain at 10, got %d", g.CurrentPlayer.TotalMana)
+	}
+	if g.CurrentPlayer.Mana != 10 {
+		t.Errorf("Expected Mana to remain at 10, got %d", g.CurrentPlayer.Mana)
+	}
+}
+
+// TestManaHandlingAcrossPlayerTurns tests the mana system works correctly across player turns
+func TestManaHandlingAcrossPlayerTurns(t *testing.T) {
+	g := createTestGame()
+	e := NewEngine(g)
+
+	// Setup game state
+	g.CurrentPlayerIndex = 0
+	g.CurrentPlayer = g.Players[0]
+	g.CurrentTurn = 1
+
+	// First player's turn - increase mana to 1
+	err := e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify first player's mana
+	if g.Players[0].TotalMana != 1 {
+		t.Errorf("Expected player 1 TotalMana to be 1, got %d", g.Players[0].TotalMana)
+	}
+	if g.Players[0].Mana != 1 {
+		t.Errorf("Expected player 1 Mana to be 1, got %d", g.Players[0].Mana)
+	}
+
+	// Verify second player's mana is still at default
+	if g.Players[1].TotalMana != 0 {
+		t.Errorf("Expected player 2 TotalMana to be 0, got %d", g.Players[1].TotalMana)
+	}
+	if g.Players[1].Mana != 0 {
+		t.Errorf("Expected player 2 Mana to be 0, got %d", g.Players[1].Mana)
+	}
+
+	// Switch to second player
+	err = e.mainNext()
+	if err != nil {
+		t.Fatalf("mainNext returned an error: %v", err)
+	}
+
+	// Verify player switched
+	if g.CurrentPlayer != g.Players[1] {
+		t.Errorf("Expected current player to be player 2")
+	}
+
+	// Second player's turn - increase mana to 1
+	err = e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify second player's mana
+	if g.Players[1].TotalMana != 1 {
+		t.Errorf("Expected player 2 TotalMana to be 1, got %d", g.Players[1].TotalMana)
+	}
+	if g.Players[1].Mana != 1 {
+		t.Errorf("Expected player 2 Mana to be 1, got %d", g.Players[1].Mana)
+	}
+
+	// First player should still have their previous values
+	if g.Players[0].TotalMana != 1 {
+		t.Errorf("Expected player 1 TotalMana to remain 1, got %d", g.Players[0].TotalMana)
+	}
+
+	// Simulate player 1 spending mana
+	g.Players[0].Mana = 0
+
+	// Switch back to first player
+	err = e.mainNext()
+	if err != nil {
+		t.Fatalf("mainNext returned an error: %v", err)
+	}
+
+	// Verify player switched back
+	if g.CurrentPlayer != g.Players[0] {
+		t.Errorf("Expected current player to be player 1")
+	}
+
+	// First player's second turn - increase mana to 2 and restore spent mana
+	err = e.mainResource()
+	if err != nil {
+		t.Fatalf("mainResource returned an error: %v", err)
+	}
+
+	// Verify first player's mana increased and restored
+	if g.Players[0].TotalMana != 2 {
+		t.Errorf("Expected player 1 TotalMana to be 2, got %d", g.Players[0].TotalMana)
+	}
+	if g.Players[0].Mana != 2 {
+		t.Errorf("Expected player 1 Mana to be restored to 2, got %d", g.Players[0].Mana)
+	}
+
+	// Second player's mana should be unchanged
+	if g.Players[1].TotalMana != 1 {
+		t.Errorf("Expected player 2 TotalMana to remain 1, got %d", g.Players[1].TotalMana)
+	}
+}
