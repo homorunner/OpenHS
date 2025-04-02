@@ -1,6 +1,7 @@
 package types
 
 // Card represents a card in the game
+// An empty card is a 0/0 minion with no cost and no effects
 type Card struct {
 	Name    string
 	Cost    int

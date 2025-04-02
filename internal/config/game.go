@@ -8,8 +8,6 @@ import (
 const (
 	DefaultMaxMana          = 10
 	DefaultStartingMana     = 0
-	DefaultFirstPlayerHand  = 3
-	DefaultSecondPlayerHand = 4
 )
 
 // GameConfig represents the configuration for a game

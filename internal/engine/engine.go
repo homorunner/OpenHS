@@ -9,9 +9,9 @@ import (
 
 // Engine handles the game rules and mechanics
 type Engine struct {
-	game       *game.Game
-	nextPhase  game.GamePhase
-	autoRun    bool
+	game      *game.Game
+	nextPhase game.GamePhase
+	autoRun   bool
 }
 
 // NewEngine creates a new game engine
@@ -31,15 +31,15 @@ func (e *Engine) SetAutoRun(autoRun bool) {
 // StartGame begins the game flow
 func (e *Engine) StartGame() error {
 	// Trigger start of game effects if needed
-	
+
 	// Set the first phase
 	e.nextPhase = game.BeginFirst
-	
+
 	// Process the first phase if autoRun is enabled
 	if e.autoRun {
 		return e.ProcessNextPhase()
 	}
-	
+
 	return nil
 }
 
@@ -51,7 +51,7 @@ func (e *Engine) ProcessNextPhase() error {
 
 	// Update current phase
 	e.game.Phase = e.nextPhase
-	
+
 	// Process phase based on type
 	var err error
 	switch e.nextPhase {
@@ -90,16 +90,16 @@ func (e *Engine) ProcessNextPhase() error {
 	default:
 		err = errors.New("unknown game phase")
 	}
-	
+
 	if err != nil {
 		return err
 	}
-	
+
 	// Process the next phase if autoRun is enabled
 	if e.autoRun && e.game.Phase != game.MainAction && e.game.Phase != game.FinalGameover {
 		return e.ProcessNextPhase()
 	}
-	
+
 	return nil
 }
 
@@ -107,14 +107,14 @@ func (e *Engine) ProcessNextPhase() error {
 func (e *Engine) ProcessUntil(phase game.GamePhase) error {
 	autoRunBackup := e.autoRun
 	e.autoRun = false
-	
+
 	for e.game.Phase != phase {
 		if err := e.ProcessNextPhase(); err != nil {
 			e.autoRun = autoRunBackup
 			return err
 		}
 	}
-	
+
 	e.autoRun = autoRunBackup
 	return nil
 }
@@ -124,7 +124,7 @@ func (e *Engine) ProcessUntil(phase game.GamePhase) error {
 func (e *Engine) beginFirst() error {
 	// Initial game setup
 	logger.Info("Phase: Begin First")
-	
+
 	// Set next phase
 	e.nextPhase = game.BeginShuffle
 	return nil
@@ -132,38 +132,63 @@ func (e *Engine) beginFirst() error {
 
 func (e *Engine) beginShuffle() error {
 	logger.Info("Phase: Begin Shuffle")
-	
+
 	// Shuffle player decks
 	// This would involve shuffling the Deck slice for each player
 	// TODO: Implement deck shuffling logic
-	
+
 	// Set next phase
 	e.nextPhase = game.BeginDraw
 	return nil
 }
 
+// drawCard is a helper function that draws a card from the player's deck to their hand
+func (e *Engine) drawCard(player *game.Player) {
+	if len(player.Deck) > 0 {
+		// Remove a card from the deck and add to hand
+		card := player.Deck[len(player.Deck)-1]
+		player.Deck = player.Deck[:len(player.Deck)-1]
+		player.Hand = append(player.Hand, card)
+	}
+}
+
 func (e *Engine) beginDraw() error {
 	logger.Info("Phase: Begin Draw")
-	
+
 	// Draw initial hands for players
-	// Each player draws their starting hand
-	// TODO: Implement draw logic
-	
-	// Set next phase (skip mulligan if configured)
-	e.nextPhase = game.BeginMulligan
-	// If skipMulligan is set, transition directly to MainBegin
-	// e.nextPhase = game.MainBegin
-	
+	// First player (index 0) draws 3 cards, second player (index 1) draws 4 cards
+	if len(e.game.Players) >= 2 {
+		// Draw 3 cards for the first player
+		for i := 0; i < 3; i++ {
+			e.drawCard(e.game.Players[0])
+		}
+
+		// Draw 4 cards for the second player
+		for i := 0; i < 4; i++ {
+			e.drawCard(e.game.Players[1])
+		}
+	}
+
+	// Set next phase based on whether to skip mulligan or not
+	// For now we'll always skip mulligan
+	// TODO: Add skipMulligan configuration to game config
+	skipMulligan := true
+	if skipMulligan {
+		e.nextPhase = game.MainBegin
+	} else {
+		e.nextPhase = game.BeginMulligan
+	}
+
 	return nil
 }
 
 func (e *Engine) beginMulligan() error {
 	logger.Info("Phase: Begin Mulligan")
-	
+
 	// Handle mulligan phase
 	// Players select cards to redraw
 	// TODO: Implement mulligan logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainBegin
 	return nil
@@ -173,13 +198,15 @@ func (e *Engine) mainBegin() error {
 	logger.Info("Phase: Main Begin")
 
 	// Main phase begins
-	
-	// Set the current turn to 1
+
+	// Set the current turn and player
 	e.game.CurrentTurn = 1
-	
+	e.game.CurrentPlayerIndex = 0
+	e.game.CurrentPlayer = e.game.Players[0]
+
 	// Give "The Coin" to second player
 	// TODO: Implement coin logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainReady
 	return nil
@@ -187,11 +214,11 @@ func (e *Engine) mainBegin() error {
 
 func (e *Engine) mainReady() error {
 	logger.Info("Phase: Main Ready")
-	
+
 	// Reset player states for new turn
 	// Refresh mana, reset attack counters, etc.
 	// TODO: Implement turn reset logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainStartTriggers
 	return nil
@@ -199,10 +226,10 @@ func (e *Engine) mainReady() error {
 
 func (e *Engine) mainStartTriggers() error {
 	logger.Info("Phase: Main Start Triggers")
-	
+
 	// Process start-of-turn triggers
 	// TODO: Implement trigger system
-	
+
 	// Set next phase
 	e.nextPhase = game.MainResource
 	return nil
@@ -210,10 +237,10 @@ func (e *Engine) mainStartTriggers() error {
 
 func (e *Engine) mainResource() error {
 	logger.Info("Phase: Main Resource")
-	
+
 	// Give mana crystal to current player
 	// TODO: Implement mana logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainDraw
 	return nil
@@ -221,10 +248,10 @@ func (e *Engine) mainResource() error {
 
 func (e *Engine) mainDraw() error {
 	logger.Info("Phase: Main Draw")
-	
+
 	// Draw a card for the current player
-	// TODO: Implement card draw logic
-	
+	e.drawCard(e.game.CurrentPlayer)
+
 	// Set next phase
 	e.nextPhase = game.MainStart
 	return nil
@@ -232,10 +259,10 @@ func (e *Engine) mainDraw() error {
 
 func (e *Engine) mainStart() error {
 	logger.Info("Phase: Main Start")
-	
+
 	// Process any destroyed entities and update auras
 	// TODO: Implement destruction and aura logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainAction
 	return nil
@@ -243,20 +270,20 @@ func (e *Engine) mainStart() error {
 
 func (e *Engine) mainAction() error {
 	logger.Info("Phase: Main Action")
-	
+
 	// Player action phase - no automatic transition
 	// The game waits for player input
-	
+
 	// This phase doesn't automatically transition
 	return nil
 }
 
 func (e *Engine) mainEnd() error {
 	logger.Info("Phase: Main End")
-	
+
 	// Process end-of-turn triggers
 	// TODO: Implement end-of-turn logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainCleanup
 	return nil
@@ -264,10 +291,10 @@ func (e *Engine) mainEnd() error {
 
 func (e *Engine) mainCleanup() error {
 	logger.Info("Phase: Main Cleanup")
-	
+
 	// Clean up one-turn effects
 	// TODO: Implement cleanup logic
-	
+
 	// Set next phase
 	e.nextPhase = game.MainNext
 	return nil
@@ -275,13 +302,14 @@ func (e *Engine) mainCleanup() error {
 
 func (e *Engine) mainNext() error {
 	logger.Info("Phase: Main Next")
-	
+
 	// Switch to next player
-	// TODO: Implement player switching logic
-	
+	e.game.CurrentPlayerIndex = (e.game.CurrentPlayerIndex + 1) % len(e.game.Players)
+	e.game.CurrentPlayer = e.game.Players[e.game.CurrentPlayerIndex]
+
 	// Increment turn counter
 	e.game.CurrentTurn++
-	
+
 	// Set next phase
 	e.nextPhase = game.MainReady
 	return nil
@@ -289,10 +317,10 @@ func (e *Engine) mainNext() error {
 
 func (e *Engine) finalWrapup() error {
 	logger.Info("Phase: Final Wrapup")
-	
+
 	// Determine game result
 	// TODO: Implement game result logic
-	
+
 	// Set next phase
 	e.nextPhase = game.FinalGameover
 	return nil
@@ -300,7 +328,7 @@ func (e *Engine) finalWrapup() error {
 
 func (e *Engine) finalGameover() error {
 	logger.Info("Phase: Final Gameover")
-	
+
 	// Game is over
 	return nil
 }
@@ -310,7 +338,7 @@ func (e *Engine) EndPlayerTurn() error {
 	if e.game.Phase != game.MainAction {
 		return errors.New("can only end turn during action phase")
 	}
-	
+
 	e.nextPhase = game.MainEnd
 	return e.ProcessNextPhase()
 }
@@ -321,10 +349,10 @@ func (e *Engine) PerformPlayerAction() error {
 	if e.game.Phase != game.MainAction {
 		return errors.New("can only perform actions during action phase")
 	}
-	
+
 	// Process the action
 	// TODO: Implement action processing
-	
+
 	return nil
 }
 
@@ -332,11 +360,11 @@ func (e *Engine) PerformPlayerAction() error {
 func (e *Engine) CheckGameOver() bool {
 	// Check if any player has lost
 	// TODO: Implement game over conditions
-	
+
 	// If game is over, transition to final wrap up
 	// e.nextPhase = game.FinalWrapup
 	// e.ProcessNextPhase()
 	// return true
-	
+
 	return false
 }
