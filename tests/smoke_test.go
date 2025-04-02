@@ -41,7 +41,7 @@ func TestGameLoadingAndInitialization(t *testing.T) {
 	if g.CurrentTurn != 0 {
 		t.Errorf("Expected initial turn to be 0, got %d", g.CurrentTurn)
 	}
-	if g.Phase != game.StartGame {
-		t.Errorf("Expected initial phase to be StartGame, got %v", g.Phase)
+	if g.Phase != game.InvalidPhase {
+		t.Errorf("Expected initial phase to be InvalidPhase, got %v", g.Phase)
 	}
 }

@@ -15,20 +15,34 @@ type Game struct {
 type GamePhase int
 
 const (
-	StartGame GamePhase = iota
-	StartTurn
-	Draw
-	Play
-	Combat
-	EndTurn
-	EndGame
+	InvalidPhase GamePhase = iota
+	BeginFirst
+	BeginShuffle
+	BeginDraw
+	BeginMulligan
+	MainBegin
+	MainReady
+	MainResource
+	MainDraw
+	MainStart
+	MainAction
+	MainCombat
+	MainEnd
+	MainNext
+	FinalWrapup
+	FinalGameover
+	MainCleanup
+	MainStartTriggers
+	MainSetActionStepType
+	MainPreAction
+	MainPostAction
 )
 
 func NewGame() *Game {
 	return &Game{
 		Players:     make([]*Player, 0),
 		CurrentTurn: 0,
-		Phase:       StartGame,
+		Phase:       BeginFirst,
 	}
 }
 
