@@ -142,16 +142,6 @@ func (e *Engine) beginShuffle() error {
 	return nil
 }
 
-// drawCard is a helper function that draws a card from the player's deck to their hand
-func (e *Engine) drawCard(player *game.Player) {
-	if len(player.Deck) > 0 {
-		// Remove a card from the deck and add to hand
-		card := player.Deck[len(player.Deck)-1]
-		player.Deck = player.Deck[:len(player.Deck)-1]
-		player.Hand = append(player.Hand, card)
-	}
-}
-
 func (e *Engine) beginDraw() error {
 	logger.Info("Phase: Begin Draw")
 
@@ -160,12 +150,12 @@ func (e *Engine) beginDraw() error {
 	if len(e.game.Players) >= 2 {
 		// Draw 3 cards for the first player
 		for i := 0; i < 3; i++ {
-			e.drawCard(e.game.Players[0])
+			e.DrawCard(e.game.Players[0])
 		}
 
 		// Draw 4 cards for the second player
 		for i := 0; i < 4; i++ {
-			e.drawCard(e.game.Players[1])
+			e.DrawCard(e.game.Players[1])
 		}
 	}
 
@@ -250,7 +240,7 @@ func (e *Engine) mainDraw() error {
 	logger.Info("Phase: Main Draw")
 
 	// Draw a card for the current player
-	e.drawCard(e.game.CurrentPlayer)
+	e.DrawCard(e.game.CurrentPlayer)
 
 	// Set next phase
 	e.nextPhase = game.MainStart

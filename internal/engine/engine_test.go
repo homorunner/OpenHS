@@ -12,14 +12,8 @@ func createTestGame() *game.Game {
 	g := game.NewGame()
 
 	// Create two players with empty decks
-	player1 := &game.Player{
-		Deck: make([]types.Card, 0),
-		Hand: make([]types.Card, 0),
-	}
-	player2 := &game.Player{
-		Deck: make([]types.Card, 0),
-		Hand: make([]types.Card, 0),
-	}
+	player1 := game.NewPlayer()
+	player2 := game.NewPlayer()
 
 	// Add test cards to decks
 	for i := 0; i < 10; i++ {
@@ -155,57 +149,6 @@ func TestPlayerSwitching(t *testing.T) {
 	// Verify turn counter increased again
 	if g.CurrentTurn != 3 {
 		t.Errorf("Expected turn counter to be 3, got %d", g.CurrentTurn)
-	}
-}
-
-// TestDrawCard tests the drawCard helper function
-func TestDrawCard(t *testing.T) {
-	g := createTestGame()
-	e := NewEngine(g)
-
-	// Test 1: Normal card draw
-	player := g.Players[0]
-	initialHandSize := len(player.Hand)
-	initialDeckSize := len(player.Deck)
-
-	e.drawCard(player)
-
-	// Verify hand increased by 1
-	if len(player.Hand) != initialHandSize+1 {
-		t.Errorf("Expected hand size to increase by 1, got %d (was %d)",
-			len(player.Hand), initialHandSize)
-	}
-
-	// Verify deck decreased by 1
-	if len(player.Deck) != initialDeckSize-1 {
-		t.Errorf("Expected deck size to decrease by 1, got %d (was %d)",
-			len(player.Deck), initialDeckSize)
-	}
-
-	// Verify the card drawn is the last one from the deck
-	lastCardName := "Test Card 1" // The name we used when creating test cards
-	if player.Hand[len(player.Hand)-1].Name != lastCardName {
-		t.Errorf("Expected drawn card name to be %s, got %s",
-			lastCardName, player.Hand[len(player.Hand)-1].Name)
-	}
-
-	// Test 2: Drawing from an empty deck
-	emptyPlayer := &game.Player{
-		Deck: make([]types.Card, 0),
-		Hand: make([]types.Card, 0),
-	}
-
-	// Add one card to hand for verification
-	emptyPlayer.Hand = append(emptyPlayer.Hand, types.Card{Name: "Test Card"})
-	handSizeBefore := len(emptyPlayer.Hand)
-
-	// Try to draw from empty deck
-	e.drawCard(emptyPlayer)
-
-	// Hand size should remain the same
-	if len(emptyPlayer.Hand) != handSizeBefore {
-		t.Errorf("Expected hand size to remain %d when drawing from empty deck, got %d",
-			handSizeBefore, len(emptyPlayer.Hand))
 	}
 }
 

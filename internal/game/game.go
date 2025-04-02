@@ -106,7 +106,7 @@ func LoadGame(config *config.GameConfig) (*Game, error) {
 
 	// Create players based on configuration
 	for _, playerConfig := range config.Players {
-		player := NewPlayer(playerConfig)
+		player := NewPlayer()
 
 		// Load hero card
 		cardManager := card.GetCardManager()
