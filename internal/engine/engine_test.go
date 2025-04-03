@@ -7,19 +7,26 @@ import (
 	"github.com/openhs/internal/types"
 )
 
+func createTestPlayer() *game.Player {
+	player := game.NewPlayer()
+
+	deck := []types.Card{}
+	for i := 0; i < 10; i++ {
+		deck = append(deck, types.Card{Name: "Test Card"})
+	}
+	player.Deck = deck
+
+	player.Hero = types.Card{Name: "Jaina", Health: 30, MaxHealth: 30, Type: types.Hero}
+
+	return player
+}
+
 // createTestGame creates a simple game with two players for testing
 func createTestGame() *game.Game {
 	g := game.NewGame()
 
-	// Create two players with empty decks
-	player1 := game.NewPlayer()
-	player2 := game.NewPlayer()
-
-	// Add test cards to decks
-	for i := 0; i < 10; i++ {
-		player1.Deck = append(player1.Deck, types.Card{Name: "Test Card 1"})
-		player2.Deck = append(player2.Deck, types.Card{Name: "Test Card 2"})
-	}
+	player1 := createTestPlayer()
+	player2 := createTestPlayer()
 
 	g.Players = append(g.Players, player1, player2)
 	return g
@@ -283,14 +290,17 @@ func TestEndPlayerTurn(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
 
-	// Set up initial state
-	g.Phase = game.MainAction
-	g.CurrentPlayerIndex = 0
-	g.CurrentPlayer = g.Players[0]
-	g.CurrentTurn = 1
+	// Process until first turn
+	err := e.StartGame()
+	if err != nil {
+		t.Fatalf("Failed to start game: %v", err)
+	}
+	if g.Phase != game.MainAction {
+		t.Errorf("Expected phase to be MainAction after StartGame, but got %v", g.Phase)
+	}
 
 	// End turn
-	err := e.EndPlayerTurn()
+	err = e.EndPlayerTurn()
 	if err != nil {
 		t.Fatalf("EndPlayerTurn returned an error: %v", err)
 	}

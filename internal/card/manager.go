@@ -108,11 +108,12 @@ func (cm *CardManager) LoadCardDatabase(cardConfigDir string) error {
 
 		// Convert config to types.Card
 		card := types.Card{
-			Name:   cardConfig.Name,
-			Cost:   cardConfig.Cost,
-			Attack: cardConfig.Attack,
-			Health: cardConfig.Health,
-			Type:   cardConfig.Type,
+			Name:      cardConfig.Name,
+			Cost:      cardConfig.Cost,
+			Attack:    cardConfig.Attack,
+			Health:    cardConfig.Health,
+			MaxHealth: cardConfig.Health, // Set MaxHealth equal to Health
+			Type:      cardConfig.Type,
 		}
 
 		// Register the card template
@@ -124,4 +125,4 @@ func (cm *CardManager) LoadCardDatabase(cardConfigDir string) error {
 
 	logger.Info("Card database loaded successfully")
 	return nil
-}
+} 

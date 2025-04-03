@@ -7,6 +7,7 @@ type Card struct {
 	Cost      int
 	Attack    int
 	Health    int
+	MaxHealth int
 	Type      CardType
 	Effects   []Effect
 }
@@ -38,6 +39,16 @@ func (c CardType) String() string {
 	default:
 		return "Unknown"
 	}
+}
+
+func (c Card) WithName(name string) Card {
+	c.Name = name
+	return c
+}
+
+func (c Card) WithCost(cost int) Card {
+	c.Cost = cost
+	return c
 }
 
 // Effect represents a card effect or ability

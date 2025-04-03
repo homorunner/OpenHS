@@ -32,7 +32,7 @@ func TestDrawCard(t *testing.T) {
 	}
 
 	// Verify the card drawn is the last one from the deck
-	lastCardName := "Test Card 1" // The name we used when creating test cards
+	lastCardName := "Test Card" // The name we used when creating test cards
 	if player.Hand[len(player.Hand)-1].Name != lastCardName {
 		t.Fatalf("Expected drawn card name to be %s, got %s",
 			lastCardName, player.Hand[len(player.Hand)-1].Name)
@@ -51,7 +51,7 @@ func TestDrawCard(t *testing.T) {
 	emptyPlayer := &game.Player{
 		Deck:      make([]types.Card, 0),
 		Hand:      make([]types.Card, 0),
-		Hero:      types.Card{Name: "Test Hero", Health: 30, Type: types.Hero},
+		Hero:      types.Card{Name: "Test Hero", Health: 30, MaxHealth: 30, Type: types.Hero},
 		HandSize:  10,
 		MaxMana:   10,
 		Mana:      0,
