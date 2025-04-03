@@ -11,3 +11,6 @@ logs/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Third party dependencies
+third_party/
