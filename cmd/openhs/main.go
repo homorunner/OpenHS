@@ -52,6 +52,7 @@ func main() {
 
 		fmt.Println("\nCommands:")
 		fmt.Println("  p <card_number> [<position>] - Play a card from your hand")
+		fmt.Println("  a <attacker_number> <defender_number> - Attack with your minion")
 		fmt.Println("  e - End your turn")
 		fmt.Println("  q - Quit the game")
 		fmt.Print("\nEnter command: ")
@@ -70,6 +71,8 @@ func main() {
 		switch parts[0] {
 		case "p":
 			handlePlayCard(e, g, parts)
+		case "a":
+			handleAttack(e, g, parts)
 		case "e":
 			e.EndPlayerTurn()
 		case "q":
@@ -196,4 +199,57 @@ func handlePlayCard(e *engine.Engine, g *game.Game, parts []string) {
 	}
 
 	fmt.Printf("Played %s successfully!\n", card.Card.Name)
+}
+
+func handleAttack(e *engine.Engine, g *game.Game, parts []string) {
+	if len(parts) < 3 {
+		fmt.Println("Error: Please specify attacker and defender numbers")
+		return
+	}
+
+	// Parse attacker index
+	attackerNum, err := strconv.Atoi(parts[1])
+	if err != nil {
+		fmt.Println("Error: Invalid attacker number")
+		return
+	}
+
+	// Parse defender index
+	defenderNum, err := strconv.Atoi(parts[2])
+	if err != nil {
+		fmt.Println("Error: Invalid defender number")
+		return
+	}
+
+	// Adjust for 0-indexed fields
+	attackerIndex := attackerNum - 1
+	defenderIndex := defenderNum - 1
+
+	// Validate attacker index
+	if attackerIndex < 0 || attackerIndex >= len(g.CurrentPlayer.Field) {
+		fmt.Println("Error: Attacker number out of range")
+		return
+	}
+
+	// Get the opponent
+	opponent := g.Players[1-g.CurrentPlayerIndex]
+
+	// Validate defender index
+	if defenderIndex < 0 || defenderIndex >= len(opponent.Field) {
+		fmt.Println("Error: Defender number out of range")
+		return
+	}
+
+	// Get the entities for attack
+	attacker := g.CurrentPlayer.Field[attackerIndex]
+	defender := opponent.Field[defenderIndex]
+
+	// Perform the attack
+	err = e.Attack(attacker, defender, false)
+	if err != nil {
+		fmt.Printf("Error performing attack: %v\n", err)
+		return
+	}
+
+	fmt.Printf("%s attacked %s successfully!\n", attacker.Card.Name, defender.Card.Name)
 }
