@@ -7,9 +7,9 @@ import (
 	"github.com/openhs/internal/logger"
 )
 
-// Attack handles combat between an attacker and defender card
+// Attack handles combat between an attacker and defender entity
 // It processes the damage exchange and any special effects
-func (e *Engine) Attack(attacker *game.Card, defender *game.Card, skipValidation bool) error {
+func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValidation bool) error {
 	// Validate the attack
 	if !skipValidation {
 		if err := e.validateAttack(attacker, defender); err != nil {
@@ -21,8 +21,8 @@ func (e *Engine) Attack(attacker *game.Card, defender *game.Card, skipValidation
 	e.game.Phase = game.MainCombat
 
 	logger.Info("Attack initiated", 
-		logger.String("attacker", attacker.Name), 
-		logger.String("defender", defender.Name))
+		logger.String("attacker", attacker.Card.Name), 
+		logger.String("defender", defender.Card.Name))
 
 	// Process pre-attack triggers or effects if needed
 
@@ -32,8 +32,8 @@ func (e *Engine) Attack(attacker *game.Card, defender *game.Card, skipValidation
 
 	// Deal damage simultaneously
 	if attackerDamage > 0 {
-		if attacker.Type == game.Hero {
-			// TODO: decrease weapon durability.
+		if attacker.Card.Type == game.Hero {
+			// Weapon handling will be implemented with weapon entity
 		}
 		e.TakeDamage(defender, attackerDamage)
 	}
@@ -57,8 +57,8 @@ func (e *Engine) Attack(attacker *game.Card, defender *game.Card, skipValidation
 }
 
 // validateAttack checks if the attack is legal
-func (e *Engine) validateAttack(attacker *game.Card, defender *game.Card) error {
-	// Check for nil cards
+func (e *Engine) validateAttack(attacker *game.Entity, defender *game.Entity) error {
+	// Check for nil entities
 	if attacker == nil || defender == nil {
 		return errors.New("invalid attacker or defender")
 	}
@@ -76,17 +76,17 @@ func (e *Engine) validateAttack(attacker *game.Card, defender *game.Card) error 
 	return nil
 }
 
-// checkForDeaths checks if any cards have died after the attack
-func (e *Engine) checkForDeaths(attacker *game.Card, defender *game.Card) {
-	// Check if cards have died (health <= 0)
+// checkForDeaths checks if any entities have died after the attack
+func (e *Engine) checkForDeaths(attacker *game.Entity, defender *game.Entity) {
+	// Check if entities have died (health <= 0)
 	if attacker.Health <= 0 {
-		logger.Info("Card has died", logger.String("card", attacker.Name))
+		logger.Info("Entity has died", logger.String("card", attacker.Card.Name))
 		// Process death effects
 		// TODO: Implement death handling
 	}
 
 	if defender.Health <= 0 {
-		logger.Info("Card has died", logger.String("card", defender.Name))
+		logger.Info("Entity has died", logger.String("card", defender.Card.Name))
 		// Process death effects
 		// TODO: Implement death handling
 	}

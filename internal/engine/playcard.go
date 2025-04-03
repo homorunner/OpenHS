@@ -14,59 +14,59 @@ import (
 // - target: Optional target for the card (can be nil)
 // - fieldPos: Position on the field for minions (-1 for auto-positioning)
 // - chooseOne: Index for choose one effects (0 for default choice)
-func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Card, fieldPos int, chooseOne int) error {
+func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entity, fieldPos int, chooseOne int) error {
 	// Validate hand index
 	if handIndex < 0 || handIndex >= len(player.Hand) {
 		return errors.New("invalid hand index")
 	}
 
-	// Get the card to play
-	card := player.Hand[handIndex]
+	// Get the entity to play
+	entity := player.Hand[handIndex]
 
 	// Check if we can play this card
-	if err := e.testPlayCard(player, &card, target, chooseOne); err != nil {
+	if err := e.testPlayCard(player, entity, target, chooseOne); err != nil {
 		return err
 	}
 
 	// Check field space for minions
-	if card.Type == game.Minion && len(player.Field) >= player.HandSize {
+	if entity.Card.Type == game.Minion && len(player.Field) >= player.FieldSize {
 		return errors.New("battlefield is full")
 	}
 
 	// Spend mana to play the card
-	if card.Cost > 0 {
+	if entity.Card.Cost > 0 {
 		// TODO: Handle temporary mana and special cost modifiers
-		if player.Mana < card.Cost {
+		if player.Mana < entity.Card.Cost {
 			return errors.New("not enough mana")
 		}
-		player.Mana -= card.Cost
+		player.Mana -= entity.Card.Cost
 	}
 
 	// Record play history and update game state
 	// TODO: Add NumCardsPlayedThisTurn to Player struct
 	
-	// Remove card from hand
+	// Remove entity from hand
 	player.Hand = append(player.Hand[:handIndex], player.Hand[handIndex+1:]...)
 
 	// Process based on card type
-	switch card.Type {
+	switch entity.Card.Type {
 	case game.Minion:
-		return e.playMinion(player, &card, target, fieldPos, chooseOne)
+		return e.playMinion(player, entity, target, fieldPos, chooseOne)
 	case game.Spell:
-		return e.playSpell(player, &card, target, chooseOne)
+		return e.playSpell(player, entity, target, chooseOne)
 	case game.Weapon:
-		return e.playWeapon(player, &card, target)
+		return e.playWeapon(player, entity, target)
 	case game.Hero:
-		return e.playHero(player, &card, target, chooseOne)
+		return e.playHero(player, entity, target, chooseOne)
 	default:
 		return errors.New("invalid card type")
 	}
 }
 
 // canPlayCard checks if a card can be played
-func (e *Engine) testPlayCard(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
+func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
 	// Basic checks
-	if card.Cost > player.Mana {
+	if entity.Card.Cost > player.Mana {
 		return errors.New("not enough mana")
 	}
 
@@ -76,21 +76,17 @@ func (e *Engine) testPlayCard(player *game.Player, card *game.Card, target *game
 }
 
 // playMinion handles playing a minion card
-func (e *Engine) playMinion(player *game.Player, card *game.Card, target *game.Card, fieldPos int, chooseOne int) error {
-	// Create a new minion entity (using Card for now since Minion type doesn't exist yet)
-	// TODO: Create a proper Minion type
-	minion := *card
-	
+func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *game.Entity, fieldPos int, chooseOne int) error {
 	// Add minion to the field at the specified position
 	if fieldPos < 0 || fieldPos > len(player.Field) {
 		// Auto-position at the end
-		player.Field = append(player.Field, minion)
+		player.Field = append(player.Field, entity)
 	} else {
 		// Insert at specified position
-		player.Field = append(player.Field[:fieldPos], append([]game.Card{minion}, player.Field[fieldPos:]...)...)
+		player.Field = append(player.Field[:fieldPos], append([]*game.Entity{entity}, player.Field[fieldPos:]...)...)
 	}
 
-	logger.Info("Minion played", logger.String("name", card.Name))
+	logger.Info("Minion played", logger.String("name", entity.Card.Name))
 
 	// TODO: Process battlecry, triggers, etc.
 	
@@ -98,44 +94,45 @@ func (e *Engine) playMinion(player *game.Player, card *game.Card, target *game.C
 }
 
 // playSpell handles playing a spell card
-func (e *Engine) playSpell(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
+func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
 	// TODO: Add spell counters to Player struct
 	
-	logger.Info("Spell played", logger.String("name", card.Name))
+	logger.Info("Spell played", logger.String("name", entity.Card.Name))
 
 	// TODO: Process spell effects
 	
 	// Move to graveyard after use
-	player.Graveyard = append(player.Graveyard, *card)
+	player.Graveyard = append(player.Graveyard, entity)
 	
 	return nil
 }
 
 // playWeapon handles playing a weapon card
-func (e *Engine) playWeapon(player *game.Player, card *game.Card, target *game.Card) error {
-	// TODO: Create a proper Weapon type
-	weapon := *card
-
-	// TODO: Implement weapon handling
-	// For now, just replace the weapon
-	if player.HasWeapon {
+func (e *Engine) playWeapon(player *game.Player, entity *game.Entity, target *game.Entity) error {
+	// If player already has a weapon, move it to graveyard
+	if player.Weapon != nil {
 		player.Graveyard = append(player.Graveyard, player.Weapon)
 	}
-	player.Weapon = weapon
-	player.HasWeapon = true
 
-	logger.Info("Weapon equipped", logger.String("name", card.Name))
+	// Equip the new weapon
+	player.Weapon = entity
+
+	logger.Info("Weapon equipped", logger.String("name", entity.Card.Name))
 	
 	return nil
 }
 
 // playHero handles playing a hero card
-func (e *Engine) playHero(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
-	// TODO: Implement hero card handling
-	// For now, just replace the hero
-	player.Hero = *card
+func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
+	// Store the old hero in graveyard
+	if player.Hero != nil {
+		player.Graveyard = append(player.Graveyard, player.Hero)
+	}
+	
+	// Set the new hero
+	player.Hero = entity
 
-	logger.Info("Hero replaced", logger.String("name", card.Name))
+	logger.Info("Hero replaced", logger.String("name", entity.Card.Name))
 	
 	return nil
 }

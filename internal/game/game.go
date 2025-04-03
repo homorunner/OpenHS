@@ -110,21 +110,27 @@ func LoadGame(config *GameConfig) (*Game, error) {
 
 		// Load hero card
 		cardManager := GetCardManager()
-		heroCard, err := cardManager.CreateCard(playerConfig.Hero)
+		heroCardTemplate, err := cardManager.CreateCard(playerConfig.Hero)
 		if err != nil {
 			logger.Error("Failed to load hero card: " + err.Error())
 			return nil, err
 		}
-		player.Hero = *heroCard
+		
+		// Create hero entity
+		heroEntity := NewEntity(heroCardTemplate, player)
+		player.Hero = heroEntity
 
 		// Load deck cards
 		for _, cardName := range playerConfig.Deck {
-			cardInstance, err := cardManager.CreateCard(cardName)
+			cardTemplate, err := cardManager.CreateCard(cardName)
 			if err != nil {
 				logger.Error("Failed to load card: " + err.Error())
 				return nil, err
 			}
-			player.Deck = append(player.Deck, *cardInstance)
+			
+			// Create card entity for deck
+			cardEntity := NewEntity(cardTemplate, player)
+			player.Deck = append(player.Deck, cardEntity)
 		}
 
 		g.Players = append(g.Players, player)

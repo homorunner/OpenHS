@@ -16,7 +16,7 @@ func TestDrawCard(t *testing.T) {
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
 
-	drawnCard := e.DrawCard(player)
+	drawnEntity := e.DrawCard(player)
 
 	// Verify hand increased by 1
 	if len(player.Hand) != initialHandSize+1 {
@@ -32,30 +32,27 @@ func TestDrawCard(t *testing.T) {
 
 	// Verify the card drawn is the last one from the deck
 	lastCardName := "Test Card" // The name we used when creating test cards
-	if player.Hand[len(player.Hand)-1].Name != lastCardName {
+	if player.Hand[len(player.Hand)-1].Card.Name != lastCardName {
 		t.Fatalf("Expected drawn card name to be %s, got %s",
-			lastCardName, player.Hand[len(player.Hand)-1].Name)
+			lastCardName, player.Hand[len(player.Hand)-1].Card.Name)
 	}
 
 	// Verify drawn card reference is returned
-	if drawnCard == nil {
-		t.Fatal("Expected drawn card to be returned, got nil")
+	if drawnEntity == nil {
+		t.Fatal("Expected drawn entity to be returned, got nil")
 	}
-	if drawnCard.Name != lastCardName {
+	if drawnEntity.Card.Name != lastCardName {
 		t.Fatalf("Expected drawn card name to be %s, got %s",
-			lastCardName, drawnCard.Name)
+			lastCardName, drawnEntity.Card.Name)
 	}
 
 	// Test 2: Drawing from an empty deck should trigger fatigue damage
-	emptyPlayer := &game.Player{
-		Deck:      make([]game.Card, 0),
-		Hand:      make([]game.Card, 0),
-		Hero:      game.Card{Name: "Test Hero", Health: 30, MaxHealth: 30, Type: game.Hero},
-		HandSize:  10,
-		MaxMana:   10,
-		Mana:      0,
-		TotalMana: 0,
-	}
+	// Create a test hero card and entity
+	heroCard := &game.Card{Name: "Test Hero", Health: 30, MaxHealth: 30, Type: game.Hero}
+	
+	emptyPlayer := game.NewPlayer()
+	heroEntity := game.NewEntity(heroCard, emptyPlayer)
+	emptyPlayer.Hero = heroEntity
 
 	// Try to draw from empty deck
 	drawn := e.DrawCard(emptyPlayer)
@@ -96,15 +93,20 @@ func TestDrawSpecificCard(t *testing.T) {
 	player := g.Players[0]
 	
 	// Add some specific cards to test
-	player.Deck = append(player.Deck, game.Card{Name: "Special Card 1"})
-	player.Deck = append(player.Deck, game.Card{Name: "Special Card 2"})
+	specialCard1 := &game.Card{Name: "Special Card 1"}
+	specialEntity1 := game.NewEntity(specialCard1, player)
+	player.Deck = append(player.Deck, specialEntity1)
+	
+	specialCard2 := &game.Card{Name: "Special Card 2"}
+	specialEntity2 := game.NewEntity(specialCard2, player)
+	player.Deck = append(player.Deck, specialEntity2)
 	
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
 	
 	// Test 1: Draw a specific card
 	cardToDraw := "Special Card 1"
-	drawnCard := e.DrawSpecificCard(player, cardToDraw)
+	drawnEntity := e.DrawSpecificCard(player, cardToDraw)
 	
 	// Verify hand increased by 1
 	if len(player.Hand) != initialHandSize+1 {
@@ -119,18 +121,18 @@ func TestDrawSpecificCard(t *testing.T) {
 	}
 	
 	// Verify the specific card was drawn
-	if player.Hand[len(player.Hand)-1].Name != cardToDraw {
+	if player.Hand[len(player.Hand)-1].Card.Name != cardToDraw {
 		t.Fatalf("Expected drawn card name to be %s, got %s",
-			cardToDraw, player.Hand[len(player.Hand)-1].Name)
+			cardToDraw, player.Hand[len(player.Hand)-1].Card.Name)
 	}
 	
 	// Verify correct card reference is returned
-	if drawnCard == nil {
-		t.Fatalf("Expected drawn card to be returned, got nil")
+	if drawnEntity == nil {
+		t.Fatalf("Expected drawn entity to be returned, got nil")
 	}
-	if drawnCard.Name != cardToDraw {
+	if drawnEntity.Card.Name != cardToDraw {
 		t.Fatalf("Expected returned card name to be %s, got %s",
-			cardToDraw, drawnCard.Name)
+			cardToDraw, drawnEntity.Card.Name)
 	}
 	
 	// Test 2: Drawing a card that doesn't exist
@@ -154,18 +156,22 @@ func TestAddCardToHand(t *testing.T) {
 	e := NewEngine(g)
 	
 	// Create a player with a nearly full hand
-	player := &game.Player{
-		Hand:     make([]game.Card, 0),
-		HandSize: 3, // Small hand size for testing
-	}
+	player := game.NewPlayer()
+	player.HandSize = 3 // Small hand size for testing
 	
 	// Add cards until one away from full
-	player.Hand = append(player.Hand, game.Card{Name: "Hand Card 1"})
-	player.Hand = append(player.Hand, game.Card{Name: "Hand Card 2"})
+	card1 := &game.Card{Name: "Hand Card 1"}
+	entity1 := game.NewEntity(card1, player)
+	player.Hand = append(player.Hand, entity1)
+	
+	card2 := &game.Card{Name: "Hand Card 2"}
+	entity2 := game.NewEntity(card2, player)
+	player.Hand = append(player.Hand, entity2)
 	
 	// Test 1: Add card to hand with space available
-	card := &game.Card{Name: "New Card"}
-	success := e.AddCardToHand(player, card)
+	newCard := &game.Card{Name: "New Card"}
+	newEntity := game.NewEntity(newCard, player)
+	success := e.AddCardToHand(player, newEntity)
 	
 	// Verify card was added successfully
 	if !success {
@@ -176,13 +182,14 @@ func TestAddCardToHand(t *testing.T) {
 		t.Fatalf("Expected hand size to be 3, got %d", len(player.Hand))
 	}
 	
-	if player.Hand[2].Name != "New Card" {
-		t.Fatalf("Expected last card in hand to be 'New Card', got %s", player.Hand[2].Name)
+	if player.Hand[2].Card.Name != "New Card" {
+		t.Fatalf("Expected last card in hand to be 'New Card', got %s", player.Hand[2].Card.Name)
 	}
 	
 	// Test 2: Add card to full hand
 	overflowCard := &game.Card{Name: "Overflow Card"}
-	success = e.AddCardToHand(player, overflowCard)
+	overflowEntity := game.NewEntity(overflowCard, player)
+	success = e.AddCardToHand(player, overflowEntity)
 	
 	// Verify card was not added
 	if success {

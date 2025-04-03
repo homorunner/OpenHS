@@ -9,13 +9,34 @@ import (
 func createTestPlayer() *game.Player {
 	player := game.NewPlayer()
 
-	deck := []game.Card{}
-	for i := 0; i < 10; i++ {
-		deck = append(deck, game.Card{Name: "Test Card"})
+	// Create a test hero card definition
+	heroCard := &game.Card{
+		Name:      "Jaina",
+		Health:    30,
+		MaxHealth: 30,
+		Type:      game.Hero,
 	}
-	player.Deck = deck
 
-	player.Hero = game.Card{Name: "Jaina", Health: 30, MaxHealth: 30, Type: game.Hero}
+	// Create hero entity
+	hero := game.NewEntity(heroCard, player)
+	player.Hero = hero
+
+	// Create test deck
+	for i := 0; i < 10; i++ {
+		// Create card definition
+		card := &game.Card{
+			Name: "Test Card",
+			Cost: 1,
+			Type: game.Minion,
+			Attack: 1,
+			Health: 1,
+			MaxHealth: 1,
+		}
+		
+		// Create entity and add to deck
+		entity := game.NewEntity(card, player)
+		player.Deck = append(player.Deck, entity)
+	}
 
 	return player
 }

@@ -12,12 +12,30 @@ func TestAttack(t *testing.T) {
 		g := game.NewGame()
 		engine := NewEngine(g)
 
-		// Create attacker and defender cards
-		attacker := createTestMinion().WithAttack(3).WithHealth(4)
-		defender := createTestMinion().WithAttack(2).WithHealth(5)
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
+		// Create attacker and defender entities
+		attackerCard := &game.Card{
+			Name:      "Test Attacker",
+			Type:      game.Minion,
+			Attack:    3,
+			Health:    4,
+			MaxHealth: 4,
+		}
+		attackerEntity := game.NewEntity(attackerCard, player)
+		
+		defenderCard := &game.Card{
+			Name:      "Test Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    5,
+			MaxHealth: 5,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
 
 		// Perform attack
-		err := engine.Attack(&attacker, &defender, false)
+		err := engine.Attack(attackerEntity, defenderEntity, false)
 
 		// Assert
 		if err != nil {
@@ -25,12 +43,12 @@ func TestAttack(t *testing.T) {
 		}
 
 		// Check health values after attack
-		if attacker.Health != 2 {
-			t.Errorf("Expected attacker health to be 2, got %d", attacker.Health)
+		if attackerEntity.Health != 2 {
+			t.Errorf("Expected attacker health to be 2, got %d", attackerEntity.Health)
 		}
 
-		if defender.Health != 2 {
-			t.Errorf("Expected defender health to be 2, got %d", defender.Health)
+		if defenderEntity.Health != 2 {
+			t.Errorf("Expected defender health to be 2, got %d", defenderEntity.Health)
 		}
 	})
 
@@ -39,12 +57,30 @@ func TestAttack(t *testing.T) {
 		g := game.NewGame()
 		engine := NewEngine(g)
 
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
 		// Create attacker with zero attack
-		attacker := createTestMinion().WithAttack(0).WithHealth(4)
-		defender := createTestMinion().WithAttack(2).WithHealth(5)
+		attackerCard := &game.Card{
+			Name:      "Zero Attack Minion",
+			Type:      game.Minion,
+			Attack:    0,
+			Health:    4,
+			MaxHealth: 4,
+		}
+		attackerEntity := game.NewEntity(attackerCard, player)
+		
+		defenderCard := &game.Card{
+			Name:      "Test Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    5,
+			MaxHealth: 5,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
 
 		// Perform attack
-		err := engine.Attack(&attacker, &defender, false)
+		err := engine.Attack(attackerEntity, defenderEntity, false)
 
 		// Assert
 		if err == nil {
@@ -52,13 +88,26 @@ func TestAttack(t *testing.T) {
 		}
 	})
 
-	t.Run("Attack with null cards", func(t *testing.T) {
+	t.Run("Attack with null entities", func(t *testing.T) {
 		// Setup
 		g := game.NewGame()
 		engine := NewEngine(g)
 
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
+		// Create a valid entity for testing
+		validCard := &game.Card{
+			Name:      "Valid Minion",
+			Type:      game.Minion,
+			Attack:    1,
+			Health:    1,
+			MaxHealth: 1,
+		}
+		validEntity := game.NewEntity(validCard, player)
+
 		// Perform attack with nil attacker
-		err := engine.Attack(nil, &game.Card{}, false)
+		err := engine.Attack(nil, validEntity, false)
 
 		// Assert
 		if err == nil {
@@ -66,7 +115,7 @@ func TestAttack(t *testing.T) {
 		}
 
 		// Perform attack with nil defender
-		err = engine.Attack(&game.Card{Attack: 1}, nil, false)
+		err = engine.Attack(validEntity, nil, false)
 
 		// Assert
 		if err == nil {
@@ -79,12 +128,30 @@ func TestAttack(t *testing.T) {
 		g := game.NewGame()
 		engine := NewEngine(g)
 
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
 		// Create zero attack attacker that would normally fail validation
-		attacker := createTestMinion().WithAttack(0).WithHealth(4)
-		defender := createTestMinion().WithAttack(2).WithHealth(5)
+		attackerCard := &game.Card{
+			Name:      "Zero Attack Minion",
+			Type:      game.Minion,
+			Attack:    0,
+			Health:    4,
+			MaxHealth: 4,
+		}
+		attackerEntity := game.NewEntity(attackerCard, player)
+		
+		defenderCard := &game.Card{
+			Name:      "Test Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    5,
+			MaxHealth: 5,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
 
 		// Perform attack with skipValidation=true
-		err := engine.Attack(&attacker, &defender, true)
+		err := engine.Attack(attackerEntity, defenderEntity, true)
 
 		// Assert
 		if err != nil {
@@ -92,40 +159,58 @@ func TestAttack(t *testing.T) {
 		}
 
 		// Since attacker has 0 attack, defender shouldn't take damage
-		if defender.Health != 5 {
-			t.Errorf("Expected defender health to be 5, got %d", defender.Health)
+		if defenderEntity.Health != 5 {
+			t.Errorf("Expected defender health to be 5, got %d", defenderEntity.Health)
 		}
 
 		// Attacker should still take damage
-		if attacker.Health != 2 {
-			t.Errorf("Expected attacker health to be 2, got %d", attacker.Health)
+		if attackerEntity.Health != 2 {
+			t.Errorf("Expected attacker health to be 2, got %d", attackerEntity.Health)
 		}
 	})
 
-	t.Run("Attack that kills both cards", func(t *testing.T) {
+	t.Run("Attack that kills both entities", func(t *testing.T) {
 		// Setup
 		g := game.NewGame()
 		engine := NewEngine(g)
 
-		// Create cards with just enough health to be killed
-		attacker := createTestMinion().WithAttack(5).WithHealth(2)
-		defender := createTestMinion().WithAttack(2).WithHealth(2)
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
+		// Create entities with just enough health to be killed
+		attackerCard := &game.Card{
+			Name:      "Lethal Attacker",
+			Type:      game.Minion,
+			Attack:    5,
+			Health:    2,
+			MaxHealth: 2,
+		}
+		attackerEntity := game.NewEntity(attackerCard, player)
+		
+		defenderCard := &game.Card{
+			Name:      "Fragile Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    2,
+			MaxHealth: 2,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
 
 		// Perform attack
-		err := engine.Attack(&attacker, &defender, false)
+		err := engine.Attack(attackerEntity, defenderEntity, false)
 
 		// Assert
 		if err != nil {
 			t.Errorf("Expected no error, got %v", err)
 		}
 
-		// Check both cards should be at 0 health or less
-		if attacker.Health > 0 {
-			t.Errorf("Expected attacker to be dead, got health %d", attacker.Health)
+		// Check both entities should be at 0 health or less
+		if attackerEntity.Health > 0 {
+			t.Errorf("Expected attacker to be dead, got health %d", attackerEntity.Health)
 		}
 
-		if defender.Health > 0 {
-			t.Errorf("Expected defender to be dead, got health %d", defender.Health)
+		if defenderEntity.Health > 0 {
+			t.Errorf("Expected defender to be dead, got health %d", defenderEntity.Health)
 		}
 	})
 
@@ -135,11 +220,30 @@ func TestAttack(t *testing.T) {
 		g.Phase = game.MainAction
 		engine := NewEngine(g)
 
-		attacker := createTestMinion().WithAttack(3).WithHealth(4)
-		defender := createTestMinion().WithAttack(2).WithHealth(5)
+		// Create a dummy player for entity ownership
+		player := game.NewPlayer()
+
+		// Create attacker and defender entities
+		attackerCard := &game.Card{
+			Name:      "Test Attacker",
+			Type:      game.Minion,
+			Attack:    3,
+			Health:    4,
+			MaxHealth: 4,
+		}
+		attackerEntity := game.NewEntity(attackerCard, player)
+		
+		defenderCard := &game.Card{
+			Name:      "Test Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    5,
+			MaxHealth: 5,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
 
 		// Perform attack
-		_ = engine.Attack(&attacker, &defender, false)
+		_ = engine.Attack(attackerEntity, defenderEntity, false)
 
 		// Assert phase returns to MainAction
 		if g.Phase != game.MainAction {

@@ -2,7 +2,7 @@ package engine
 
 import "github.com/openhs/internal/game"
 
-func (e *Engine) TakeDamage(character *game.Card, amount int) {
+func (e *Engine) TakeDamage(character *game.Entity, amount int) {
 	character.Health -= amount
 }
 

@@ -6,16 +6,37 @@ import (
 	"github.com/openhs/internal/game"
 )
 
-func createTestMinion() game.Card {
-	return game.Card{Name: "Test Minion", Type: game.Minion, Cost: 2, Attack: 2, Health: 3, MaxHealth: 3}
+func createTestMinionEntity(player *game.Player) *game.Entity {
+	card := &game.Card{
+		Name:      "Test Minion", 
+		Type:      game.Minion, 
+		Cost:      2, 
+		Attack:    2, 
+		Health:    3, 
+		MaxHealth: 3,
+	}
+	return game.NewEntity(card, player)
 }
 
-func createTestSpell() game.Card {
-	return game.Card{Name: "Test Spell", Type: game.Spell, Cost: 1}
+func createTestSpellEntity(player *game.Player) *game.Entity {
+	card := &game.Card{
+		Name: "Test Spell", 
+		Type: game.Spell, 
+		Cost: 1,
+	}
+	return game.NewEntity(card, player)
 }
 
-func createTestWeapon() game.Card {
-	return game.Card{Name: "Test Weapon", Type: game.Weapon, Cost: 1, Attack: 1, Health: 4, MaxHealth: 4}
+func createTestWeaponEntity(player *game.Player) *game.Entity {
+	card := &game.Card{
+		Name:      "Test Weapon", 
+		Type:      game.Weapon, 
+		Cost:      1, 
+		Attack:    1, 
+		Health:    4, 
+		MaxHealth: 4,
+	}
+	return game.NewEntity(card, player)
 }	
 
 // TestPlayCard tests the PlayCard functionality
@@ -25,10 +46,19 @@ func TestPlayCard(t *testing.T) {
 	player := g.Players[0]
 
 	// Add different types of cards to the player's hand for testing
-	player.Hand = append(player.Hand, createTestMinion().WithName("Foo"))
-	player.Hand = append(player.Hand, createTestSpell())
-	player.Hand = append(player.Hand, createTestWeapon().WithName("Bar"))
-	player.Hand = append(player.Hand, createTestMinion().WithCost(10))
+	minionEntity := createTestMinionEntity(player)
+	minionEntity.Card.Name = "Foo"
+	player.Hand = append(player.Hand, minionEntity)
+	
+	player.Hand = append(player.Hand, createTestSpellEntity(player))
+	
+	weaponEntity := createTestWeaponEntity(player)
+	weaponEntity.Card.Name = "Bar"
+	player.Hand = append(player.Hand, weaponEntity)
+	
+	expensiveMinionEntity := createTestMinionEntity(player)
+	expensiveMinionEntity.Card.Cost = 10
+	player.Hand = append(player.Hand, expensiveMinionEntity)
 
 	// Setup player resources
 	player.Mana = 5
@@ -62,9 +92,9 @@ func TestPlayCard(t *testing.T) {
 	}
 
 	// Verify field position - should be at the end when auto-positioned
-	if player.Field[len(player.Field)-1].Name != "Foo" {
+	if player.Field[len(player.Field)-1].Card.Name != "Foo" {
 		t.Fatalf("Expected last field card to be Foo, got %s",
-			player.Field[len(player.Field)-1].Name)
+			player.Field[len(player.Field)-1].Card.Name)
 	}
 
 	// Test 2: Play a spell card
@@ -110,18 +140,18 @@ func TestPlayCard(t *testing.T) {
 	}
 
 	// Verify player has a weapon equipped
-	if !player.HasWeapon {
+	if player.Weapon == nil {
 		t.Fatalf("Expected player to have a weapon equipped")
 	}
 
 	// Verify the correct weapon is equipped
-	if player.Weapon.Name != "Bar" {
-		t.Fatalf("Expected weapon name to be Bar, got %s", player.Weapon.Name)
+	if player.Weapon.Card.Name != "Bar" {
+		t.Fatalf("Expected weapon name to be Bar, got %s", player.Weapon.Card.Name)
 	}
 
 	// Verify mana was spent
-	if player.Mana != 1 { // Should be -1 after spending 1 from 2
-		t.Fatalf("Expected mana to decrease to -1, got %d", player.Mana)
+	if player.Mana != 1 {
+		t.Fatalf("Expected mana to decrease to 1, got %d", player.Mana)
 	}
 
 	// Test 4: Try to play a card with insufficient mana
@@ -153,13 +183,17 @@ func TestPlayCardWithFullField(t *testing.T) {
 	player := g.Players[0]
 
 	// Setup a full field
-	player.HandSize = 7 // Max field size
-	for i := 0; i < player.HandSize; i++ {
-		player.Field = append(player.Field, game.Card{Name: "Field Minion", Type: game.Minion, Attack: 1, Health: 1, MaxHealth: 1})
+	player.FieldSize = 7 // Max field size
+	for i := 0; i < player.FieldSize; i++ {
+		minion := createTestMinionEntity(player)
+		minion.Card.Name = "Field Minion"
+		player.Field = append(player.Field, minion)
 	}
 
 	// Add a minion card to hand
-	player.Hand = append(player.Hand, game.Card{Name: "Test Minion", Type: game.Minion, Cost: 1, Attack: 1, Health: 1, MaxHealth: 1})
+	minion := createTestMinionEntity(player)
+	player.Hand = append(player.Hand, minion)
+	
 	player.Mana = 10
 
 	// Try to play minion on full field
@@ -169,8 +203,8 @@ func TestPlayCardWithFullField(t *testing.T) {
 	}
 
 	// Verify field size didn't change
-	if len(player.Field) != player.HandSize {
-		t.Fatalf("Expected field size to remain %d, got %d", player.HandSize, len(player.Field))
+	if len(player.Field) != player.FieldSize {
+		t.Fatalf("Expected field size to remain %d, got %d", player.FieldSize, len(player.Field))
 	}
 }
 
@@ -181,11 +215,19 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 	player := g.Players[0]
 
 	// Add some minions to the field
-	player.Field = append(player.Field, createTestMinion().WithName("Field Minion 1"))
-	player.Field = append(player.Field, createTestMinion().WithName("Field Minion 2"))
+	minion1 := createTestMinionEntity(player)
+	minion1.Card.Name = "Field Minion 1"
+	player.Field = append(player.Field, minion1)
+	
+	minion2 := createTestMinionEntity(player)
+	minion2.Card.Name = "Field Minion 2"
+	player.Field = append(player.Field, minion2)
 
 	// Add a minion card to hand
-	player.Hand = append(player.Hand, createTestMinion().WithName("Test Minion"))
+	handMinion := createTestMinionEntity(player)
+	handMinion.Card.Name = "Test Minion"
+	player.Hand = append(player.Hand, handMinion)
+	
 	player.Mana = 10
 
 	// Play minion at position 1 (between the two existing minions)
@@ -200,8 +242,14 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 	}
 
 	// Verify minion is in the correct position
-	if player.Field[1].Name != "Test Minion" {
-		t.Fatalf("Expected minion at position 1 to be 'Test Minion', got %s", player.Field[1].Name)
+	if player.Field[0].Card.Name != "Field Minion 1" {
+		t.Fatalf("Expected minion at position 0 to be 'Field Minion 1', got %s", player.Field[0].Card.Name)
+	}
+	if player.Field[1].Card.Name != "Test Minion" {
+		t.Fatalf("Expected minion at position 1 to be 'Test Minion', got %s", player.Field[1].Card.Name)
+	}
+	if player.Field[2].Card.Name != "Field Minion 2" {
+		t.Fatalf("Expected minion at position 2 to be 'Field Minion 2', got %s", player.Field[2].Card.Name)
 	}
 }
 
@@ -212,11 +260,15 @@ func TestReplaceWeapon(t *testing.T) {
 	player := g.Players[0]
 
 	// Equip an initial weapon
-	player.Weapon = createTestWeapon().WithName("Old Weapon")
-	player.HasWeapon = true
+	oldWeapon := createTestWeaponEntity(player)
+	oldWeapon.Card.Name = "Old Weapon"
+	player.Weapon = oldWeapon
 
 	// Add a new weapon to hand
-	player.Hand = append(player.Hand, createTestWeapon().WithName("New Weapon"))
+	newWeapon := createTestWeaponEntity(player)
+	newWeapon.Card.Name = "New Weapon"
+	player.Hand = append(player.Hand, newWeapon)
+	
 	player.Mana = 10
 
 	initialGraveyardSize := len(player.Graveyard)
@@ -228,8 +280,8 @@ func TestReplaceWeapon(t *testing.T) {
 	}
 
 	// Verify weapon was replaced
-	if player.Weapon.Name != "New Weapon" {
-		t.Fatalf("Expected weapon to be 'New Weapon', got %s", player.Weapon.Name)
+	if player.Weapon.Card.Name != "New Weapon" {
+		t.Fatalf("Expected weapon to be 'New Weapon', got %s", player.Weapon.Card.Name)
 	}
 
 	// Verify old weapon went to graveyard
@@ -238,8 +290,8 @@ func TestReplaceWeapon(t *testing.T) {
 			len(player.Graveyard), initialGraveyardSize)
 	}
 
-	if player.Graveyard[initialGraveyardSize].Name != "Old Weapon" {
+	if player.Graveyard[initialGraveyardSize].Card.Name != "Old Weapon" {
 		t.Fatalf("Expected old weapon in graveyard to be 'Old Weapon', got %s",
-			player.Graveyard[initialGraveyardSize].Name)
+			player.Graveyard[initialGraveyardSize].Card.Name)
 	}
 } 
