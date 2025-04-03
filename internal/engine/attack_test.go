@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/types"
 )
 
 func TestAttack(t *testing.T) {
@@ -59,7 +58,7 @@ func TestAttack(t *testing.T) {
 		engine := NewEngine(g)
 
 		// Perform attack with nil attacker
-		err := engine.Attack(nil, &types.Card{}, false)
+		err := engine.Attack(nil, &game.Card{}, false)
 
 		// Assert
 		if err == nil {
@@ -67,7 +66,7 @@ func TestAttack(t *testing.T) {
 		}
 
 		// Perform attack with nil defender
-		err = engine.Attack(&types.Card{Attack: 1}, nil, false)
+		err = engine.Attack(&game.Card{Attack: 1}, nil, false)
 
 		// Assert
 		if err == nil {

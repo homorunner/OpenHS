@@ -3,19 +3,19 @@ package engine
 import (
 	"testing"
 
-	"github.com/openhs/internal/types"
+	"github.com/openhs/internal/game"
 )
 
-func createTestMinion() types.Card {
-	return types.Card{Name: "Test Minion", Type: types.Minion, Cost: 2, Attack: 2, Health: 3, MaxHealth: 3}
+func createTestMinion() game.Card {
+	return game.Card{Name: "Test Minion", Type: game.Minion, Cost: 2, Attack: 2, Health: 3, MaxHealth: 3}
 }
 
-func createTestSpell() types.Card {
-	return types.Card{Name: "Test Spell", Type: types.Spell, Cost: 1}
+func createTestSpell() game.Card {
+	return game.Card{Name: "Test Spell", Type: game.Spell, Cost: 1}
 }
 
-func createTestWeapon() types.Card {
-	return types.Card{Name: "Test Weapon", Type: types.Weapon, Cost: 1, Attack: 1, Health: 4, MaxHealth: 4}
+func createTestWeapon() game.Card {
+	return game.Card{Name: "Test Weapon", Type: game.Weapon, Cost: 1, Attack: 1, Health: 4, MaxHealth: 4}
 }	
 
 // TestPlayCard tests the PlayCard functionality
@@ -155,11 +155,11 @@ func TestPlayCardWithFullField(t *testing.T) {
 	// Setup a full field
 	player.HandSize = 7 // Max field size
 	for i := 0; i < player.HandSize; i++ {
-		player.Field = append(player.Field, types.Card{Name: "Field Minion", Type: types.Minion, Attack: 1, Health: 1, MaxHealth: 1})
+		player.Field = append(player.Field, game.Card{Name: "Field Minion", Type: game.Minion, Attack: 1, Health: 1, MaxHealth: 1})
 	}
 
 	// Add a minion card to hand
-	player.Hand = append(player.Hand, types.Card{Name: "Test Minion", Type: types.Minion, Cost: 1, Attack: 1, Health: 1, MaxHealth: 1})
+	player.Hand = append(player.Hand, game.Card{Name: "Test Minion", Type: game.Minion, Cost: 1, Attack: 1, Health: 1, MaxHealth: 1})
 	player.Mana = 10
 
 	// Try to play minion on full field

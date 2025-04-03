@@ -1,8 +1,8 @@
 package engine
 
-import "github.com/openhs/internal/types"
+import "github.com/openhs/internal/game"
 
-func (e *Engine) TakeDamage(character *types.Card, amount int) {
+func (e *Engine) TakeDamage(character *game.Card, amount int) {
 	character.Health -= amount
 }
 

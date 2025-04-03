@@ -3,7 +3,7 @@ package engine
 import (
 	"testing"
 
-	"github.com/openhs/internal/types"
+	"github.com/openhs/internal/game"
 )
 
 // TestHealCard tests the HealCard function
@@ -12,7 +12,7 @@ func TestHealCard(t *testing.T) {
 	e := NewEngine(g)
 
 	// Test 1: Healing with valid amount
-	card := &types.Card{
+	card := &game.Card{
 		Health:    10,
 		MaxHealth: 20,
 	}

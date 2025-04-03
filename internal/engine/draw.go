@@ -3,12 +3,11 @@ package engine
 import (
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
-	"github.com/openhs/internal/types"
 )
 
 // DrawCard draws a card from the player's deck to their hand
 // It returns the drawn card or nil if no card was drawn
-func (e *Engine) DrawCard(player *game.Player) *types.Card {
+func (e *Engine) DrawCard(player *game.Player) *game.Card {
 	return e.DrawSpecificCard(player, "")
 }
 
@@ -16,7 +15,7 @@ func (e *Engine) DrawCard(player *game.Player) *types.Card {
 // If cardToDraw is nil, it draws the top card of the deck
 // 
 // Returns the drawn card or nil if no card was drawn
-func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *types.Card {
+func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.Card {
 	// Check if the deck is empty
 	if len(player.Deck) == 0 {
 		player.FatigueDamage++
@@ -26,7 +25,7 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *types
 		return nil
 	}
 	
-	var card types.Card
+	var card game.Card
 	
 	// If a specific card is requested, find and draw it
 	if cardToDraw != "" {
@@ -63,7 +62,7 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *types
 
 // AddCardToHand adds a card to the player's hand
 // Returns true if successful, false if hand is full
-func (e *Engine) AddCardToHand(player *game.Player, card *types.Card) bool {
+func (e *Engine) AddCardToHand(player *game.Player, card *game.Card) bool {
 	if len(player.Hand) >= player.HandSize {
 		logger.Info("Hand is full, card discarded", logger.String("card", card.Name))
 		return false

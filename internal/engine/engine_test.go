@@ -4,19 +4,18 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/types"
 )
 
 func createTestPlayer() *game.Player {
 	player := game.NewPlayer()
 
-	deck := []types.Card{}
+	deck := []game.Card{}
 	for i := 0; i < 10; i++ {
-		deck = append(deck, types.Card{Name: "Test Card"})
+		deck = append(deck, game.Card{Name: "Test Card"})
 	}
 	player.Deck = deck
 
-	player.Hero = types.Card{Name: "Jaina", Health: 30, MaxHealth: 30, Type: types.Hero}
+	player.Hero = game.Card{Name: "Jaina", Health: 30, MaxHealth: 30, Type: game.Hero}
 
 	return player
 }

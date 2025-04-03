@@ -1,10 +1,10 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
-	"github.com/openhs/internal/card"
-	"github.com/openhs/internal/config"
 	"github.com/openhs/internal/logger"
 )
 
@@ -101,7 +101,7 @@ func NewGame() *Game {
 }
 
 // LoadGame creates a new game from a configuration
-func LoadGame(config *config.GameConfig) (*Game, error) {
+func LoadGame(config *GameConfig) (*Game, error) {
 	g := NewGame()
 
 	// Create players based on configuration
@@ -109,7 +109,7 @@ func LoadGame(config *config.GameConfig) (*Game, error) {
 		player := NewPlayer()
 
 		// Load hero card
-		cardManager := card.GetCardManager()
+		cardManager := GetCardManager()
 		heroCard, err := cardManager.CreateCard(playerConfig.Hero)
 		if err != nil {
 			logger.Error("Failed to load hero card: " + err.Error())
@@ -131,4 +131,32 @@ func LoadGame(config *config.GameConfig) (*Game, error) {
 	}
 
 	return g, nil
+}
+
+// GameConfig represents the configuration for a game
+type GameConfig struct {
+	Players []PlayerConfig `json:"players"`
+}
+
+// PlayerConfig represents the configuration for a player
+type PlayerConfig struct {
+	Hero string   `json:"hero"`
+	Deck []string `json:"deck"`
+}
+
+// LoadGameConfig loads a game configuration from a JSON file
+func LoadGameConfig(configPath string) (*GameConfig, error) {
+	// Read the JSON file
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the JSON data
+	var config GameConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
 }

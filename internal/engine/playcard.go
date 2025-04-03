@@ -5,7 +5,6 @@ import (
 
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
-	"github.com/openhs/internal/types"
 )
 
 // PlayCard processes playing a card from the player's hand
@@ -15,7 +14,7 @@ import (
 // - target: Optional target for the card (can be nil)
 // - fieldPos: Position on the field for minions (-1 for auto-positioning)
 // - chooseOne: Index for choose one effects (0 for default choice)
-func (e *Engine) PlayCard(player *game.Player, handIndex int, target *types.Card, fieldPos int, chooseOne int) error {
+func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Card, fieldPos int, chooseOne int) error {
 	// Validate hand index
 	if handIndex < 0 || handIndex >= len(player.Hand) {
 		return errors.New("invalid hand index")
@@ -30,7 +29,7 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *types.Card
 	}
 
 	// Check field space for minions
-	if card.Type == types.Minion && len(player.Field) >= player.HandSize {
+	if card.Type == game.Minion && len(player.Field) >= player.HandSize {
 		return errors.New("battlefield is full")
 	}
 
@@ -51,13 +50,13 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *types.Card
 
 	// Process based on card type
 	switch card.Type {
-	case types.Minion:
+	case game.Minion:
 		return e.playMinion(player, &card, target, fieldPos, chooseOne)
-	case types.Spell:
+	case game.Spell:
 		return e.playSpell(player, &card, target, chooseOne)
-	case types.Weapon:
+	case game.Weapon:
 		return e.playWeapon(player, &card, target)
-	case types.Hero:
+	case game.Hero:
 		return e.playHero(player, &card, target, chooseOne)
 	default:
 		return errors.New("invalid card type")
@@ -65,7 +64,7 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *types.Card
 }
 
 // canPlayCard checks if a card can be played
-func (e *Engine) testPlayCard(player *game.Player, card *types.Card, target *types.Card, chooseOne int) error {
+func (e *Engine) testPlayCard(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
 	// Basic checks
 	if card.Cost > player.Mana {
 		return errors.New("not enough mana")
@@ -77,7 +76,7 @@ func (e *Engine) testPlayCard(player *game.Player, card *types.Card, target *typ
 }
 
 // playMinion handles playing a minion card
-func (e *Engine) playMinion(player *game.Player, card *types.Card, target *types.Card, fieldPos int, chooseOne int) error {
+func (e *Engine) playMinion(player *game.Player, card *game.Card, target *game.Card, fieldPos int, chooseOne int) error {
 	// Create a new minion entity (using Card for now since Minion type doesn't exist yet)
 	// TODO: Create a proper Minion type
 	minion := *card
@@ -88,7 +87,7 @@ func (e *Engine) playMinion(player *game.Player, card *types.Card, target *types
 		player.Field = append(player.Field, minion)
 	} else {
 		// Insert at specified position
-		player.Field = append(player.Field[:fieldPos], append([]types.Card{minion}, player.Field[fieldPos:]...)...)
+		player.Field = append(player.Field[:fieldPos], append([]game.Card{minion}, player.Field[fieldPos:]...)...)
 	}
 
 	logger.Info("Minion played", logger.String("name", card.Name))
@@ -99,7 +98,7 @@ func (e *Engine) playMinion(player *game.Player, card *types.Card, target *types
 }
 
 // playSpell handles playing a spell card
-func (e *Engine) playSpell(player *game.Player, card *types.Card, target *types.Card, chooseOne int) error {
+func (e *Engine) playSpell(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
 	// TODO: Add spell counters to Player struct
 	
 	logger.Info("Spell played", logger.String("name", card.Name))
@@ -113,7 +112,7 @@ func (e *Engine) playSpell(player *game.Player, card *types.Card, target *types.
 }
 
 // playWeapon handles playing a weapon card
-func (e *Engine) playWeapon(player *game.Player, card *types.Card, target *types.Card) error {
+func (e *Engine) playWeapon(player *game.Player, card *game.Card, target *game.Card) error {
 	// TODO: Create a proper Weapon type
 	weapon := *card
 
@@ -131,7 +130,7 @@ func (e *Engine) playWeapon(player *game.Player, card *types.Card, target *types
 }
 
 // playHero handles playing a hero card
-func (e *Engine) playHero(player *game.Player, card *types.Card, target *types.Card, chooseOne int) error {
+func (e *Engine) playHero(player *game.Player, card *game.Card, target *game.Card, chooseOne int) error {
 	// TODO: Implement hero card handling
 	// For now, just replace the hero
 	player.Hero = *card

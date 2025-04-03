@@ -5,12 +5,11 @@ import (
 
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
-	"github.com/openhs/internal/types"
 )
 
 // Attack handles combat between an attacker and defender card
 // It processes the damage exchange and any special effects
-func (e *Engine) Attack(attacker *types.Card, defender *types.Card, skipValidation bool) error {
+func (e *Engine) Attack(attacker *game.Card, defender *game.Card, skipValidation bool) error {
 	// Validate the attack
 	if !skipValidation {
 		if err := e.validateAttack(attacker, defender); err != nil {
@@ -33,7 +32,7 @@ func (e *Engine) Attack(attacker *types.Card, defender *types.Card, skipValidati
 
 	// Deal damage simultaneously
 	if attackerDamage > 0 {
-		if attacker.Type == types.Hero {
+		if attacker.Type == game.Hero {
 			// TODO: decrease weapon durability.
 		}
 		e.TakeDamage(defender, attackerDamage)
@@ -58,7 +57,7 @@ func (e *Engine) Attack(attacker *types.Card, defender *types.Card, skipValidati
 }
 
 // validateAttack checks if the attack is legal
-func (e *Engine) validateAttack(attacker *types.Card, defender *types.Card) error {
+func (e *Engine) validateAttack(attacker *game.Card, defender *game.Card) error {
 	// Check for nil cards
 	if attacker == nil || defender == nil {
 		return errors.New("invalid attacker or defender")
@@ -78,7 +77,7 @@ func (e *Engine) validateAttack(attacker *types.Card, defender *types.Card) erro
 }
 
 // checkForDeaths checks if any cards have died after the attack
-func (e *Engine) checkForDeaths(attacker *types.Card, defender *types.Card) {
+func (e *Engine) checkForDeaths(attacker *game.Card, defender *game.Card) {
 	// Check if cards have died (health <= 0)
 	if attacker.Health <= 0 {
 		logger.Info("Card has died", logger.String("card", attacker.Name))

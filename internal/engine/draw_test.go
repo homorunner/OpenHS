@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/types"
 )
 
 // TestDrawCard tests the DrawCard helper function
@@ -49,9 +48,9 @@ func TestDrawCard(t *testing.T) {
 
 	// Test 2: Drawing from an empty deck should trigger fatigue damage
 	emptyPlayer := &game.Player{
-		Deck:      make([]types.Card, 0),
-		Hand:      make([]types.Card, 0),
-		Hero:      types.Card{Name: "Test Hero", Health: 30, MaxHealth: 30, Type: types.Hero},
+		Deck:      make([]game.Card, 0),
+		Hand:      make([]game.Card, 0),
+		Hero:      game.Card{Name: "Test Hero", Health: 30, MaxHealth: 30, Type: game.Hero},
 		HandSize:  10,
 		MaxMana:   10,
 		Mana:      0,
@@ -97,8 +96,8 @@ func TestDrawSpecificCard(t *testing.T) {
 	player := g.Players[0]
 	
 	// Add some specific cards to test
-	player.Deck = append(player.Deck, types.Card{Name: "Special Card 1"})
-	player.Deck = append(player.Deck, types.Card{Name: "Special Card 2"})
+	player.Deck = append(player.Deck, game.Card{Name: "Special Card 1"})
+	player.Deck = append(player.Deck, game.Card{Name: "Special Card 2"})
 	
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
@@ -156,16 +155,16 @@ func TestAddCardToHand(t *testing.T) {
 	
 	// Create a player with a nearly full hand
 	player := &game.Player{
-		Hand:     make([]types.Card, 0),
+		Hand:     make([]game.Card, 0),
 		HandSize: 3, // Small hand size for testing
 	}
 	
 	// Add cards until one away from full
-	player.Hand = append(player.Hand, types.Card{Name: "Hand Card 1"})
-	player.Hand = append(player.Hand, types.Card{Name: "Hand Card 2"})
+	player.Hand = append(player.Hand, game.Card{Name: "Hand Card 1"})
+	player.Hand = append(player.Hand, game.Card{Name: "Hand Card 2"})
 	
 	// Test 1: Add card to hand with space available
-	card := &types.Card{Name: "New Card"}
+	card := &game.Card{Name: "New Card"}
 	success := e.AddCardToHand(player, card)
 	
 	// Verify card was added successfully
@@ -182,7 +181,7 @@ func TestAddCardToHand(t *testing.T) {
 	}
 	
 	// Test 2: Add card to full hand
-	overflowCard := &types.Card{Name: "Overflow Card"}
+	overflowCard := &game.Card{Name: "Overflow Card"}
 	success = e.AddCardToHand(player, overflowCard)
 	
 	// Verify card was not added

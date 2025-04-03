@@ -11,7 +11,6 @@ import (
 	"github.com/openhs/internal/bootstrap"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/types"
 )
 
 func main() {
@@ -128,9 +127,9 @@ func displayGameState(g *game.Game) {
 			}
 
 			// Add attack and health for minions and weapons
-			if card.Type == types.Minion {
+			if card.Type == game.Minion {
 				cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Health: %d", card.Attack, card.Health))
-			} else if card.Type == types.Weapon {
+			} else if card.Type == game.Weapon {
 				cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Durability: %d", card.Attack, card.Health))
 			}
 
@@ -167,7 +166,7 @@ func handlePlayCard(e *engine.Engine, g *game.Game, parts []string) {
 	position := -1
 
 	// If position is specified and the card is a minion
-	if len(parts) >= 3 && card.Type == types.Minion {
+	if len(parts) >= 3 && card.Type == game.Minion {
 		pos, err := strconv.Atoi(parts[2])
 		if err == nil && pos > 0 && pos <= len(g.CurrentPlayer.Field)+1 {
 			position = pos - 1
@@ -175,7 +174,7 @@ func handlePlayCard(e *engine.Engine, g *game.Game, parts []string) {
 	}
 
 	// For now, we don't handle targeting or choose one effects
-	var target *types.Card = nil
+	var target *game.Card = nil
 	chooseOne := 0
 
 	// Play the card

@@ -1,4 +1,4 @@
-package types
+package game
 
 // Card represents a card in the game
 // An empty card is a 0/0 minion with no cost and no effects
@@ -90,3 +90,20 @@ type Action interface {
 type Condition interface {
 	IsMet(*Card) bool
 }
+
+// CardConfig represents the configuration for a card
+type CardConfig struct {
+	Name    string         `json:"name"`
+	Cost    int            `json:"cost"`
+	Attack  int            `json:"attack"`
+	Health  int            `json:"health"`
+	Type    CardType `json:"type"`
+	Effects []EffectConfig `json:"effects,omitempty"`
+}
+
+// EffectConfig represents the configuration for a card effect
+type EffectConfig struct {
+	Trigger    Trigger `json:"trigger"`
+	Conditions []string      `json:"conditions,omitempty"`
+	Action     string        `json:"action"`
+} 
