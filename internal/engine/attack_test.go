@@ -16,23 +16,8 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create attacker and defender entities
-		attackerCard := &game.Card{
-			Name:      "Test Attacker",
-			Type:      game.Minion,
-			Attack:    3,
-			Health:    4,
-			MaxHealth: 4,
-		}
-		attackerEntity := game.NewEntity(attackerCard, player)
-		
-		defenderCard := &game.Card{
-			Name:      "Test Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    5,
-			MaxHealth: 5,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -61,23 +46,8 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create attacker with zero attack
-		attackerCard := &game.Card{
-			Name:      "Zero Attack Minion",
-			Type:      game.Minion,
-			Attack:    0,
-			Health:    4,
-			MaxHealth: 4,
-		}
-		attackerEntity := game.NewEntity(attackerCard, player)
-		
-		defenderCard := &game.Card{
-			Name:      "Test Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    5,
-			MaxHealth: 5,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -97,14 +67,7 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create a valid entity for testing
-		validCard := &game.Card{
-			Name:      "Valid Minion",
-			Type:      game.Minion,
-			Attack:    1,
-			Health:    1,
-			MaxHealth: 1,
-		}
-		validEntity := game.NewEntity(validCard, player)
+		validEntity := createTestMinionEntity(player, withName("Valid Minion"), withAttack(1), withHealth(1))
 
 		// Perform attack with nil attacker
 		err := engine.Attack(nil, validEntity, false)
@@ -132,23 +95,8 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create zero attack attacker that would normally fail validation
-		attackerCard := &game.Card{
-			Name:      "Zero Attack Minion",
-			Type:      game.Minion,
-			Attack:    0,
-			Health:    4,
-			MaxHealth: 4,
-		}
-		attackerEntity := game.NewEntity(attackerCard, player)
-		
-		defenderCard := &game.Card{
-			Name:      "Test Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    5,
-			MaxHealth: 5,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Perform attack with skipValidation=true
 		err := engine.Attack(attackerEntity, defenderEntity, true)
@@ -178,23 +126,8 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create entities with just enough health to be killed
-		attackerCard := &game.Card{
-			Name:      "Lethal Attacker",
-			Type:      game.Minion,
-			Attack:    5,
-			Health:    2,
-			MaxHealth: 2,
-		}
-		attackerEntity := game.NewEntity(attackerCard, player)
-		
-		defenderCard := &game.Card{
-			Name:      "Fragile Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    2,
-			MaxHealth: 2,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		attackerEntity := createTestMinionEntity(player, withName("Lethal Attacker"), withAttack(5), withHealth(2))
+		defenderEntity := createTestMinionEntity(player, withName("Fragile Defender"), withAttack(2), withHealth(2))
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -224,23 +157,8 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 
 		// Create attacker and defender entities
-		attackerCard := &game.Card{
-			Name:      "Test Attacker",
-			Type:      game.Minion,
-			Attack:    3,
-			Health:    4,
-			MaxHealth: 4,
-		}
-		attackerEntity := game.NewEntity(attackerCard, player)
-		
-		defenderCard := &game.Card{
-			Name:      "Test Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    5,
-			MaxHealth: 5,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Perform attack
 		_ = engine.Attack(attackerEntity, defenderEntity, false)
@@ -260,38 +178,17 @@ func TestBasicAttack(t *testing.T) {
 		player := game.NewPlayer()
 		
 		// Create a hero entity
-		heroCard := &game.Card{
-			Name:      "Test Hero",
-			Type:      game.Hero,
-			Attack:    0, // Base attack without weapon
-			Health:    30,
-			MaxHealth: 30,
-		}
-		heroEntity := game.NewEntity(heroCard, player)
+		heroEntity := createTestHeroEntity(player, withName("Test Hero"))
 		player.Hero = heroEntity
 		heroEntity.Owner = player
 		
 		// Create and equip a weapon
-		weaponCard := &game.Card{
-			Name:      "Test Weapon",
-			Type:      game.Weapon,
-			Attack:    3,
-			Health:    2, // Durability for weapons
-			MaxHealth: 2,
-		}
-		weaponEntity := game.NewEntity(weaponCard, player)
+		weaponEntity := createTestWeaponEntity(player, withName("Test Weapon"), withAttack(3), withHealth(2))
 		player.Weapon = weaponEntity
 		weaponEntity.Owner = player
 		
 		// Create a defender entity
-		defenderCard := &game.Card{
-			Name:      "Test Defender",
-			Type:      game.Minion,
-			Attack:    2,
-			Health:    5,
-			MaxHealth: 5,
-		}
-		defenderEntity := game.NewEntity(defenderCard, player)
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Set hero's attack value to match weapon's attack
 		heroEntity.Attack = weaponEntity.Attack

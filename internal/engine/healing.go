@@ -5,10 +5,10 @@ import (
 	"github.com/openhs/internal/logger"
 )
 
-// HealCard heals a card by the specified amount
-func (e *Engine) HealCard(character *game.Card, amount int) {
+// Heal heals a character by the specified amount
+func (e *Engine) Heal(character *game.Entity, amount int) {
 	if amount <= 0 {
-		logger.Error("HealCard: healing amount must be greater than 0")
+		logger.Error("Heal: healing amount must be greater than 0")
 		return
 	}
 

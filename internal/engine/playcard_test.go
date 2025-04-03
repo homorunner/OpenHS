@@ -6,38 +6,112 @@ import (
 	"github.com/openhs/internal/game"
 )
 
-func createTestMinionEntity(player *game.Player) *game.Entity {
+// createTestMinionEntity creates a test minion with customizable properties
+func createTestMinionEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name:      "Test Minion", 
-		Type:      game.Minion, 
-		Cost:      2, 
-		Attack:    2, 
-		Health:    3, 
+		Name:      "Test Minion",
+		Type:      game.Minion,
+		Cost:      2,
+		Attack:    2,
+		Health:    3,
 		MaxHealth: 3,
 	}
+	// Apply any option functions
+	for _, opt := range opts {
+		opt(card)
+	}
+
 	return game.NewEntity(card, player)
 }
 
-func createTestSpellEntity(player *game.Player) *game.Entity {
+// createTestSpellEntity creates a test spell with customizable properties
+func createTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name: "Test Spell", 
-		Type: game.Spell, 
+		Name: "Test Spell",
+		Type: game.Spell,
 		Cost: 1,
 	}
+
+	// Apply any option functions
+	for _, opt := range opts {
+		opt(card)
+	}
+
 	return game.NewEntity(card, player)
 }
 
-func createTestWeaponEntity(player *game.Player) *game.Entity {
+// createTestWeaponEntity creates a test weapon with customizable properties
+func createTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name:      "Test Weapon", 
-		Type:      game.Weapon, 
-		Cost:      1, 
-		Attack:    1, 
-		Health:    4, 
+		Name:      "Test Weapon",
+		Type:      game.Weapon,
+		Cost:      1,
+		Attack:    1,
+		Health:    4,
 		MaxHealth: 4,
 	}
+
+	// Apply any option functions
+	for _, opt := range opts {
+		opt(card)
+	}
+
 	return game.NewEntity(card, player)
-}	
+}
+
+// createTestHeroEntity creates a test hero with customizable properties
+func createTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+	card := &game.Card{
+		Name:      "Test Hero",
+		Type:      game.Hero,
+		Attack:    0,
+		Health:    30,
+		MaxHealth: 30,
+	}
+
+	// Apply any option functions
+	for _, opt := range opts {
+		opt(card)
+	}
+
+	return game.NewEntity(card, player)
+}
+
+// Helper functions for common entity customizations
+func withName(name string) func(*game.Card) {
+	return func(c *game.Card) {
+		c.Name = name
+	}
+}
+
+func withCost(cost int) func(*game.Card) {
+	return func(c *game.Card) {
+		c.Cost = cost
+	}
+}
+
+func withAttack(attack int) func(*game.Card) {
+	return func(c *game.Card) {
+		c.Attack = attack
+	}
+}
+
+func withHealth(health int) func(*game.Card) {
+	return func(c *game.Card) {
+		c.Health = health
+		c.MaxHealth = health
+	}
+}
+
+// addToHand adds an entity to player's hand
+func addToHand(player *game.Player, entity *game.Entity) {
+	player.Hand = append(player.Hand, entity)
+}
+
+// addToField adds a minion to player's field
+func addToField(player *game.Player, entity *game.Entity) {
+	player.Field = append(player.Field, entity)
+}
 
 // TestPlayCard tests the PlayCard functionality
 func TestPlayCard(t *testing.T) {
@@ -46,19 +120,10 @@ func TestPlayCard(t *testing.T) {
 	player := g.Players[0]
 
 	// Add different types of cards to the player's hand for testing
-	minionEntity := createTestMinionEntity(player)
-	minionEntity.Card.Name = "Foo"
-	player.Hand = append(player.Hand, minionEntity)
-	
-	player.Hand = append(player.Hand, createTestSpellEntity(player))
-	
-	weaponEntity := createTestWeaponEntity(player)
-	weaponEntity.Card.Name = "Bar"
-	player.Hand = append(player.Hand, weaponEntity)
-	
-	expensiveMinionEntity := createTestMinionEntity(player)
-	expensiveMinionEntity.Card.Cost = 10
-	player.Hand = append(player.Hand, expensiveMinionEntity)
+	addToHand(player, createTestMinionEntity(player, withName("Foo")))
+	addToHand(player, createTestSpellEntity(player))
+	addToHand(player, createTestWeaponEntity(player, withName("Bar")))
+	addToHand(player, createTestMinionEntity(player, withCost(10)))
 
 	// Setup player resources
 	player.Mana = 5
@@ -185,15 +250,12 @@ func TestPlayCardWithFullField(t *testing.T) {
 	// Setup a full field
 	player.FieldSize = 7 // Max field size
 	for i := 0; i < player.FieldSize; i++ {
-		minion := createTestMinionEntity(player)
-		minion.Card.Name = "Field Minion"
-		player.Field = append(player.Field, minion)
+		addToField(player, createTestMinionEntity(player, withName("Field Minion")))
 	}
 
 	// Add a minion card to hand
-	minion := createTestMinionEntity(player)
-	player.Hand = append(player.Hand, minion)
-	
+	addToHand(player, createTestMinionEntity(player))
+
 	player.Mana = 10
 
 	// Try to play minion on full field
@@ -215,19 +277,12 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 	player := g.Players[0]
 
 	// Add some minions to the field
-	minion1 := createTestMinionEntity(player)
-	minion1.Card.Name = "Field Minion 1"
-	player.Field = append(player.Field, minion1)
-	
-	minion2 := createTestMinionEntity(player)
-	minion2.Card.Name = "Field Minion 2"
-	player.Field = append(player.Field, minion2)
+	addToField(player, createTestMinionEntity(player, withName("Field Minion 1")))
+	addToField(player, createTestMinionEntity(player, withName("Field Minion 2")))
 
 	// Add a minion card to hand
-	handMinion := createTestMinionEntity(player)
-	handMinion.Card.Name = "Test Minion"
-	player.Hand = append(player.Hand, handMinion)
-	
+	addToHand(player, createTestMinionEntity(player, withName("Test Minion")))
+
 	player.Mana = 10
 
 	// Play minion at position 1 (between the two existing minions)
@@ -260,15 +315,11 @@ func TestReplaceWeapon(t *testing.T) {
 	player := g.Players[0]
 
 	// Equip an initial weapon
-	oldWeapon := createTestWeaponEntity(player)
-	oldWeapon.Card.Name = "Old Weapon"
-	player.Weapon = oldWeapon
+	player.Weapon = createTestWeaponEntity(player, withName("Old Weapon"))
 
 	// Add a new weapon to hand
-	newWeapon := createTestWeaponEntity(player)
-	newWeapon.Card.Name = "New Weapon"
-	player.Hand = append(player.Hand, newWeapon)
-	
+	addToHand(player, createTestWeaponEntity(player, withName("New Weapon")))
+
 	player.Mana = 10
 
 	initialGraveyardSize := len(player.Graveyard)
@@ -294,4 +345,4 @@ func TestReplaceWeapon(t *testing.T) {
 		t.Fatalf("Expected old weapon in graveyard to be 'Old Weapon', got %s",
 			player.Graveyard[initialGraveyardSize].Card.Name)
 	}
-} 
+}
