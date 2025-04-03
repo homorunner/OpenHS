@@ -51,6 +51,17 @@ func (c Card) WithCost(cost int) Card {
 	return c
 }
 
+func (c Card) WithAttack(attack int) Card {
+	c.Attack = attack
+	return c
+}
+
+func (c Card) WithHealth(health int) Card {
+	c.Health = health
+	c.MaxHealth = health
+	return c
+}
+
 // Effect represents a card effect or ability
 type Effect struct {
 	Trigger    Trigger
