@@ -53,7 +53,7 @@ func main() {
 
 		fmt.Println("\nCommands:")
 		fmt.Println("  p <card_number> [<position>] - Play a card from your hand")
-		fmt.Println("  e - End your turn (not implemented yet)")
+		fmt.Println("  e - End your turn")
 		fmt.Println("  q - Quit the game")
 		fmt.Print("\nEnter command: ")
 

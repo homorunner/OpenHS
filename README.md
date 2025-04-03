@@ -2,15 +2,48 @@
 
 OpenHS is a simulator core for the game Hearthstone, implemented in Go. This project aims to provide a robust and efficient implementation of Hearthstone's core game mechanics.
 
-## Features (Planned)
+## Implemented Features
 
-- Card system implementation
-- Game state management
-- Combat mechanics
-- Spell system
-- Hero powers
-- Card effects and interactions
-- Game rules engine
+- **Game Engine Framework**:
+  - Core game loop with phase management (BeginFirst, BeginShuffle, BeginDraw, etc.)
+- **Card System**: 
+  - Card template loading from JSON configurations
+  - Basic card types (Minion, Spell, Weapon, Hero, HeroPower)
+  - Card effect framework with triggers and conditions
+- **Player Management**: Player state tracking including hero, deck, hand, and board
+- **Game Mechanics**:
+  - Initial game setup with card drawing
+  - Turn management
+  - Card drawing mechanism
+  - Playing cards from hand
+  - Basic damage system
+
+## Currently Implemented Cards
+- **Heroes**: Jaina Proudmoore
+- **Minions**: Water Elemental
+- **Spells**: Fireball, Frostbolt, Arcane Intellect
+
+## TODO List
+
+- **Game Mechanics**:
+  - Complete mulligan phase implementation
+  - Full combat system with minion attacks
+  - Mana crystal management
+  - Death processing and graveyard management
+  - Hero powers implementation
+  - More advanced card effects and interactions
+  - Secretes and auras
+
+- **Card Library**:
+  - Implement more cards from the basic and classic sets
+  - Add card mechanic tags (Taunt, Charge, Divine Shield, etc.)
+  - Add card rarity and classes
+
+- **Game Features**:
+  - Game history and replay system
+  - Game state serialization/deserialization
+  - Network play support
+  - AI opponents
 
 ## Project Structure
 
@@ -21,14 +54,22 @@ openhs/
 ├── internal/              # Private application and library code
 │   ├── game/             # Core game mechanics
 │   ├── card/             # Card system implementation
-│   └── engine/           # Game rules engine
-├── pkg/                   # Library code that's ok to use by external applications
-└── test/                 # Additional external test applications and test data
+│   ├── engine/           # Game rules engine
+│   ├── types/            # Common type definitions
+│   ├── config/           # Configuration handling
+│   ├── logger/           # Logging utilities
+│   ├── bootstrap/        # Application initialization
+│   └── util/             # Utility functions
+├── cards/                 # Card definition files
+├── config/                # Configuration files
+├── games/                 # Game scenario definitions
+├── tests/                 # Test files and utilities
+└── third_party/          # Third-party dependencies
 ```
 
 ## Requirements
 
-- Go 1.21 or later
+- Go 1.24 or later
 - Git
 
 ## Getting Started
