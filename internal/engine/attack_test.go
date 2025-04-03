@@ -6,7 +6,7 @@ import (
 	"github.com/openhs/internal/game"
 )
 
-func TestAttack(t *testing.T) {
+func TestBasicAttack(t *testing.T) {
 	t.Run("Basic attack between minions", func(t *testing.T) {
 		// Setup
 		g := game.NewGame()
@@ -248,6 +248,78 @@ func TestAttack(t *testing.T) {
 		// Assert phase returns to MainAction
 		if g.Phase != game.MainAction {
 			t.Errorf("Expected game phase to be MainAction after attack, got %v", g.Phase)
+		}
+	})
+
+	t.Run("Weapon durability decreases on hero attack", func(t *testing.T) {
+		// Setup
+		g := game.NewGame()
+		engine := NewEngine(g)
+
+		// Create a player with a weapon
+		player := game.NewPlayer()
+		
+		// Create a hero entity
+		heroCard := &game.Card{
+			Name:      "Test Hero",
+			Type:      game.Hero,
+			Attack:    0, // Base attack without weapon
+			Health:    30,
+			MaxHealth: 30,
+		}
+		heroEntity := game.NewEntity(heroCard, player)
+		player.Hero = heroEntity
+		heroEntity.Owner = player
+		
+		// Create and equip a weapon
+		weaponCard := &game.Card{
+			Name:      "Test Weapon",
+			Type:      game.Weapon,
+			Attack:    3,
+			Health:    2, // Durability for weapons
+			MaxHealth: 2,
+		}
+		weaponEntity := game.NewEntity(weaponCard, player)
+		player.Weapon = weaponEntity
+		weaponEntity.Owner = player
+		
+		// Create a defender entity
+		defenderCard := &game.Card{
+			Name:      "Test Defender",
+			Type:      game.Minion,
+			Attack:    2,
+			Health:    5,
+			MaxHealth: 5,
+		}
+		defenderEntity := game.NewEntity(defenderCard, player)
+
+		// Set hero's attack value to match weapon's attack
+		heroEntity.Attack = weaponEntity.Attack
+
+		// Perform attack
+		err := engine.Attack(heroEntity, defenderEntity, false)
+
+		// Assert
+		if err != nil {
+			t.Errorf("Expected no error, got %v", err)
+		}
+
+		// Check weapon durability decreased
+		if player.Weapon.Health != 1 {
+			t.Errorf("Expected weapon durability to be 1, got %d", player.Weapon.Health)
+		}
+
+		// Perform another attack
+		err = engine.Attack(heroEntity, defenderEntity, false)
+
+		// Assert
+		if err != nil {
+			t.Errorf("Expected no error, got %v", err)
+		}
+
+		// Check weapon is destroyed after reaching 0 durability
+		if player.Weapon != nil {
+			t.Errorf("Expected weapon to be destroyed, but it still exists with durability %d", player.Weapon.Health)
 		}
 	})
 } 

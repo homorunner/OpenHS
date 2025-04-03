@@ -33,7 +33,9 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	// Deal damage simultaneously
 	if attackerDamage > 0 {
 		if attacker.Card.Type == game.Hero {
-			// Weapon handling will be implemented with weapon entity
+			if attacker.Owner != nil && attacker.Owner.Weapon != nil {
+				e.decreaseWeaponDurability(attacker.Owner)
+			}
 		}
 		e.TakeDamage(defender, attackerDamage)
 	}

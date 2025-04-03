@@ -107,21 +107,6 @@ func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *gam
 	return nil
 }
 
-// playWeapon handles playing a weapon card
-func (e *Engine) playWeapon(player *game.Player, entity *game.Entity, target *game.Entity) error {
-	// If player already has a weapon, move it to graveyard
-	if player.Weapon != nil {
-		player.Graveyard = append(player.Graveyard, player.Weapon)
-	}
-
-	// Equip the new weapon
-	player.Weapon = entity
-
-	logger.Info("Weapon equipped", logger.String("name", entity.Card.Name))
-	
-	return nil
-}
-
 // playHero handles playing a hero card
 func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
 	// Store the old hero in graveyard
