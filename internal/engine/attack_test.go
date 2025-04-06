@@ -170,31 +170,21 @@ func TestBasicAttack(t *testing.T) {
 	})
 
 	t.Run("Weapon durability decreases on hero attack", func(t *testing.T) {
-		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
 
-		// Create a player with a weapon
-		player := game.NewPlayer()
-		
-		// Create a hero entity
-		heroEntity := createTestHeroEntity(player, withName("Test Hero"))
-		player.Hero = heroEntity
-		heroEntity.Owner = player
-		
-		// Create and equip a weapon
-		weaponEntity := createTestWeaponEntity(player, withName("Test Weapon"), withAttack(3), withHealth(2))
-		player.Weapon = weaponEntity
-		weaponEntity.Owner = player
+		// Give player a weapon
+		player := g.Players[0]
+		player.Weapon = createTestWeaponEntity(player, withName("Test Weapon"), withAttack(3), withHealth(2))
 		
 		// Create a defender entity
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
 		// Set hero's attack value to match weapon's attack
-		heroEntity.Attack = weaponEntity.Attack
+		player.Hero.Attack = player.Weapon.Attack
 
 		// Perform attack
-		err := engine.Attack(heroEntity, defenderEntity, false)
+		err := engine.Attack(player.Hero, defenderEntity, false)
 
 		// Assert
 		if err != nil {
@@ -207,7 +197,7 @@ func TestBasicAttack(t *testing.T) {
 		}
 
 		// Perform another attack
-		err = engine.Attack(heroEntity, defenderEntity, false)
+		err = engine.Attack(player.Hero, defenderEntity, false)
 
 		// Assert
 		if err != nil {

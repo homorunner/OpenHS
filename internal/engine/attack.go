@@ -30,13 +30,15 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	attackerDamage := attacker.Attack
 	defenderDamage := defender.Attack
 
+	// Decrease weapon durability if attacker is a hero
+	if attacker.Card.Type == game.Hero {
+		if attacker.Owner != nil && attacker.Owner.Weapon != nil {
+			e.decreaseWeaponDurability(attacker.Owner)
+		}
+	}
+
 	// Deal damage simultaneously
 	if attackerDamage > 0 {
-		if attacker.Card.Type == game.Hero {
-			if attacker.Owner != nil && attacker.Owner.Weapon != nil {
-				e.decreaseWeaponDurability(attacker.Owner)
-			}
-		}
 		e.TakeDamage(defender, attackerDamage)
 	}
 	if defenderDamage > 0 {
@@ -49,8 +51,8 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 
 	// Process post-attack triggers or effects if needed
 
-	// Check for deaths
-	e.checkForDeaths(attacker, defender)
+	// Check for deaths and update aura
+	e.processDestroyAndUpdateAura()
 
 	// Set the phase back to main
 	e.game.Phase = game.MainAction
@@ -78,18 +80,49 @@ func (e *Engine) validateAttack(attacker *game.Entity, defender *game.Entity) er
 	return nil
 }
 
-// checkForDeaths checks if any entities have died after the attack
-func (e *Engine) checkForDeaths(attacker *game.Entity, defender *game.Entity) {
-	// Check if entities have died (health <= 0)
-	if attacker.Health <= 0 {
-		logger.Info("Entity has died", logger.String("card", attacker.Card.Name))
-		// Process death effects
-		// TODO: Implement death handling
+func (e *Engine) processDestroyAndUpdateAura() {
+	// Update aura
+
+	// Trigger summon events
+
+	// Process destroy, trigger deathrattle and reborn events (loop until no more entity dies)
+	for e.processDestroyedWeapons() || e.processGraveyard() {
+		e.processReborn()
 	}
 
-	if defender.Health <= 0 {
-		logger.Info("Entity has died", logger.String("card", defender.Card.Name))
-		// Process death effects
-		// TODO: Implement death handling
+	// Update aura
+}
+
+func (e *Engine) processDestroyedWeapons() bool {
+	destroyed := false
+	for _, player := range e.game.Players {
+		if player.Weapon != nil && (player.Weapon.Health <= 0 || player.Weapon.IsDestroyed) {
+			player.Graveyard = append(player.Graveyard, player.Weapon)
+			player.Weapon = nil
+			destroyed = true
+		}
 	}
-} 
+	return destroyed
+}
+
+func (e *Engine) processGraveyard() bool {
+	destroyed := false
+	for _, player := range e.game.Players {
+		for _, minion := range player.Field {
+			if minion.Health <= 0 || minion.IsDestroyed {
+				destroyed = true
+				e.removeEntityFromBoard(player, minion)
+				
+				// TODO: trigger death, deathrattle, infuse, add to reborn list, etc.
+				
+				// add to graveyard
+				player.Graveyard = append(player.Graveyard, minion)
+			}
+		}
+	}
+
+	return destroyed
+}
+
+func (e *Engine) processReborn() {
+}

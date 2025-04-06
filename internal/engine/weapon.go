@@ -22,6 +22,8 @@ func (e *Engine) playWeapon(player *game.Player, entity *game.Entity, target *ga
 	return nil
 }
 
+// decreases the durability of the weapon
+// note: this function will not destroy the weapon, that is handled in processGraveyard()
 func (e *Engine) decreaseWeaponDurability(player *game.Player) error {
 	if player.Weapon == nil {
 		return errors.New("no weapon equipped")
@@ -30,12 +32,6 @@ func (e *Engine) decreaseWeaponDurability(player *game.Player) error {
 	weapon := player.Weapon
 	weapon.Health--
 	logger.Debug("Weapon durability decreased", logger.String("name", weapon.Card.Name))
-
-	if weapon.Health <= 0 {
-		player.Graveyard = append(player.Graveyard, weapon)
-		player.Weapon = nil
-		logger.Debug("Weapon destroyed", logger.String("name", weapon.Card.Name))
-	}
 
 	return nil
 }

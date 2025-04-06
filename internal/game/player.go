@@ -2,13 +2,13 @@ package game
 
 // Entity represents a card instance in play with a reference to its definition and owner
 type Entity struct {
-	Card      *Card
-	Owner     *Player
-	Health    int
-	MaxHealth int
-	Attack    int
-	// Track any modifications specific to this instance
-	Buffs []Buff
+	Card        *Card
+	Owner       *Player
+	Health      int
+	MaxHealth   int
+	Attack      int
+	Buffs       []Buff // Track any modifications specific to this instance
+	IsDestroyed bool
 }
 
 // Buff represents a temporary modification to an entity
