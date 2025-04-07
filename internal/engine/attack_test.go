@@ -17,6 +17,9 @@ func TestBasicAttack(t *testing.T) {
 		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
 
@@ -44,6 +47,9 @@ func TestBasicAttack(t *testing.T) {
 		// Create attacker with zero attack
 		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
+
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -90,6 +96,9 @@ func TestBasicAttack(t *testing.T) {
 		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+
 		// Perform attack with skipValidation=true
 		err := engine.Attack(attackerEntity, defenderEntity, true)
 
@@ -118,6 +127,9 @@ func TestBasicAttack(t *testing.T) {
 		// Create entities with just enough health to be killed
 		attackerEntity := createTestMinionEntity(player, withName("Lethal Attacker"), withAttack(5), withHealth(2))
 		defenderEntity := createTestMinionEntity(player, withName("Fragile Defender"), withAttack(2), withHealth(2))
+
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -148,6 +160,9 @@ func TestBasicAttack(t *testing.T) {
 		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
 
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+
 		// Perform attack
 		_ = engine.Attack(attackerEntity, defenderEntity, false)
 
@@ -167,6 +182,9 @@ func TestBasicAttack(t *testing.T) {
 		
 		// Create a defender entity
 		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
+
+		// Add defender to player's field
+		player.Field = append(player.Field, defenderEntity)
 
 		// Set hero's attack value to match weapon's attack
 		player.Hero.Attack = player.Weapon.Attack
@@ -195,6 +213,156 @@ func TestBasicAttack(t *testing.T) {
 		// Check weapon is destroyed after reaching 0 durability
 		if player.Weapon != nil {
 			t.Errorf("Expected weapon to be destroyed, but it still exists with durability %d", player.Weapon.Health)
+		}
+	})
+
+	t.Run("Attack with poisonous effect destroys minions", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create attacker with poisonous tag
+		attackerEntity := createTestMinionEntity(player, 
+			withName("Poisonous Minion"), 
+			withAttack(1), 
+			withHealth(3),
+			withTag(game.TAG_POISONOUS, true))
+		
+		// Create defender with high health
+		defenderEntity := createTestMinionEntity(player, 
+			withName("Tough Minion"), 
+			withAttack(2), 
+			withHealth(10))
+			
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+			
+		// Perform attack
+		err := engine.Attack(attackerEntity, defenderEntity, false)
+		
+		// Assert
+		if err != nil {
+			t.Errorf("Expected no error, got %v", err)
+		}
+		
+		// Attacker should take defender's damage
+		if attackerEntity.Health != 1 {
+			t.Errorf("Expected attacker health to be 1, got %d", attackerEntity.Health)
+		}
+		
+		// Defender should be marked as destroyed even though it has health remaining
+		if defenderEntity.Health != 9 {
+			t.Errorf("Expected defender health to be 9, got %d", defenderEntity.Health)
+		}
+		
+		if !defenderEntity.IsDestroyed {
+			t.Errorf("Expected defender to be marked as destroyed due to poisonous")
+		}
+		
+		// Check that the defender was moved to the graveyard after processDestroyAndUpdateAura
+		if len(player.Field) != 0 {
+			t.Errorf("Expected field to be empty, got %d minions", len(player.Field))
+		}
+		
+		if len(player.Graveyard) != 1 || player.Graveyard[0].Card.Name != "Tough Minion" {
+			t.Errorf("Expected Tough Minion to be in graveyard")
+		}
+	})
+	
+	t.Run("Mutual poisonous attack destroys both minions", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create both minions with poisonous
+		attackerEntity := createTestMinionEntity(player, 
+			withName("Poisonous Attacker"), 
+			withAttack(1), 
+			withHealth(2),
+			withTag(game.TAG_POISONOUS, true))
+			
+		defenderEntity := createTestMinionEntity(player, 
+			withName("Poisonous Defender"), 
+			withAttack(1), 
+			withHealth(3),
+			withTag(game.TAG_POISONOUS, true))
+			
+		// Add them to the field to check graveyard logic
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+		
+		// Perform attack
+		err := engine.Attack(attackerEntity, defenderEntity, false)
+		
+		// Assert
+		if err != nil {
+			t.Errorf("Expected no error, got %v", err)
+		}
+		
+		// Both should take damage
+		if attackerEntity.Health != 1 { // 2 - 1 = 1
+			t.Errorf("Expected attacker health to be 1, got %d", attackerEntity.Health)
+		}
+		
+		if defenderEntity.Health != 2 { // 3 - 1 = 2
+			t.Errorf("Expected defender health to be 2, got %d", defenderEntity.Health)
+		}
+		
+		// Both should be marked as destroyed due to poisonous
+		if !attackerEntity.IsDestroyed {
+			t.Errorf("Expected attacker to be marked as destroyed due to poisonous")
+		}
+		
+		if !defenderEntity.IsDestroyed {
+			t.Errorf("Expected defender to be marked as destroyed due to poisonous")
+		}
+		
+		// Check that both were moved to the graveyard
+		if len(player.Field) != 0 {
+			t.Errorf("Expected field to be empty, got %d minions", len(player.Field))
+		}
+		
+		if len(player.Graveyard) != 2 {
+			t.Errorf("Expected 2 minions in graveyard, got %d", len(player.Graveyard))
+		}
+	})
+	
+	t.Run("Poisonous doesn't affect heroes", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create poisonous minion
+		minionEntity := createTestMinionEntity(player, 
+			withName("Poisonous Minion"), 
+			withAttack(2), 
+			withHealth(2),
+			withTag(game.TAG_POISONOUS, true))
+			
+		// Add minion to player's field
+		player.Field = append(player.Field, minionEntity)
+			
+		// Get hero entity
+		heroEntity := player.Hero
+		heroEntity.Health = 30
+		
+		// Perform attack against hero
+		err := engine.Attack(minionEntity, heroEntity, false)
+		
+		// Assert
+		if err != nil {
+			t.Errorf("Expected no error, got %v", err)
+		}
+		
+		// Hero should take damage but not be destroyed by poisonous
+		if heroEntity.Health != 28 { // 30 - 2 = 28
+			t.Errorf("Expected hero health to be 28, got %d", heroEntity.Health)
+		}
+		
+		if heroEntity.IsDestroyed {
+			t.Errorf("Hero should not be affected by poisonous")
 		}
 	})
 }

@@ -20,8 +20,8 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	// Set the phase to main combat
 	e.game.Phase = game.MainCombat
 
-	logger.Info("Attack initiated", 
-		logger.String("attacker", attacker.Card.Name), 
+	logger.Info("Attack initiated",
+		logger.String("attacker", attacker.Card.Name),
 		logger.String("defender", defender.Card.Name))
 
 	// Process pre-attack triggers or effects if needed
@@ -31,18 +31,39 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	defenderDamage := defender.Attack
 
 	// Decrease weapon durability if attacker is a hero
-	if attacker.Card.Type == game.Hero {
-		if attacker.Owner != nil && attacker.Owner.Weapon != nil {
-			e.decreaseWeaponDurability(attacker.Owner)
-		}
+	var attackerWeapon *game.Entity
+	if attacker.Card.Type == game.Hero && attacker.Owner != nil && attacker.Owner.Weapon != nil {
+		attackerWeapon = attacker.Owner.Weapon
+		e.decreaseWeaponDurability(attacker.Owner)
 	}
 
 	// Deal damage simultaneously
 	if attackerDamage > 0 {
 		e.TakeDamage(defender, attackerDamage)
+
+		// Check for poisonous effect on attacker
+		if defender.Card.Type == game.Minion {
+			if (attackerWeapon != nil && game.HasTag(attackerWeapon.Tags, game.TAG_POISONOUS)) ||
+				game.HasTag(attacker.Tags, game.TAG_POISONOUS) {
+				// If defender is still alive after taking damage, mark it for destruction
+				defender.IsDestroyed = true
+				logger.Info("Poisonous effect triggered",
+					logger.String("source", attacker.Card.Name),
+					logger.String("target", defender.Card.Name))
+			}
+		}
 	}
 	if defenderDamage > 0 {
 		e.TakeDamage(attacker, defenderDamage)
+
+		// Check for poisonous effect on defender
+		if attacker.Card.Type == game.Minion && game.HasTag(defender.Tags, game.TAG_POISONOUS) {
+			// If attacker is still alive after taking damage, mark it for destruction
+			attacker.IsDestroyed = true
+			logger.Info("Poisonous effect triggered",
+				logger.String("source", defender.Card.Name),
+				logger.String("target", attacker.Card.Name))
+		}
 	}
 
 	// Process special effects like poison, freeze, etc.
@@ -112,9 +133,9 @@ func (e *Engine) processGraveyard() bool {
 			if minion.Health <= 0 || minion.IsDestroyed {
 				destroyed = true
 				e.removeEntityFromBoard(player, minion)
-				
+
 				// TODO: trigger death, deathrattle, infuse, add to reborn list, etc.
-				
+
 				// add to graveyard
 				player.Graveyard = append(player.Graveyard, minion)
 			}
