@@ -9,11 +9,9 @@ import (
 func TestBasicAttack(t *testing.T) {
 	t.Run("Basic attack between minions", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create attacker and defender entities
 		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
@@ -39,11 +37,9 @@ func TestBasicAttack(t *testing.T) {
 
 	t.Run("Attack with zero attack minion", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create attacker with zero attack
 		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
@@ -60,11 +56,9 @@ func TestBasicAttack(t *testing.T) {
 
 	t.Run("Attack with null entities", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create a valid entity for testing
 		validEntity := createTestMinionEntity(player, withName("Valid Minion"), withAttack(1), withHealth(1))
@@ -88,11 +82,9 @@ func TestBasicAttack(t *testing.T) {
 
 	t.Run("Attack with skipValidation", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create zero attack attacker that would normally fail validation
 		attackerEntity := createTestMinionEntity(player, withName("Zero Attack Minion"), withAttack(0), withHealth(4))
@@ -119,11 +111,9 @@ func TestBasicAttack(t *testing.T) {
 
 	t.Run("Attack that kills both entities", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create entities with just enough health to be killed
 		attackerEntity := createTestMinionEntity(player, withName("Lethal Attacker"), withAttack(5), withHealth(2))
@@ -149,12 +139,10 @@ func TestBasicAttack(t *testing.T) {
 
 	t.Run("Game phase changes during attack", func(t *testing.T) {
 		// Setup
-		g := game.NewGame()
+		g := createTestGame()
 		g.Phase = game.MainAction
 		engine := NewEngine(g)
-
-		// Create a dummy player for entity ownership
-		player := game.NewPlayer()
+		player := g.Players[0]
 
 		// Create attacker and defender entities
 		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
@@ -172,9 +160,9 @@ func TestBasicAttack(t *testing.T) {
 	t.Run("Weapon durability decreases on hero attack", func(t *testing.T) {
 		g := createTestGame()
 		engine := NewEngine(g)
-
-		// Give player a weapon
 		player := g.Players[0]
+		
+		// Give player a weapon
 		player.Weapon = createTestWeaponEntity(player, withName("Test Weapon"), withAttack(3), withHealth(2))
 		
 		// Create a defender entity

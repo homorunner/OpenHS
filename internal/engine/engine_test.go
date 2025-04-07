@@ -6,30 +6,6 @@ import (
 	"github.com/openhs/internal/game"
 )
 
-func createTestPlayer() *game.Player {
-	player := game.NewPlayer()
-	player.Hero = createTestHeroEntity(player)
-
-	deck := []*game.Entity{}
-	for i := 0; i < 10; i++ {
-		deck = append(deck, createTestMinionEntity(player, withName("Test Card")))
-	}
-	player.Deck = deck
-
-	return player
-}
-
-// createTestGame creates a simple game with two players for testing
-func createTestGame() *game.Game {
-	g := game.NewGame()
-
-	player1 := createTestPlayer()
-	player2 := createTestPlayer()
-
-	g.Players = append(g.Players, player1, player2)
-	return g
-}
-
 // TestBeginDraw tests if beginDraw correctly draws cards for both players
 func TestBeginDraw(t *testing.T) {
 	g := createTestGame()
