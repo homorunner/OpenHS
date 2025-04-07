@@ -123,7 +123,7 @@ func (e *Engine) ProcessUntil(phase game.GamePhase) error {
 
 func (e *Engine) beginFirst() error {
 	// Initial game setup
-	logger.Info("Phase: Begin First")
+	logger.Debug("Phase: Begin First")
 
 	// Set next phase
 	e.nextPhase = game.BeginShuffle
@@ -131,7 +131,7 @@ func (e *Engine) beginFirst() error {
 }
 
 func (e *Engine) beginShuffle() error {
-	logger.Info("Phase: Begin Shuffle")
+	logger.Debug("Phase: Begin Shuffle")
 
 	// Shuffle player decks
 	// This would involve shuffling the Deck slice for each player
@@ -143,7 +143,7 @@ func (e *Engine) beginShuffle() error {
 }
 
 func (e *Engine) beginDraw() error {
-	logger.Info("Phase: Begin Draw")
+	logger.Debug("Phase: Begin Draw")
 
 	// Draw initial hands for players
 	// First player (index 0) draws 3 cards, second player (index 1) draws 4 cards
@@ -173,7 +173,7 @@ func (e *Engine) beginDraw() error {
 }
 
 func (e *Engine) beginMulligan() error {
-	logger.Info("Phase: Begin Mulligan")
+	logger.Debug("Phase: Begin Mulligan")
 
 	// Handle mulligan phase
 	// Players select cards to redraw
@@ -185,7 +185,7 @@ func (e *Engine) beginMulligan() error {
 }
 
 func (e *Engine) mainBegin() error {
-	logger.Info("Phase: Main Begin")
+	logger.Debug("Phase: Main Begin")
 
 	// Main phase begins
 
@@ -203,31 +203,31 @@ func (e *Engine) mainBegin() error {
 }
 
 func (e *Engine) mainReady() error {
-	logger.Info("Phase: Main Ready")
+	logger.Debug("Phase: Main Ready")
 
 	// Reset player states for new turn
 	player := e.game.CurrentPlayer
-	
+
 	// Reset attack counters and exhaustion for all entities controlled by the player
 	// Hero
 	if player.Hero != nil {
 		player.Hero.NumAttackThisTurn = 0
 		player.Hero.Exhausted = false
 	}
-	
+
 	// Field minions
 	for _, minion := range player.Field {
 		minion.NumAttackThisTurn = 0
 		minion.Exhausted = false
 	}
-	
+
 	// Set next phase
 	e.nextPhase = game.MainStartTriggers
 	return nil
 }
 
 func (e *Engine) mainStartTriggers() error {
-	logger.Info("Phase: Main Start Triggers")
+	logger.Debug("Phase: Main Start Triggers")
 
 	// Process start-of-turn triggers
 	// TODO: Implement trigger system
@@ -238,16 +238,16 @@ func (e *Engine) mainStartTriggers() error {
 }
 
 func (e *Engine) mainResource() error {
-	logger.Info("Phase: Main Resource")
+	logger.Debug("Phase: Main Resource")
 
 	// Give mana crystal to current player
 	player := e.game.CurrentPlayer
-	
+
 	// Increase total mana by 1, but do not exceed MaxMana
 	if player.TotalMana < player.MaxMana {
 		player.TotalMana++
 	}
-	
+
 	// Restore mana to current total
 	player.Mana = player.TotalMana
 
@@ -257,7 +257,7 @@ func (e *Engine) mainResource() error {
 }
 
 func (e *Engine) mainDraw() error {
-	logger.Info("Phase: Main Draw")
+	logger.Debug("Phase: Main Draw")
 
 	// Draw a card for the current player
 	e.DrawCard(e.game.CurrentPlayer)
@@ -268,7 +268,7 @@ func (e *Engine) mainDraw() error {
 }
 
 func (e *Engine) mainStart() error {
-	logger.Info("Phase: Main Start")
+	logger.Debug("Phase: Main Start")
 
 	// Process any destroyed entities and update auras
 	// TODO: Implement destruction and aura logic
@@ -279,7 +279,7 @@ func (e *Engine) mainStart() error {
 }
 
 func (e *Engine) mainAction() error {
-	logger.Info("Phase: Main Action")
+	logger.Debug("Phase: Main Action")
 
 	// Player action phase - no automatic transition
 	// The game waits for player input
@@ -289,7 +289,7 @@ func (e *Engine) mainAction() error {
 }
 
 func (e *Engine) mainEnd() error {
-	logger.Info("Phase: Main End")
+	logger.Debug("Phase: Main End")
 
 	// Process end-of-turn triggers
 	// TODO: Implement end-of-turn logic
@@ -300,7 +300,7 @@ func (e *Engine) mainEnd() error {
 }
 
 func (e *Engine) mainCleanup() error {
-	logger.Info("Phase: Main Cleanup")
+	logger.Debug("Phase: Main Cleanup")
 
 	// Clean up one-turn effects
 	// TODO: Implement cleanup logic
@@ -311,7 +311,7 @@ func (e *Engine) mainCleanup() error {
 }
 
 func (e *Engine) mainNext() error {
-	logger.Info("Phase: Main Next")
+	logger.Debug("Phase: Main Next")
 
 	// Switch to next player
 	e.game.CurrentPlayerIndex = (e.game.CurrentPlayerIndex + 1) % len(e.game.Players)
@@ -326,7 +326,7 @@ func (e *Engine) mainNext() error {
 }
 
 func (e *Engine) finalWrapup() error {
-	logger.Info("Phase: Final Wrapup")
+	logger.Debug("Phase: Final Wrapup")
 
 	// Determine game result
 	// TODO: Implement game result logic
@@ -337,7 +337,7 @@ func (e *Engine) finalWrapup() error {
 }
 
 func (e *Engine) finalGameover() error {
-	logger.Info("Phase: Final Gameover")
+	logger.Debug("Phase: Final Gameover")
 
 	// Game is over
 	return nil

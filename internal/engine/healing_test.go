@@ -8,12 +8,13 @@ import (
 func TestHealCard(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
+	e.StartGame()
 
 	// Test 1: Healing with valid amount
 	player := g.Players[0]
 	entity := createTestMinionEntity(player, withHealth(20))
 	entity.Health = 10 // Set current health to 10
-	
+
 	e.Heal(entity, 5)
 
 	if entity.Health != 15 {
@@ -31,4 +32,4 @@ func TestHealCard(t *testing.T) {
 	if entity.Health != entity.MaxHealth {
 		t.Errorf("Expected health to remain at max health %d, got %d", entity.MaxHealth, entity.Health)
 	}
-} 
+}

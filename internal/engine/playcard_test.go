@@ -8,9 +8,11 @@ import (
 func TestPlayCard(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
+	e.StartGame()
 	player := g.Players[0]
 
 	// Add different types of cards to the player's hand for testing
+	player.Hand = nil
 	addToHand(player, createTestMinionEntity(player, withName("Foo")))
 	addToHand(player, createTestSpellEntity(player))
 	addToHand(player, createTestWeaponEntity(player, withName("Bar")))
@@ -136,6 +138,7 @@ func TestPlayCard(t *testing.T) {
 func TestPlayCardWithFullField(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
+	e.StartGame()
 	player := g.Players[0]
 
 	// Setup a full field
@@ -165,6 +168,7 @@ func TestPlayCardWithFullField(t *testing.T) {
 func TestPlayCardWithSpecificPosition(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
+	e.StartGame()
 	player := g.Players[0]
 
 	// Add some minions to the field
@@ -172,6 +176,7 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 	addToField(player, createTestMinionEntity(player, withName("Field Minion 2")))
 
 	// Add a minion card to hand
+	player.Hand = nil
 	addToHand(player, createTestMinionEntity(player, withName("Test Minion")))
 
 	player.Mana = 10
@@ -203,10 +208,12 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 func TestReplaceWeapon(t *testing.T) {
 	g := createTestGame()
 	e := NewEngine(g)
+	e.StartGame()
 	player := g.Players[0]
 
 	// Equip an initial weapon
 	player.Weapon = createTestWeaponEntity(player, withName("Old Weapon"))
+	player.Hand = nil
 
 	// Add a new weapon to hand
 	addToHand(player, createTestWeaponEntity(player, withName("New Weapon")))
