@@ -197,4 +197,151 @@ func TestBasicAttack(t *testing.T) {
 			t.Errorf("Expected weapon to be destroyed, but it still exists with durability %d", player.Weapon.Health)
 		}
 	})
+}
+
+func TestProcessDestroyAndUpdateAura(t *testing.T) {
+	t.Run("Minions with zero or negative health are moved to graveyard", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+
+		// Create minions with zero and negative health
+		minion1 := createTestMinionEntity(player, withName("Dead Minion 1"), withAttack(1), withHealth(0))
+		minion2 := createTestMinionEntity(player, withName("Dead Minion 2"), withAttack(1), withHealth(-1))
+		minion3 := createTestMinionEntity(player, withName("Alive Minion"), withAttack(1), withHealth(2))
+		
+		// Add minions to the field
+		player.Field = append(player.Field, minion1, minion2, minion3)
+		initialFieldSize := len(player.Field)
+		
+		// Process deaths
+		engine.processDestroyAndUpdateAura()
+		
+		// Check that the dead minions were removed from the field
+		if len(player.Field) != initialFieldSize-2 {
+			t.Errorf("Expected field size to be %d, got %d", initialFieldSize-2, len(player.Field))
+		}
+		
+		// Check that the dead minions were added to the graveyard
+		if len(player.Graveyard) != 2 {
+			t.Errorf("Expected graveyard size to be 2, got %d", len(player.Graveyard))
+		}
+		
+		// Check that the living minion is still on the field
+		if len(player.Field) != 1 || player.Field[0].Card.Name != "Alive Minion" {
+			t.Errorf("Expected only 'Alive Minion' to remain on the field")
+		}
+	})
+	
+	t.Run("Minions marked as destroyed are moved to graveyard", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create a minion marked for destruction
+		minion := createTestMinionEntity(player, withName("Marked Minion"), withAttack(1), withHealth(5))
+		minion.IsDestroyed = true
+		
+		// Add minion to the field
+		player.Field = append(player.Field, minion)
+		
+		// Process deaths
+		engine.processDestroyAndUpdateAura()
+		
+		// Check that the minion was removed from the field
+		if len(player.Field) != 0 {
+			t.Errorf("Expected field to be empty, got %d minions", len(player.Field))
+		}
+		
+		// Check that the minion was added to the graveyard
+		if len(player.Graveyard) != 1 {
+			t.Errorf("Expected graveyard size to be 1, got %d", len(player.Graveyard))
+		}
+	})
+	
+	t.Run("Weapons with zero or negative durability are destroyed", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create and equip a weapon with zero durability
+		weapon := createTestWeaponEntity(player, withName("Broken Weapon"), withAttack(3), withHealth(0))
+		player.Weapon = weapon
+		
+		// Process deaths
+		engine.processDestroyAndUpdateAura()
+		
+		// Check that the weapon was destroyed
+		if player.Weapon != nil {
+			t.Errorf("Expected weapon to be destroyed, but it still exists")
+		}
+		
+		// Check that the weapon was added to the graveyard
+		if len(player.Graveyard) != 1 {
+			t.Errorf("Expected graveyard size to be 1, got %d", len(player.Graveyard))
+		}
+	})
+	
+	t.Run("Weapons marked as destroyed are removed", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create and equip a weapon marked for destruction
+		weapon := createTestWeaponEntity(player, withName("Marked Weapon"), withAttack(3), withHealth(2))
+		weapon.IsDestroyed = true
+		player.Weapon = weapon
+		
+		// Process deaths
+		engine.processDestroyAndUpdateAura()
+		
+		// Check that the weapon was destroyed
+		if player.Weapon != nil {
+			t.Errorf("Expected weapon to be destroyed, but it still exists")
+		}
+		
+		// Check that the weapon was added to the graveyard
+		if len(player.Graveyard) != 1 {
+			t.Errorf("Expected graveyard size to be 1, got %d", len(player.Graveyard))
+		}
+	})
+	
+	t.Run("Process continues until no more entities die", func(t *testing.T) {
+		// Setup - we need to ensure the code can handle a cascading effect
+		// For now we're just testing it runs without errors, as processReborn is empty
+		g := createTestGame()
+		engine := NewEngine(g)
+		player := g.Players[0]
+		
+		// Create minions with various health values
+		minion1 := createTestMinionEntity(player, withName("Dead Minion"), withAttack(1), withHealth(0))
+		minion2 := createTestMinionEntity(player, withName("Alive Minion"), withAttack(1), withHealth(2))
+		
+		// Add minions to the field
+		player.Field = append(player.Field, minion1, minion2)
+		
+		// Also add a weapon
+		weapon := createTestWeaponEntity(player, withName("Broken Weapon"), withAttack(3), withHealth(0))
+		player.Weapon = weapon
+		
+		// Process deaths
+		engine.processDestroyAndUpdateAura()
+		
+		// Verify final state
+		if len(player.Field) != 1 {
+			t.Errorf("Expected 1 minion on field, got %d", len(player.Field))
+		}
+		
+		if player.Weapon != nil {
+			t.Errorf("Expected weapon to be destroyed")
+		}
+		
+		if len(player.Graveyard) != 2 {
+			t.Errorf("Expected 2 entities in graveyard, got %d", len(player.Graveyard))
+		}
+	})
 } 
