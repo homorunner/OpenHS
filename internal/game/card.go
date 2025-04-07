@@ -4,13 +4,14 @@ package game
 // An empty card is a 0/0 minion with no cost and no effects
 type Card struct {
 	Name      string
+	ZhName    string
 	Cost      int
 	Attack    int
 	Health    int
 	MaxHealth int
 	Type      CardType
 	Effects   []Effect
-	Tags      []Tag  // Card tags like Taunt, Divine Shield, etc.
+	Tags      []Tag // Card tags like Taunt, Divine Shield, etc.
 }
 
 // CardType represents the type of a card
@@ -39,6 +40,23 @@ func (c CardType) String() string {
 		return "Hero Power"
 	default:
 		return "Unknown"
+	}
+}
+
+func (c CardType) ZhString() string {
+	switch c {
+	case Minion:
+		return "随从"
+	case Spell:
+		return "法术"
+	case Weapon:
+		return "武器"
+	case Hero:
+		return "英雄"
+	case HeroPower:
+		return "英雄技能"
+	default:
+		return "未知"
 	}
 }
 
@@ -74,6 +92,7 @@ type Condition interface {
 // CardConfig represents the configuration for a card
 type CardConfig struct {
 	Name    string         `json:"name"`
+	ZhName  string         `json:"zh_name"`
 	Cost    int            `json:"cost"`
 	Attack  int            `json:"attack"`
 	Health  int            `json:"health"`
@@ -90,7 +109,7 @@ type TagConfig struct {
 
 // EffectConfig represents the configuration for a card effect
 type EffectConfig struct {
-	Trigger    Trigger `json:"trigger"`
-	Conditions []string      `json:"conditions,omitempty"`
-	Action     string        `json:"action"`
-} 
+	Trigger    Trigger  `json:"trigger"`
+	Conditions []string `json:"conditions,omitempty"`
+	Action     string   `json:"action"`
+}

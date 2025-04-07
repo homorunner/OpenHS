@@ -1,5 +1,6 @@
 {
     "name": "Fireball",
+    "zh_name": "火球术",
     "cost": 4,
     "attack": 0,
     "health": 0,

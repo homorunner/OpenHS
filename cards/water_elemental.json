@@ -1,5 +1,6 @@
 {
     "name": "Water Elemental",
+    "zh_name": "水元素",
     "cost": 4,
     "attack": 3,
     "health": 6,

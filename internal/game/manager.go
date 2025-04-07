@@ -108,6 +108,7 @@ func (cm *CardManager) LoadCardDatabase(cardConfigDir string) error {
 		// Convert config to Card
 		card := Card{
 			Name:      cardConfig.Name,
+			ZhName:    cardConfig.ZhName,
 			Cost:      cardConfig.Cost,
 			Attack:    cardConfig.Attack,
 			Health:    cardConfig.Health,

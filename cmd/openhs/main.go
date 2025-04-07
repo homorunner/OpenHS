@@ -13,6 +13,10 @@ import (
 	"github.com/openhs/internal/game"
 )
 
+const (
+	displayLang = "zh"
+)
+
 func main() {
 	// Initialize the application with config
 	configPath := filepath.Join("config", "openhs.json")
@@ -21,8 +25,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("OpenHS - Hearthstone Simulator Core")
-	fmt.Println("Loading sample game...")
+	displayHello()
 
 	// Load the sample game
 	gameManager := game.GetGameManager()
@@ -47,27 +50,19 @@ func main() {
 	running := true
 
 	for running {
-		// Display game state information
 		displayGameState(g)
 
-		fmt.Println("\nCommands:")
-		fmt.Println("  p <card_number> [<position>] - Play a card from your hand")
-		fmt.Println("  a <attacker_number> <defender_number> - Attack with your minion")
-		fmt.Println("  e - End your turn")
-		fmt.Println("  q - Quit the game")
-		fmt.Print("\nEnter command: ")
+		displayCommands()
 
 		if !scanner.Scan() {
 			break
 		}
-
 		command := scanner.Text()
-		parts := strings.Fields(command)
 
+		parts := strings.Fields(command)
 		if len(parts) == 0 {
 			continue
 		}
-
 		switch parts[0] {
 		case "p":
 			handlePlayCard(e, g, parts)
@@ -84,70 +79,164 @@ func main() {
 	}
 }
 
+func displayHello() {
+	if displayLang == "zh" {
+		fmt.Println("OpenHS - 炉石传说核心模拟器")
+		fmt.Println("正在加载游戏Demo...")
+	} else {
+		fmt.Println("OpenHS - Hearthstone Simulator Core")
+		fmt.Println("Loading sample game...")
+	}
+}
+
+func displayCommands() {
+	if displayLang == "zh" {
+		fmt.Println("\n可用指令:")
+		fmt.Println("  p <card_number> [<position>] - 从手牌中打出一张牌")
+		fmt.Println("  a <attacker_number> <defender_number> - 用你的随从攻击")
+		fmt.Println("  e - 结束你的回合")
+		fmt.Println("  q - 退出游戏")
+		fmt.Print("\n输入指令: ")
+	} else {
+		fmt.Println("\nCommands:")
+		fmt.Println("  p <card_number> [<position>] - Play a card from your hand")
+		fmt.Println("  a <attacker_number> <defender_number> - Attack with your minion")
+		fmt.Println("  e - End your turn")
+		fmt.Println("  q - Quit the game")
+		fmt.Print("\nEnter command: ")
+	}
+}
+
 func displayGameState(g *game.Game) {
-	fmt.Printf("\n=== Game State ===\n")
-	fmt.Printf("Current Turn: %d\n", g.CurrentTurn)
-	fmt.Printf("Current Phase: %s\n", g.Phase.String())
-	fmt.Printf("Current Player: %s (%s)\n", g.CurrentPlayer.Hero.Card.Name, []string{"First", "Second"}[g.CurrentPlayerIndex])
-	fmt.Printf("Player Mana: %d/%d\n", g.CurrentPlayer.Mana, g.CurrentPlayer.TotalMana)
-	fmt.Printf("Player Health: %d\n", g.CurrentPlayer.Hero.Health)
-	if g.CurrentPlayer.FatigueDamage > 0 {
-		fmt.Printf("Player Fatigue Damage: %d\n", g.CurrentPlayer.FatigueDamage)
+	if displayLang == "zh" {
+		fmt.Printf("\n=== 游戏状态 ===\n")
+		fmt.Printf("当前回合: %d\n", g.CurrentTurn)
+		fmt.Printf("当前阶段: %s\n", g.Phase.String())
+		fmt.Printf("当前玩家: %s (%s)\n", g.CurrentPlayer.Hero.Card.ZhName, []string{"先手", "后手"}[g.CurrentPlayerIndex])
+		fmt.Printf("法力水晶: %d/%d\n", g.CurrentPlayer.Mana, g.CurrentPlayer.TotalMana)
+		fmt.Printf("生命值: %d\n", g.CurrentPlayer.Hero.Health)
+		if g.CurrentPlayer.FatigueDamage > 0 {
+			fmt.Printf("下一次疲劳伤害: %d\n", g.CurrentPlayer.FatigueDamage)
+		}
+	} else {
+		fmt.Printf("Current Turn: %d\n", g.CurrentTurn)
+		fmt.Printf("Current Phase: %s\n", g.Phase.String())
+		fmt.Printf("Current Player: %s (%s)\n", g.CurrentPlayer.Hero.Card.Name, []string{"First", "Second"}[g.CurrentPlayerIndex])
+		fmt.Printf("Player Mana: %d/%d\n", g.CurrentPlayer.Mana, g.CurrentPlayer.TotalMana)
+		fmt.Printf("Player Health: %d\n", g.CurrentPlayer.Hero.Health)
+		if g.CurrentPlayer.FatigueDamage > 0 {
+			fmt.Printf("Next Fatigue Damage: %d\n", g.CurrentPlayer.FatigueDamage)
+		}
 	}
 
 	// Print the opponent player's field
 	opponent := g.Players[1-g.CurrentPlayerIndex]
-	fmt.Printf("\nOpponent Player's Field (%d cards):\n", len(opponent.Field))
-	if len(opponent.Field) == 0 {
-		fmt.Println("(Empty field)")
+	if displayLang == "zh" {
+		fmt.Printf("\n对手场面:\n")
+		if len(opponent.Field) == 0 {
+			fmt.Println("(无随从)")
+		}
+		for i, card := range opponent.Field {
+			fmt.Printf("  %d. %s (%d/%d)\n", i+1, card.Card.ZhName, card.Attack, card.Health)
+		}
 	} else {
+		fmt.Printf("\nOpponent Player's Field:\n")
+		if len(opponent.Field) == 0 {
+			fmt.Println("(Empty field)")
+		}
 		for i, card := range opponent.Field {
 			fmt.Printf("  %d. %s (%d/%d)\n", i+1, card.Card.Name, card.Attack, card.Health)
 		}
 	}
 
 	// Print the current player's field
-	fmt.Printf("\nCurrent Player's Field (%d cards):\n", len(g.CurrentPlayer.Field))
-	if len(g.CurrentPlayer.Field) == 0 {
-		fmt.Println("(Empty field)")
+	if displayLang == "zh" {
+		fmt.Printf("\n当前场面:\n")
+		if len(g.CurrentPlayer.Field) == 0 {
+			fmt.Println("(无随从)")
+		} else {
+			for i, card := range g.CurrentPlayer.Field {
+				fmt.Printf("  %d. %s (%d/%d)\n", i+1, card.Card.ZhName, card.Attack, card.Health)
+			}
+		}
 	} else {
-		for i, card := range g.CurrentPlayer.Field {
-			fmt.Printf("  %d. %s (%d/%d)\n", i+1, card.Card.Name, card.Attack, card.Health)
+		fmt.Printf("\nCurrent Player's Field:\n")
+		if len(g.CurrentPlayer.Field) == 0 {
+			fmt.Println("(Empty field)")
+		} else {
+			for i, card := range g.CurrentPlayer.Field {
+				fmt.Printf("  %d. %s (%d/%d)\n", i+1, card.Card.Name, card.Attack, card.Health)
+			}
 		}
 	}
 
 	// Print weapon if equipped
 	if g.CurrentPlayer.Weapon != nil {
-		fmt.Printf("\nEquipped Weapon: %s (%d/%d)\n",
-			g.CurrentPlayer.Weapon.Card.Name,
-			g.CurrentPlayer.Weapon.Attack,
-			g.CurrentPlayer.Weapon.Health)
+		if displayLang == "zh" {
+			fmt.Printf("\n当前装备: %s (%d/%d)\n",
+				g.CurrentPlayer.Weapon.Card.ZhName,
+				g.CurrentPlayer.Weapon.Attack,
+				g.CurrentPlayer.Weapon.Health)
+		} else {
+			fmt.Printf("\nEquipped Weapon: %s (%d/%d)\n",
+				g.CurrentPlayer.Weapon.Card.Name,
+				g.CurrentPlayer.Weapon.Attack,
+				g.CurrentPlayer.Weapon.Health)
+		}
 	}
 
 	// Print the current player's hand
-	fmt.Printf("\nCurrent Player's Hand (%d cards):\n", len(g.CurrentPlayer.Hand))
-	if len(g.CurrentPlayer.Hand) == 0 {
-		fmt.Println("(Empty hand)")
+	if displayLang == "zh" {
+		fmt.Printf("\n当前手牌:\n")
+		if len(g.CurrentPlayer.Hand) == 0 {
+			fmt.Println("(无手牌)")
+		} else {
+			for i, card := range g.CurrentPlayer.Hand {
+				cardInfo := []string{
+					card.Card.Type.ZhString(),
+					card.Card.ZhName,
+				}
+
+				// Add cost
+				if card.Card.Cost > 0 {
+					cardInfo = append(cardInfo, fmt.Sprintf("费用: %d", card.Card.Cost))
+				}
+
+				// Add attack and health for minions and weapons
+				if card.Card.Type == game.Minion {
+					cardInfo = append(cardInfo, fmt.Sprintf("攻击: %d, 生命: %d", card.Attack, card.Health))
+				} else if card.Card.Type == game.Weapon {
+					cardInfo = append(cardInfo, fmt.Sprintf("攻击: %d, 耐久: %d", card.Attack, card.Health))
+				}
+
+				fmt.Printf("  %d. %s\n", i+1, strings.Join(cardInfo, ", "))
+			}
+		}
 	} else {
-		for i, card := range g.CurrentPlayer.Hand {
-			cardInfo := []string{
-				card.Card.Type.String(),
-				card.Card.Name,
-			}
+		fmt.Printf("\nCurrent Player's Hand:\n")
+		if len(g.CurrentPlayer.Hand) == 0 {
+			fmt.Println("(Empty hand)")
+		} else {
+			for i, card := range g.CurrentPlayer.Hand {
+				cardInfo := []string{
+					card.Card.Type.String(),
+					card.Card.Name,
+				}
 
-			// Add cost
-			if card.Card.Cost > 0 {
-				cardInfo = append(cardInfo, fmt.Sprintf("Cost: %d", card.Card.Cost))
-			}
+				// Add cost
+				if card.Card.Cost > 0 {
+					cardInfo = append(cardInfo, fmt.Sprintf("Cost: %d", card.Card.Cost))
+				}
 
-			// Add attack and health for minions and weapons
-			if card.Card.Type == game.Minion {
-				cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Health: %d", card.Attack, card.Health))
-			} else if card.Card.Type == game.Weapon {
-				cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Durability: %d", card.Attack, card.Health))
-			}
+				// Add attack and health for minions and weapons
+				if card.Card.Type == game.Minion {
+					cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Health: %d", card.Attack, card.Health))
+				} else if card.Card.Type == game.Weapon {
+					cardInfo = append(cardInfo, fmt.Sprintf("Attack: %d, Durability: %d", card.Attack, card.Health))
+				}
 
-			fmt.Printf("  %d. %s\n", i+1, strings.Join(cardInfo, ", "))
+				fmt.Printf("  %d. %s\n", i+1, strings.Join(cardInfo, ", "))
+			}
 		}
 	}
 }
