@@ -1,33 +1,33 @@
-package engine
+package test
 
 import "github.com/openhs/internal/game"
 
-func createTestPlayer() *game.Player {
+func CreateTestPlayer() *game.Player {
 	player := game.NewPlayer()
-	player.Hero = createTestHeroEntity(player)
+	player.Hero = CreateTestHeroEntity(player)
 
 	deck := []*game.Entity{}
 	for i := 0; i < 10; i++ {
-		deck = append(deck, createTestMinionEntity(player, withName("Test Card")))
+		deck = append(deck, CreateTestMinionEntity(player, WithName("Test Card")))
 	}
 	player.Deck = deck
 
 	return player
 }
 
-// createTestGame creates a simple game with two players for testing
-func createTestGame() *game.Game {
+// CreateTestGame creates a simple game with two players for testing
+func CreateTestGame() *game.Game {
 	g := game.NewGame()
 
-	player1 := createTestPlayer()
-	player2 := createTestPlayer()
+	player1 := CreateTestPlayer()
+	player2 := CreateTestPlayer()
 
 	g.Players = append(g.Players, player1, player2)
 	return g
 }
 
-// createTestMinionEntity creates a test minion with customizable properties
-func createTestMinionEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+// CreateTestMinionEntity creates a test minion with customizable properties
+func CreateTestMinionEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
 		Name:      "Test Minion",
 		Type:      game.Minion,
@@ -44,8 +44,8 @@ func createTestMinionEntity(player *game.Player, opts ...func(*game.Card)) *game
 	return game.NewEntity(card, player)
 }
 
-// createTestSpellEntity creates a test spell with customizable properties
-func createTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+// CreateTestSpellEntity creates a test spell with customizable properties
+func CreateTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
 		Name: "Test Spell",
 		Type: game.Spell,
@@ -60,8 +60,8 @@ func createTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.
 	return game.NewEntity(card, player)
 }
 
-// createTestWeaponEntity creates a test weapon with customizable properties
-func createTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+// CreateTestWeaponEntity creates a test weapon with customizable properties
+func CreateTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
 		Name:      "Test Weapon",
 		Type:      game.Weapon,
@@ -79,8 +79,8 @@ func createTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game
 	return game.NewEntity(card, player)
 }
 
-// createTestHeroEntity creates a test hero with customizable properties
-func createTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+// CreateTestHeroEntity creates a test hero with customizable properties
+func CreateTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
 		Name:      "Test Hero",
 		Type:      game.Hero,
@@ -98,43 +98,43 @@ func createTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.E
 }
 
 // Helper functions for common entity customizations
-func withName(name string) func(*game.Card) {
+func WithName(name string) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Name = name
 	}
 }
 
-func withCost(cost int) func(*game.Card) {
+func WithCost(cost int) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Cost = cost
 	}
 }
 
-func withAttack(attack int) func(*game.Card) {
+func WithAttack(attack int) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Attack = attack
 	}
 }
 
-func withHealth(health int) func(*game.Card) {
+func WithHealth(health int) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Health = health
 		c.MaxHealth = health
 	}
 }
 
-func withTag(tagType game.TagType, value interface{}) func(*game.Card) {
+func WithTag(tagType game.TagType, value interface{}) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Tags = append(c.Tags, game.NewTag(tagType, value))
 	}
 }
 
-// addToHand adds an entity to player's hand
-func addToHand(player *game.Player, entity *game.Entity) {
+// AddToHand adds an entity to player's hand
+func AddToHand(player *game.Player, entity *game.Entity) {
 	player.Hand = append(player.Hand, entity)
 }
 
-// addToField adds a minion to player's field
-func addToField(player *game.Player, entity *game.Entity) {
+// AddToField adds a minion to player's field
+func AddToField(player *game.Player, entity *game.Entity) {
 	player.Field = append(player.Field, entity)
 }

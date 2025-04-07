@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
+	"github.com/openhs/internal/game/test"
 )
 
 // TestBeginDraw tests if beginDraw correctly draws cards for both players
 func TestBeginDraw(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Before draw
@@ -49,7 +50,7 @@ func TestBeginDraw(t *testing.T) {
 
 // TestMainDraw tests if mainDraw correctly draws a card for the current player
 func TestMainDraw(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup current player
@@ -86,7 +87,7 @@ func TestMainDraw(t *testing.T) {
 
 // TestPlayerSwitching tests if the player switching logic works correctly
 func TestPlayerSwitching(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup initial state
@@ -135,7 +136,7 @@ func TestPlayerSwitching(t *testing.T) {
 
 // TestPhaseProgression tests that the game phases progress correctly
 func TestPhaseProgression(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Set initial phase and disable auto-run
@@ -194,7 +195,7 @@ func TestPhaseProgression(t *testing.T) {
 // TestAutoRunAndPhaseProcessing tests the auto-run functionality and ProcessUntil
 func TestAutoRunAndPhaseProcessing(t *testing.T) {
 	// Test with auto-run enabled (default)
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Verify auto-run is enabled by default
@@ -214,7 +215,7 @@ func TestAutoRunAndPhaseProcessing(t *testing.T) {
 	}
 
 	// Test with auto-run disabled
-	g = createTestGame()
+	g = test.CreateTestGame()
 	e = NewEngine(g)
 
 	// Disable auto-run
@@ -261,7 +262,7 @@ func TestAutoRunAndPhaseProcessing(t *testing.T) {
 
 // TestEndPlayerTurn tests the end turn functionality
 func TestEndPlayerTurn(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Process until first turn
@@ -303,7 +304,7 @@ func TestEndPlayerTurn(t *testing.T) {
 
 // TestManaHandling tests the mana handling functionality
 func TestManaHandling(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup current player
@@ -387,7 +388,7 @@ func TestManaHandling(t *testing.T) {
 
 // TestManaHandlingAcrossPlayerTurns tests the mana system works correctly across player turns
 func TestManaHandlingAcrossPlayerTurns(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup game state

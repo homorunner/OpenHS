@@ -2,17 +2,19 @@ package engine
 
 import (
 	"testing"
+
+	"github.com/openhs/internal/game/test"
 )
 
 // TestHealCard tests the HealCard function
 func TestHealCard(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 
 	// Test 1: Healing with valid amount
 	player := g.Players[0]
-	entity := createTestMinionEntity(player, withHealth(20))
+	entity := test.CreateTestMinionEntity(player, test.WithHealth(20))
 	entity.Health = 10 // Set current health to 10
 
 	e.Heal(entity, 5)

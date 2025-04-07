@@ -2,21 +2,23 @@ package engine
 
 import (
 	"testing"
+
+	"github.com/openhs/internal/game/test"
 )
 
 // TestPlayCard tests the PlayCard functionality
 func TestPlayCard(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 	player := g.Players[0]
 
 	// Add different types of cards to the player's hand for testing
 	player.Hand = nil
-	addToHand(player, createTestMinionEntity(player, withName("Foo")))
-	addToHand(player, createTestSpellEntity(player))
-	addToHand(player, createTestWeaponEntity(player, withName("Bar")))
-	addToHand(player, createTestMinionEntity(player, withCost(10)))
+	test.AddToHand(player, test.CreateTestMinionEntity(player, test.WithName("Foo")))
+	test.AddToHand(player, test.CreateTestSpellEntity(player))
+	test.AddToHand(player, test.CreateTestWeaponEntity(player, test.WithName("Bar")))
+	test.AddToHand(player, test.CreateTestMinionEntity(player, test.WithCost(10)))
 
 	// Setup player resources
 	player.Mana = 5
@@ -136,7 +138,7 @@ func TestPlayCard(t *testing.T) {
 
 // TestPlayCardWithFullField tests playing minions when the field is full
 func TestPlayCardWithFullField(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 	player := g.Players[0]
@@ -144,11 +146,11 @@ func TestPlayCardWithFullField(t *testing.T) {
 	// Setup a full field
 	player.FieldSize = 7 // Max field size
 	for i := 0; i < player.FieldSize; i++ {
-		addToField(player, createTestMinionEntity(player, withName("Field Minion")))
+		test.AddToField(player, test.CreateTestMinionEntity(player, test.WithName("Field Minion")))
 	}
 
 	// Add a minion card to hand
-	addToHand(player, createTestMinionEntity(player))
+	test.AddToHand(player, test.CreateTestMinionEntity(player))
 
 	player.Mana = 10
 
@@ -166,18 +168,18 @@ func TestPlayCardWithFullField(t *testing.T) {
 
 // TestPlayCardWithSpecificPosition tests playing a minion at a specific field position
 func TestPlayCardWithSpecificPosition(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 	player := g.Players[0]
 
 	// Add some minions to the field
-	addToField(player, createTestMinionEntity(player, withName("Field Minion 1")))
-	addToField(player, createTestMinionEntity(player, withName("Field Minion 2")))
+	test.AddToField(player, test.CreateTestMinionEntity(player, test.WithName("Field Minion 1")))
+	test.AddToField(player, test.CreateTestMinionEntity(player, test.WithName("Field Minion 2")))
 
 	// Add a minion card to hand
 	player.Hand = nil
-	addToHand(player, createTestMinionEntity(player, withName("Test Minion")))
+	test.AddToHand(player, test.CreateTestMinionEntity(player, test.WithName("Test Minion")))
 
 	player.Mana = 10
 
@@ -206,17 +208,17 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 
 // TestReplaceWeapon tests replacing an equipped weapon
 func TestReplaceWeapon(t *testing.T) {
-	g := createTestGame()
+	g := test.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 	player := g.Players[0]
 
 	// Equip an initial weapon
-	player.Weapon = createTestWeaponEntity(player, withName("Old Weapon"))
-	player.Hand = nil
+	player.Weapon = test.CreateTestWeaponEntity(player, test.WithName("Old Weapon"))
 
 	// Add a new weapon to hand
-	addToHand(player, createTestWeaponEntity(player, withName("New Weapon")))
+	player.Hand = nil
+	test.AddToHand(player, test.CreateTestWeaponEntity(player, test.WithName("New Weapon")))
 
 	player.Mana = 10
 

@@ -9,6 +9,7 @@ The following tags have been implemented and tested:
 | Tag | Description | Implemented | Tested |
 |-----|-------------|-------------|--------|
 | TAG_POISONOUS | Destroys any minion damaged by this | ✅ | ✅ |
+| TAG_WINDFURY | Can attack twice per turn | ✅ | ✅ |
 
 ## Unimplemented Tags
 
@@ -21,7 +22,6 @@ The following tags are defined but not fully implemented or tested:
 | TAG_CHARGE | Can attack on the turn it's played | Defined but not implemented |
 | TAG_FROZEN | Cannot attack | Defined but not implemented |
 | TAG_STEALTH | Cannot be targeted by opponents | Defined but not implemented |
-| TAG_WINDFURY | Can attack twice per turn | Defined but not implemented |
 | TAG_DEATHRATTLE | Triggers an effect when destroyed | Defined but not implemented |
 | TAG_BATTLECRY | Triggers an effect when played | Defined but not implemented |
 | TAG_RUSH | Can attack minions on the turn it's played | Defined but not implemented |
