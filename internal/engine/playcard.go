@@ -77,6 +77,11 @@ func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *
 
 // playMinion handles playing a minion card
 func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *game.Entity, fieldPos int, chooseOne int) error {
+	// The minion is exhausted when it enters play
+	// Note: exhausted and sleeping are not the same state, but for now we use the same flag
+	entity.Exhausted = true
+	entity.NumAttackThisTurn = 0
+	
 	// Add minion to the field at the specified position
 	if fieldPos < 0 || fieldPos > len(player.Field) {
 		// Auto-position at the end
@@ -113,6 +118,10 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 	if player.Hero != nil {
 		player.Graveyard = append(player.Graveyard, player.Hero)
 	}
+	
+	// Copy the old hero's state of attacking
+	entity.Exhausted = player.Hero.Exhausted
+	entity.NumAttackThisTurn = player.Hero.NumAttackThisTurn
 	
 	// Set the new hero
 	player.Hero = entity

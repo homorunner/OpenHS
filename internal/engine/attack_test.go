@@ -512,4 +512,137 @@ func TestProcessDestroyAndUpdateAura(t *testing.T) {
 			t.Errorf("Expected 2 entities in graveyard, got %d", len(player.Graveyard))
 		}
 	})
+}
+
+func TestAttackRestrictions(t *testing.T) {
+	t.Run("Entity cannot attack when exhausted", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		engine.StartGame()
+		player := g.Players[0]
+
+		// Create attacker and defender entities
+		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
+
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+
+		// Set attacker as exhausted
+		attackerEntity.Exhausted = true
+
+		// Attempt to attack
+		err := engine.Attack(attackerEntity, defenderEntity, false)
+
+		// Assert that attack is rejected due to exhaustion
+		if err == nil {
+			t.Error("Expected an error when attacking with exhausted entity, got none")
+		}
+	})
+
+	t.Run("Entity cannot attack more than once per turn", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		engine.StartGame()
+		player := g.Players[0]
+
+		// Create attacker and defender entities
+		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(2), withHealth(5))
+
+		// Add minions to player's field
+		player.Field = append(player.Field, attackerEntity, defenderEntity)
+
+		// Set attacker as ready to attack
+		attackerEntity.Exhausted = false
+
+		// First attack should succeed
+		err := engine.Attack(attackerEntity, defenderEntity, false)
+		if err != nil {
+			t.Errorf("Expected first attack to succeed, got error: %v", err)
+		}
+
+		// Check that NumAttackThisTurn was incremented
+		if attackerEntity.NumAttackThisTurn != 1 {
+			t.Errorf("Expected NumAttackThisTurn to be 1, got %d", attackerEntity.NumAttackThisTurn)
+		}
+
+		// Second attack should fail
+		err = engine.Attack(attackerEntity, defenderEntity, false)
+		if err == nil {
+			t.Error("Expected an error when attacking twice in one turn, got none")
+		}
+	})
+
+	t.Run("Entity attack counters are reset at turn start", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		engine.StartGame()
+		player := g.Players[0]
+
+		// Create attacker and set it as having already attacked
+		attackerEntity := createTestMinionEntity(player, withName("Test Attacker"), withAttack(3), withHealth(4))
+		attackerEntity.NumAttackThisTurn = 1
+		attackerEntity.Exhausted = true
+
+		// Add minion to player's field
+		player.Field = append(player.Field, attackerEntity)
+
+		// End the turn twice to reset the attack counters
+		engine.EndPlayerTurn()
+		engine.EndPlayerTurn()
+
+		// Check that NumAttackThisTurn was reset
+		if attackerEntity.NumAttackThisTurn != 0 {
+			t.Errorf("Expected NumAttackThisTurn to be reset to 0, got %d", attackerEntity.NumAttackThisTurn)
+		}
+
+		// Check that Exhausted was set to false
+		if attackerEntity.Exhausted {
+			t.Error("Expected Exhausted to be reset to false")
+		}
+	})
+
+	t.Run("Newly played minions are exhausted", func(t *testing.T) {
+		// Setup
+		g := createTestGame()
+		engine := NewEngine(g)
+		engine.StartGame()
+		player := g.Players[0]
+
+		// Create a minion entity for the hand
+		minionEntity := createTestMinionEntity(player, withName("Test Minion"), withAttack(2), withHealth(2))
+		player.Hand = append(player.Hand, minionEntity)
+		player.Mana = 10 // Ensure enough mana
+
+		// Play the minion
+		err := engine.PlayCard(player, 0, nil, -1, 0)
+		if err != nil {
+			t.Fatalf("Failed to play minion: %v", err)
+		}
+
+		// Check that the minion is on the field
+		if len(player.Field) != 1 {
+			t.Fatalf("Expected 1 minion on field, got %d", len(player.Field))
+		}
+
+		// Check that the minion is exhausted
+		playedMinion := player.Field[0]
+		if !playedMinion.Exhausted {
+			t.Error("Expected newly played minion to be exhausted")
+		}
+
+		// Create a defender
+		defenderEntity := createTestMinionEntity(player, withName("Test Defender"), withAttack(1), withHealth(1))
+		player.Field = append(player.Field, defenderEntity)
+
+		// Attempt to attack with the newly played minion
+		err = engine.Attack(playedMinion, defenderEntity, false)
+		if err == nil {
+			t.Error("Expected an error when attacking with newly played minion, got none")
+		}
+	})
 } 

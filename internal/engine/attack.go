@@ -38,6 +38,7 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	}
 
 	// Deal damage simultaneously
+	// TODO: maybe merge the poisonous logic to DealDamage function
 	if attackerDamage > 0 {
 		e.TakeDamage(defender, attackerDamage)
 
@@ -66,9 +67,20 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 		}
 	}
 
-	// Process special effects like poison, freeze, etc.
-
 	// Mark attacker as having attacked this turn
+	attacker.NumAttackThisTurn++
+
+	// Check if attacker is exhausted
+	expectedAttacks := 1
+	if game.HasTag(attacker.Tags, game.TAG_WINDFURY) ||
+		(attackerWeapon != nil && game.HasTag(attackerWeapon.Tags, game.TAG_WINDFURY)) {
+		expectedAttacks = 2
+	}
+	if attacker.NumAttackThisTurn >= expectedAttacks {
+		attacker.Exhausted = true
+	}
+
+	// Process special effects like poison, freeze, etc.
 
 	// Process post-attack triggers or effects if needed
 
@@ -93,8 +105,12 @@ func (e *Engine) validateAttack(attacker *game.Entity, defender *game.Entity) er
 		return errors.New("attacker has 0 or negative attack")
 	}
 
+	// Check if attacker is exhausted
+	if attacker.Exhausted {
+		return errors.New("entity is exhausted and cannot attack this turn")
+	}
+
 	// Additional validation logic can be added here
-	// - Check if attacker is exhausted
 	// - Check if defender is a valid target
 	// - Check for special effects like taunt, stealth, etc.
 

@@ -206,8 +206,20 @@ func (e *Engine) mainReady() error {
 	logger.Info("Phase: Main Ready")
 
 	// Reset player states for new turn
-	// Reset attack counters, etc.
-	// Note: Mana will be handled in mainResource phase
+	player := e.game.CurrentPlayer
+	
+	// Reset attack counters and exhaustion for all entities controlled by the player
+	// Hero
+	if player.Hero != nil {
+		player.Hero.NumAttackThisTurn = 0
+		player.Hero.Exhausted = false
+	}
+	
+	// Field minions
+	for _, minion := range player.Field {
+		minion.NumAttackThisTurn = 0
+		minion.Exhausted = false
+	}
 	
 	// Set next phase
 	e.nextPhase = game.MainStartTriggers
