@@ -14,3 +14,9 @@ Thumbs.db
 
 # Third party dependencies
 third_party/
+
+# Build files
+build/
+
+# VSCode files
+.vscode/
