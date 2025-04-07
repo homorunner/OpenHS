@@ -3,17 +3,5 @@
     "cost": 2,
     "attack": 0,
     "health": 0,
-    "type": 1,
-    "effects": [
-        {
-            "trigger": 0,
-            "action": "deal_damage",
-            "conditions": ["has_target"]
-        },
-        {
-            "trigger": 0,
-            "action": "freeze_target",
-            "conditions": ["is_character"]
-        }
-    ]
+    "type": 1
 } 

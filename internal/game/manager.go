@@ -113,6 +113,57 @@ func (cm *CardManager) LoadCardDatabase(cardConfigDir string) error {
 			Health:    cardConfig.Health,
 			MaxHealth: cardConfig.Health, // Set MaxHealth equal to Health
 			Type:      cardConfig.Type,
+			Tags:      make([]Tag, 0, len(cardConfig.Tags)), // Initialize tags
+		}
+
+		// Process tags
+		for _, tagConfig := range cardConfig.Tags {
+			// Convert string tag name to TagType
+			var tagType TagType
+			switch tagConfig.Type {
+			case "TAG_TAUNT":
+				tagType = TAG_TAUNT
+			case "TAG_DIVINE_SHIELD":
+				tagType = TAG_DIVINE_SHIELD
+			case "TAG_CHARGE":
+				tagType = TAG_CHARGE
+			case "TAG_FROZEN":
+				tagType = TAG_FROZEN
+			case "TAG_STEALTH":
+				tagType = TAG_STEALTH
+			case "TAG_POISONOUS":
+				tagType = TAG_POISONOUS
+			case "TAG_WINDFURY":
+				tagType = TAG_WINDFURY
+			case "TAG_DEATHRATTLE":
+				tagType = TAG_DEATHRATTLE
+			case "TAG_BATTLECRY":
+				tagType = TAG_BATTLECRY
+			case "TAG_RUSH":
+				tagType = TAG_RUSH
+			case "TAG_LIFESTEAL":
+				tagType = TAG_LIFESTEAL
+			case "TAG_REBORN":
+				tagType = TAG_REBORN
+			case "TAG_DORMANT":
+				tagType = TAG_DORMANT
+			case "TAG_SPELLPOWER":
+				tagType = TAG_SPELLPOWER
+			case "TAG_CANT_ATTACK":
+				tagType = TAG_CANT_ATTACK
+			case "TAG_CANT_BE_TARGETED":
+				tagType = TAG_CANT_BE_TARGETED
+			case "TAG_IMMUNE":
+				tagType = TAG_IMMUNE
+			default:
+				logger.Warn("Unknown tag type",
+					logger.String("tag", tagConfig.Type),
+					logger.String("card", card.Name))
+				continue
+			}
+
+			// Add the tag to the card
+			card.Tags = append(card.Tags, NewTag(tagType, tagConfig.Value))
 		}
 
 		// Register the card template

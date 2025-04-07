@@ -1,32 +1,5 @@
 package game
 
-// Entity represents a card instance in play with a reference to its definition and owner
-type Entity struct {
-	Card        *Card
-	Owner       *Player
-	Health      int
-	MaxHealth   int
-	Attack      int
-	Buffs       []Buff // Track any modifications specific to this instance
-	IsDestroyed bool
-}
-
-// Buff represents a temporary modification to an entity
-type Buff struct {
-}
-
-// NewEntity creates a new entity from a card
-func NewEntity(card *Card, owner *Player) *Entity {
-	return &Entity{
-		Card:      card,
-		Owner:     owner,
-		Health:    card.Health,
-		MaxHealth: card.MaxHealth,
-		Attack:    card.Attack,
-		Buffs:     make([]Buff, 0),
-	}
-}
-
 const (
 	DefaultMaxMana      = 10
 	DefaultStartingMana = 0

@@ -4,11 +4,9 @@
     "attack": 3,
     "health": 6,
     "type": 0,
-    "effects": [
+    "tags": [
         {
-            "trigger": 2,
-            "action": "freeze_target",
-            "conditions": ["is_character"]
+            "type": "TAG_FREEZE"
         }
     ]
 } 

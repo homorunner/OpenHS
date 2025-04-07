@@ -10,6 +10,7 @@ type Card struct {
 	MaxHealth int
 	Type      CardType
 	Effects   []Effect
+	Tags      []Tag  // Card tags like Taunt, Divine Shield, etc.
 }
 
 // CardType represents the type of a card
@@ -76,8 +77,15 @@ type CardConfig struct {
 	Cost    int            `json:"cost"`
 	Attack  int            `json:"attack"`
 	Health  int            `json:"health"`
-	Type    CardType `json:"type"`
+	Type    CardType       `json:"type"`
 	Effects []EffectConfig `json:"effects,omitempty"`
+	Tags    []TagConfig    `json:"tags,omitempty"`
+}
+
+// TagConfig represents the configuration for a card tag
+type TagConfig struct {
+	Type  string      `json:"type"`
+	Value interface{} `json:"value,omitempty"`
 }
 
 // EffectConfig represents the configuration for a card effect

@@ -123,6 +123,12 @@ func withHealth(health int) func(*game.Card) {
 	}
 }
 
+func withTag(tagType game.TagType, value interface{}) func(*game.Card) {
+	return func(c *game.Card) {
+		c.Tags = append(c.Tags, game.NewTag(tagType, value))
+	}
+}
+
 // addToHand adds an entity to player's hand
 func addToHand(player *game.Player, entity *game.Entity) {
 	player.Hand = append(player.Hand, entity)
