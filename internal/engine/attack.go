@@ -121,6 +121,13 @@ func (e *Engine) validateAttack(attacker *game.Entity, defender *game.Entity) er
 		return errors.New("cannot attack your own entities")
 	}
 
+	// Check rush restriction - Entities with rush cannot attack heroes on their first turn in field
+	if game.HasTag(attacker.Tags, game.TAG_RUSH) &&
+		defender.Card.Type == game.Hero &&
+		attacker.NumTurnInPlay == 0 {
+		return errors.New("minions with rush cannot attack heroes on their first turn")
+	}
+
 	// Additional validation logic can be added here
 	// - Check for special effects like taunt, stealth, etc.
 

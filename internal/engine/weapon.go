@@ -18,7 +18,7 @@ func (e *Engine) playWeapon(player *game.Player, entity *game.Entity, target *ga
 	// Equip the new weapon
 	player.Weapon = entity
 	logger.Debug("Weapon equipped", logger.String("name", entity.Card.Name))
-	
+
 	return nil
 }
 

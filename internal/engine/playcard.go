@@ -80,11 +80,16 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 	// The minion is exhausted when it enters play, unless it has charge
 	// Note: exhausted and sleeping are not the same state, but for now we use the same flag
 	entity.NumAttackThisTurn = 0
+	entity.NumTurnInPlay = 0 // First turn in play
 
 	if game.HasTag(entity.Tags, game.TAG_CHARGE) {
 		// Minions with charge can attack immediately
 		entity.Exhausted = false
 		logger.Info("Charge effect activated", logger.String("name", entity.Card.Name))
+	} else if game.HasTag(entity.Tags, game.TAG_RUSH) {
+		// Minions with rush can attack minions immediately, but not heroes
+		entity.Exhausted = false
+		logger.Info("Rush effect activated", logger.String("name", entity.Card.Name))
 	} else {
 		entity.Exhausted = true
 	}
@@ -129,6 +134,7 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 	// Copy the old hero's state of attacking
 	entity.Exhausted = player.Hero.Exhausted
 	entity.NumAttackThisTurn = player.Hero.NumAttackThisTurn
+	entity.NumTurnInPlay = 0 // First turn in play
 
 	// Set the new hero
 	player.Hero = entity
@@ -137,3 +143,5 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 
 	return nil
 }
+
+// playWeapon is implemented in weapon.go

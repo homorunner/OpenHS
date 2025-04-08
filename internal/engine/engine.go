@@ -213,12 +213,16 @@ func (e *Engine) mainReady() error {
 	if player.Hero != nil {
 		player.Hero.NumAttackThisTurn = 0
 		player.Hero.Exhausted = false
+		// Increment turns in play counter
+		player.Hero.NumTurnInPlay++
 	}
 
 	// Field minions
 	for _, minion := range player.Field {
 		minion.NumAttackThisTurn = 0
 		minion.Exhausted = false
+		// Increment turns in play counter
+		minion.NumTurnInPlay++
 	}
 
 	// Set next phase
