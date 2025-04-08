@@ -58,4 +58,3 @@ func GetTagValue(tags []Tag, tagType TagType) (interface{}, bool) {
 	}
 	return nil, false
 }
-
