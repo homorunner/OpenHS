@@ -40,7 +40,7 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	// Deal damage simultaneously
 	// TODO: maybe merge the poisonous logic to DealDamage function
 	if attackerDamage > 0 {
-		e.TakeDamage(defender, attackerDamage)
+		e.DealDamage(attacker, defender, attackerDamage)
 
 		// Check for poisonous effect on attacker
 		if defender.Card.Type == game.Minion {
@@ -55,7 +55,7 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 		}
 	}
 	if defenderDamage > 0 {
-		e.TakeDamage(attacker, defenderDamage)
+		e.DealDamage(defender, attacker, defenderDamage)
 
 		// Check for poisonous effect on defender
 		if attacker.Card.Type == game.Minion && game.HasTag(defender.Tags, game.TAG_POISONOUS) {

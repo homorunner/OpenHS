@@ -17,20 +17,20 @@ func TestHealCard(t *testing.T) {
 	entity := test.CreateTestMinionEntity(player, test.WithHealth(20))
 	entity.Health = 10 // Set current health to 10
 
-	e.Heal(entity, 5)
+	e.Heal(nil, entity, 5)
 
 	if entity.Health != 15 {
 		t.Errorf("Expected health to be 15 after healing 5, got %d", entity.Health)
 	}
 
 	// Test 2: Healing beyond max health should cap at max health
-	e.Heal(entity, 10)
+	e.Heal(nil, entity, 10)
 	if entity.Health != entity.MaxHealth {
 		t.Errorf("Expected health to be capped at max health %d, got %d", entity.MaxHealth, entity.Health)
 	}
 
 	// Test 3: Healing a card already at max health
-	e.Heal(entity, 5)
+	e.Heal(nil, entity, 5)
 	if entity.Health != entity.MaxHealth {
 		t.Errorf("Expected health to remain at max health %d, got %d", entity.MaxHealth, entity.Health)
 	}

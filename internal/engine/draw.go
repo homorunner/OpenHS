@@ -13,7 +13,7 @@ func (e *Engine) DrawCard(player *game.Player) *game.Entity {
 
 // DrawSpecificCard allows drawing a specific card from the deck
 // If cardToDraw is nil, it draws the top card of the deck
-// 
+//
 // Returns the drawn entity or nil if no card was drawn
 func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.Entity {
 	// Check if the deck is empty
@@ -21,12 +21,12 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		player.FatigueDamage++
 
 		logger.Info("Player taking fatigue damage", logger.Int("damage", player.FatigueDamage))
-		e.TakeDamage(player.Hero, player.FatigueDamage)
+		e.DealDamage(nil, player.Hero, player.FatigueDamage)
 		return nil
 	}
-	
+
 	var entity *game.Entity
-	
+
 	// If a specific card is requested, find and draw it
 	if cardToDraw != "" {
 		found := false
@@ -40,7 +40,7 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 				break
 			}
 		}
-		
+
 		// If the card wasn't found, return nil
 		if !found {
 			logger.Info("Card not found in deck", logger.String("card", cardToDraw))
@@ -51,12 +51,12 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		entity = player.Deck[len(player.Deck)-1]
 		player.Deck = player.Deck[:len(player.Deck)-1]
 	}
-	
+
 	// Add entity to hand if space is available
 	if !e.AddCardToHand(player, entity) {
 		return nil
 	}
-	
+
 	return entity
 }
 
@@ -67,9 +67,9 @@ func (e *Engine) AddCardToHand(player *game.Player, entity *game.Entity) bool {
 		logger.Info("Hand is full, card discarded", logger.String("card", entity.Card.Name))
 		return false
 	}
-	
+
 	// Add entity to hand
 	player.Hand = append(player.Hand, entity)
-	
+
 	return true
 }
