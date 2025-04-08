@@ -110,8 +110,18 @@ func (e *Engine) validateAttack(attacker *game.Entity, defender *game.Entity) er
 		return errors.New("entity is exhausted and cannot attack this turn")
 	}
 
+	// Check if defender is a valid target
+	// Only minion or hero of another player can be attack target
+	if defender.Card.Type != game.Minion && defender.Card.Type != game.Hero {
+		return errors.New("defender must be a minion or hero")
+	}
+
+	// Check if defender belongs to a different player
+	if defender.Owner == attacker.Owner {
+		return errors.New("cannot attack your own entities")
+	}
+
 	// Additional validation logic can be added here
-	// - Check if defender is a valid target
 	// - Check for special effects like taunt, stealth, etc.
 
 	return nil

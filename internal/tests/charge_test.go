@@ -15,6 +15,7 @@ func TestCharge(t *testing.T) {
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
+		opponent := g.Players[1]
 
 		// Create a charge minion entity for the hand
 		chargeMinionEntity := test.CreateTestMinionEntity(player,
@@ -28,14 +29,14 @@ func TestCharge(t *testing.T) {
 		player.Hand = []*game.Entity{chargeMinionEntity}
 		player.Mana = 10 // Ensure enough mana
 
-		// Create a target minion on the board
-		targetMinionEntity := test.CreateTestMinionEntity(player,
+		// Create a target minion for the opponent
+		targetMinionEntity := test.CreateTestMinionEntity(opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(2),
 			test.WithHealth(4))
 
-		// Add target minion to player's field
-		player.Field = append(player.Field, targetMinionEntity)
+		// Add target minion to opponent's field
+		opponent.Field = append(opponent.Field, targetMinionEntity)
 
 		// Play the charge minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)
@@ -44,12 +45,12 @@ func TestCharge(t *testing.T) {
 		}
 
 		// Check that the minion is on the field
-		if len(player.Field) != 2 {
-			t.Fatalf("Expected 2 minions on field, got %d", len(player.Field))
+		if len(player.Field) != 1 {
+			t.Fatalf("Expected 1 minion on player's field, got %d", len(player.Field))
 		}
 
 		// Get the played charge minion
-		playedCharge := player.Field[1]
+		playedCharge := player.Field[0]
 
 		// Check that the minion is not exhausted due to charge
 		if playedCharge.Exhausted {
@@ -81,6 +82,7 @@ func TestCharge(t *testing.T) {
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
+		opponent := g.Players[1]
 
 		// Create a regular minion entity for the hand
 		regularMinionEntity := test.CreateTestMinionEntity(player,
@@ -93,14 +95,14 @@ func TestCharge(t *testing.T) {
 		player.Hand = append(player.Hand, regularMinionEntity)
 		player.Mana = 10 // Ensure enough mana
 
-		// Create a target minion on the board
-		targetMinionEntity := test.CreateTestMinionEntity(player,
+		// Create a target minion for the opponent
+		targetMinionEntity := test.CreateTestMinionEntity(opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(2),
 			test.WithHealth(4))
 
-		// Add target minion to player's field
-		player.Field = append(player.Field, targetMinionEntity)
+		// Add target minion to opponent's field
+		opponent.Field = append(opponent.Field, targetMinionEntity)
 
 		// Play the regular minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)
@@ -109,12 +111,12 @@ func TestCharge(t *testing.T) {
 		}
 
 		// Check that the minion is on the field
-		if len(player.Field) != 2 {
-			t.Fatalf("Expected 2 minions on field, got %d", len(player.Field))
+		if len(player.Field) != 1 {
+			t.Fatalf("Expected 1 minion on player's field, got %d", len(player.Field))
 		}
 
 		// Get the played regular minion
-		playedRegular := player.Field[1]
+		playedRegular := player.Field[0]
 
 		// Check that the minion is exhausted
 		if !playedRegular.Exhausted {

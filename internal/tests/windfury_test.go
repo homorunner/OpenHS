@@ -15,6 +15,7 @@ func TestWindfury(t *testing.T) {
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
+		opponent := g.Players[1]
 
 		// Create attacker with windfury
 		attackerEntity := test.CreateTestMinionEntity(player,
@@ -23,18 +24,19 @@ func TestWindfury(t *testing.T) {
 			test.WithHealth(4),
 			test.WithTag(game.TAG_WINDFURY, true))
 
-		// Create two defender entities
-		defender1 := test.CreateTestMinionEntity(player,
+		// Create two defender entities for the opponent
+		defender1 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(player,
+		defender2 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))
 
-		// Add minions to player's field
-		player.Field = append(player.Field, attackerEntity, defender1, defender2)
+		// Add minions to respective player fields
+		player.Field = append(player.Field, attackerEntity)
+		opponent.Field = append(opponent.Field, defender1, defender2)
 
 		// Make sure minion isn't exhausted
 		attackerEntity.Exhausted = false
@@ -84,6 +86,7 @@ func TestWindfury(t *testing.T) {
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
+		opponent := g.Players[1]
 
 		// Create normal attacker without windfury
 		attackerEntity := test.CreateTestMinionEntity(player,
@@ -91,18 +94,19 @@ func TestWindfury(t *testing.T) {
 			test.WithAttack(3),
 			test.WithHealth(4))
 
-		// Create two defender entities
-		defender1 := test.CreateTestMinionEntity(player,
+		// Create two defender entities for the opponent
+		defender1 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(player,
+		defender2 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))
 
-		// Add minions to player's field
-		player.Field = append(player.Field, attackerEntity, defender1, defender2)
+		// Add minions to respective player fields
+		player.Field = append(player.Field, attackerEntity)
+		opponent.Field = append(opponent.Field, defender1, defender2)
 
 		// Make sure minion isn't exhausted
 		attackerEntity.Exhausted = false
@@ -136,6 +140,7 @@ func TestWindfury(t *testing.T) {
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
+		opponent := g.Players[1]
 
 		// Create a windfury weapon and equip it
 		weapon := test.CreateTestWeaponEntity(player,
@@ -149,18 +154,18 @@ func TestWindfury(t *testing.T) {
 		// Set hero's attack value to match weapon's attack
 		player.Hero.Attack = weapon.Attack
 
-		// Create two defender entities
-		defender1 := test.CreateTestMinionEntity(player,
+		// Create two defender entities for the opponent
+		defender1 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(player,
+		defender2 := test.CreateTestMinionEntity(opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))
 
-		// Add minions to player's field
-		player.Field = append(player.Field, defender1, defender2)
+		// Add minions to opponent's field
+		opponent.Field = append(opponent.Field, defender1, defender2)
 
 		// Make sure hero isn't exhausted
 		player.Hero.Exhausted = false

@@ -14,26 +14,28 @@ func TestPoisonous(t *testing.T) {
 		g := test.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
-		player := g.Players[0]
+		player1 := g.Players[0]
+		player2 := g.Players[1]
 
 		// Create attacker with poisonous tag
-		attackerEntity := test.CreateTestMinionEntity(player,
+		attackerEntity := test.CreateTestMinionEntity(player1,
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(1),
 			test.WithHealth(3),
 			test.WithTag(game.TAG_POISONOUS, true))
 
-		// Create defender with high health
-		defenderEntity := test.CreateTestMinionEntity(player,
+		// Create defender with high health for opponent
+		defenderEntity := test.CreateTestMinionEntity(player2,
 			test.WithName("Tough Minion"),
 			test.WithAttack(2),
 			test.WithHealth(10))
 
-		// Add minions to player's field
-		player.Field = append(player.Field, attackerEntity, defenderEntity)
+		// Add minions to respective players' fields
+		player1.Field = append(player1.Field, attackerEntity)
+		player2.Field = append(player2.Field, defenderEntity)
 
-		// Perform attack, skip validation
-		err := engine.Attack(attackerEntity, defenderEntity, true)
+		// Perform attack
+		err := engine.Attack(attackerEntity, defenderEntity, false)
 
 		// Assert
 		if err != nil {
@@ -54,13 +56,18 @@ func TestPoisonous(t *testing.T) {
 			t.Errorf("Expected defender to be marked as destroyed due to poisonous")
 		}
 
-		// Check that the defender was moved to the graveyard after processDestroyAndUpdateAura
-		if len(player.Field) != 1 {
-			t.Errorf("Expected field to have 1 minion, got %d minions", len(player.Field))
+		// Check that the defender moves to the graveyard when destroyed
+		// This happens inside the Attack method, no need to call processDestroyAndUpdateAura separately
+		if len(player1.Field) != 1 {
+			t.Errorf("Expected attacker's field to have 1 minion, got %d minions", len(player1.Field))
 		}
 
-		if len(player.Graveyard) != 1 || player.Graveyard[0].Card.Name != "Tough Minion" {
-			t.Errorf("Expected Tough Minion to be in graveyard")
+		if len(player2.Field) != 0 {
+			t.Errorf("Expected defender's field to be empty, got %d minions", len(player2.Field))
+		}
+
+		if len(player2.Graveyard) != 1 || player2.Graveyard[0].Card.Name != "Tough Minion" {
+			t.Errorf("Expected Tough Minion to be in defender's graveyard")
 		}
 	})
 
@@ -69,23 +76,25 @@ func TestPoisonous(t *testing.T) {
 		g := test.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
-		player := g.Players[0]
+		player1 := g.Players[0]
+		player2 := g.Players[1]
 
-		// Create both minions with poisonous
-		attackerEntity := test.CreateTestMinionEntity(player,
+		// Create minions with poisonous for different players
+		attackerEntity := test.CreateTestMinionEntity(player1,
 			test.WithName("Poisonous Attacker"),
 			test.WithAttack(1),
 			test.WithHealth(2),
 			test.WithTag(game.TAG_POISONOUS, true))
 
-		defenderEntity := test.CreateTestMinionEntity(player,
+		defenderEntity := test.CreateTestMinionEntity(player2,
 			test.WithName("Poisonous Defender"),
 			test.WithAttack(1),
 			test.WithHealth(3),
 			test.WithTag(game.TAG_POISONOUS, true))
 
-		// Add them to the field to check graveyard logic
-		player.Field = append(player.Field, attackerEntity, defenderEntity)
+		// Add them to their respective player's field
+		player1.Field = append(player1.Field, attackerEntity)
+		player2.Field = append(player2.Field, defenderEntity)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -114,12 +123,21 @@ func TestPoisonous(t *testing.T) {
 		}
 
 		// Check that both were moved to the graveyard
-		if len(player.Field) != 0 {
-			t.Errorf("Expected field to be empty, got %d minions", len(player.Field))
+		// This happens inside the Attack method
+		if len(player1.Field) != 0 {
+			t.Errorf("Expected attacker's field to be empty, got %d minions", len(player1.Field))
 		}
 
-		if len(player.Graveyard) != 2 {
-			t.Errorf("Expected 2 minions in graveyard, got %d", len(player.Graveyard))
+		if len(player2.Field) != 0 {
+			t.Errorf("Expected defender's field to be empty, got %d minions", len(player2.Field))
+		}
+
+		if len(player1.Graveyard) != 1 {
+			t.Errorf("Expected 1 minion in attacker's graveyard, got %d", len(player1.Graveyard))
+		}
+
+		if len(player2.Graveyard) != 1 {
+			t.Errorf("Expected 1 minion in defender's graveyard, got %d", len(player2.Graveyard))
 		}
 	})
 
@@ -128,23 +146,24 @@ func TestPoisonous(t *testing.T) {
 		g := test.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
-		player := g.Players[0]
+		player1 := g.Players[0]
+		player2 := g.Players[1]
 
 		// Create poisonous minion
-		minionEntity := test.CreateTestMinionEntity(player,
+		minionEntity := test.CreateTestMinionEntity(player1,
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(2),
 			test.WithHealth(2),
 			test.WithTag(game.TAG_POISONOUS, true))
 
 		// Add minion to player's field
-		player.Field = append(player.Field, minionEntity)
+		player1.Field = append(player1.Field, minionEntity)
 
-		// Get hero entity
-		heroEntity := player.Hero
+		// Get opponent's hero entity
+		heroEntity := player2.Hero
 		heroEntity.Health = 30
 
-		// Perform attack against hero
+		// Perform attack against opponent's hero
 		err := engine.Attack(minionEntity, heroEntity, false)
 
 		// Assert
