@@ -5,6 +5,7 @@ package game
 type Card struct {
 	Name      string
 	ZhName    string
+	ID        string
 	Cost      int
 	Attack    int
 	Health    int

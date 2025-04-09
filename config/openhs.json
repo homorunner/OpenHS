@@ -1,5 +1,4 @@
 {
-    "card_config_dir": "cards",
     "game_config_dir": "games",
     "logging": {
         "level": "info",

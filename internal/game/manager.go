@@ -1,10 +1,8 @@
 package game
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 
 	"github.com/openhs/internal/logger"
@@ -14,16 +12,14 @@ var globalCardManager *CardManager
 
 // GetCardManager returns the global card manager instance
 func GetCardManager() *CardManager {
-	if globalCardManager == nil {
-		globalCardManager = NewCardManager()
-	}
 	return globalCardManager
 }
 
-// InitializeCardManager initializes the global card manager and loads card database
-func InitializeCardManager(configDir string) error {
-	cm := GetCardManager()
-	return cm.LoadCardDatabase(configDir)
+// InitializeCardManager initializes the global card manager
+func InitializeCardManager() error {
+	globalCardManager = NewCardManager()
+	logger.Info("Card manager initialized")
+	return nil
 }
 
 // CardManager handles card creation and management
@@ -68,114 +64,6 @@ func (cm *CardManager) GetCardTemplate(name string) (*Card, error) {
 		return nil, err
 	}
 	return &template, nil
-}
-
-// LoadCardDatabase loads all card templates from the specified directory
-func (cm *CardManager) LoadCardDatabase(cardConfigDir string) error {
-	logger.Info("Loading card database", logger.String("dir", cardConfigDir))
-
-	// Ensure the card config directory exists
-	if _, err := os.Stat(cardConfigDir); os.IsNotExist(err) {
-		err := NewCardError(ErrCardNotFound, fmt.Sprintf("card config directory not found: %s", cardConfigDir))
-		logger.Error("Failed to load card database", logger.String("dir", cardConfigDir), logger.Err(err))
-		return err
-	}
-
-	// Read all JSON files in the cards directory
-	files, err := os.ReadDir(cardConfigDir)
-	if err != nil {
-		logger.Error("Failed to read card config directory", logger.String("dir", cardConfigDir), logger.Err(err))
-		return err
-	}
-
-	for _, file := range files {
-		data, err := os.ReadFile(filepath.Join(cardConfigDir, file.Name()))
-		if err != nil {
-			logger.Error("Failed to read card config file",
-				logger.String("file", file.Name()),
-				logger.Err(err))
-			continue
-		}
-
-		var cardConfig CardConfig
-		if err := json.Unmarshal(data, &cardConfig); err != nil {
-			logger.Error("Failed to parse card config",
-				logger.String("file", file.Name()),
-				logger.Err(err))
-			continue
-		}
-
-		// Convert config to Card
-		card := Card{
-			Name:      cardConfig.Name,
-			ZhName:    cardConfig.ZhName,
-			Cost:      cardConfig.Cost,
-			Attack:    cardConfig.Attack,
-			Health:    cardConfig.Health,
-			MaxHealth: cardConfig.Health, // Set MaxHealth equal to Health
-			Type:      cardConfig.Type,
-			Tags:      make([]Tag, 0, len(cardConfig.Tags)), // Initialize tags
-		}
-
-		// Process tags
-		for _, tagConfig := range cardConfig.Tags {
-			// Convert string tag name to TagType
-			var tagType TagType
-			switch tagConfig.Type {
-			case "TAG_TAUNT":
-				tagType = TAG_TAUNT
-			case "TAG_DIVINE_SHIELD":
-				tagType = TAG_DIVINE_SHIELD
-			case "TAG_CHARGE":
-				tagType = TAG_CHARGE
-			case "TAG_FROZEN":
-				tagType = TAG_FROZEN
-			case "TAG_STEALTH":
-				tagType = TAG_STEALTH
-			case "TAG_POISONOUS":
-				tagType = TAG_POISONOUS
-			case "TAG_WINDFURY":
-				tagType = TAG_WINDFURY
-			case "TAG_DEATHRATTLE":
-				tagType = TAG_DEATHRATTLE
-			case "TAG_BATTLECRY":
-				tagType = TAG_BATTLECRY
-			case "TAG_RUSH":
-				tagType = TAG_RUSH
-			case "TAG_LIFESTEAL":
-				tagType = TAG_LIFESTEAL
-			case "TAG_REBORN":
-				tagType = TAG_REBORN
-			case "TAG_DORMANT":
-				tagType = TAG_DORMANT
-			case "TAG_SPELLPOWER":
-				tagType = TAG_SPELLPOWER
-			case "TAG_CANT_ATTACK":
-				tagType = TAG_CANT_ATTACK
-			case "TAG_CANT_BE_TARGETED":
-				tagType = TAG_CANT_BE_TARGETED
-			case "TAG_IMMUNE":
-				tagType = TAG_IMMUNE
-			default:
-				logger.Warn("Unknown tag type",
-					logger.String("tag", tagConfig.Type),
-					logger.String("card", card.Name))
-				continue
-			}
-
-			// Add the tag to the card
-			card.Tags = append(card.Tags, NewTag(tagType, tagConfig.Value))
-		}
-
-		// Register the card template
-		cm.RegisterCard(card)
-		logger.Info("Loaded card template",
-			logger.String("name", card.Name),
-			logger.String("file", file.Name()))
-	}
-
-	logger.Info("Card database loaded successfully")
-	return nil
 }
 
 // GameManager handles loading and managing game configurations

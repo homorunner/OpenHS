@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"github.com/openhs/internal/cards"
 	"github.com/openhs/internal/config"
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
@@ -21,10 +22,13 @@ func Initialize(configPath string) error {
 	}
 
 	// Initialize card manager
-	if err := game.InitializeCardManager(config.GetConfig().CardConfigDir); err != nil {
+	if err := game.InitializeCardManager(); err != nil {
 		return err
 	}
-	
+
+	// Register all cards
+	cards.RegisterAllCards(game.GetCardManager())
+
 	// Initialize game manager
 	if err := game.InitializeGameManager(config.GetConfig().GameConfigDir); err != nil {
 		return err

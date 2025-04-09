@@ -15,7 +15,6 @@ type LogConfig struct {
 
 // GlobalConfig represents the global configuration
 type GlobalConfig struct {
-	CardConfigDir string    `json:"card_config_dir"`
 	GameConfigDir string    `json:"game_config_dir"`
 	Log           LogConfig `json:"logging"`
 }

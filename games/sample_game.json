@@ -1,7 +1,7 @@
 {
     "players": [
         {
-            "hero": "Jaina",
+            "hero": "Jaina Proudmoore",
             "deck": [
                 "Fireball",
                 "Frostbolt",
@@ -10,7 +10,7 @@
             ]
         },
         {
-            "hero": "Jaina",
+            "hero": "Jaina Proudmoore",
             "deck": [
                 "Fireball",
                 "Frostbolt",
