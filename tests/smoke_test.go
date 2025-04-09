@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -10,8 +11,11 @@ import (
 
 // TestGameLoadingAndInitialization tests that games can be loaded from configuration
 func TestGameLoadingAndInitialization(t *testing.T) {
+	// Run in the root directory
+	os.Chdir("..")
+
 	// Initialize the application with test config
-	configPath := filepath.Join("testdata", "smoke_test.json")
+	configPath := filepath.Join("config", "openhs.json")
 	if err := bootstrap.Initialize(configPath); err != nil {
 		t.Fatalf("Failed to initialize global components: %v", err)
 	}
