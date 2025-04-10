@@ -11,6 +11,9 @@ The following tags have been implemented and tested:
 | TAG_POISONOUS | Destroys any minion damaged by this | ✅ | ✅ |
 | TAG_WINDFURY | Can attack twice per turn | ✅ | ✅ |
 | TAG_CHARGE | Can attack on the turn it's played | ✅ | ✅ |
+| TAG_RUSH | Can attack minions on the turn it's played | ✅ | ✅ |
+| TAG_LIFESTEAL | Damage dealt heals your hero | ✅ | ✅ |
+
 
 ## Unimplemented Tags
 
@@ -24,8 +27,6 @@ The following tags are defined but not fully implemented or tested:
 | TAG_STEALTH | Cannot be targeted by opponents | Defined but not implemented |
 | TAG_DEATHRATTLE | Triggers an effect when destroyed | Defined but not implemented |
 | TAG_BATTLECRY | Triggers an effect when played | Defined but not implemented |
-| TAG_RUSH | Can attack minions on the turn it's played | Defined but not implemented |
-| TAG_LIFESTEAL | Damage dealt heals your hero | Defined but not implemented |
 | TAG_REBORN | Returns to life with 1 Health | Defined but not implemented |
 | TAG_DORMANT | Cannot act for a set number of turns | Defined but not implemented |
 | TAG_SPELLPOWER | Increases spell damage | Defined but not implemented |

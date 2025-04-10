@@ -18,11 +18,6 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
   - Playing cards from hand
   - Basic damage system
 
-## Currently Implemented Cards
-- **Heroes**: Jaina Proudmoore
-- **Minions**: Water Elemental
-- **Spells**: Fireball, Frostbolt, Arcane Intellect
-
 ## TODO List
 
 - **Game Mechanics**:
