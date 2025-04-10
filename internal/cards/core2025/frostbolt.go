@@ -1,6 +1,8 @@
 package cards
 
-import "github.com/openhs/internal/game"
+import (
+	"github.com/openhs/internal/game"
+)
 
 type Frostbolt struct{}
 

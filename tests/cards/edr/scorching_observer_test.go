@@ -3,10 +3,18 @@ package tests
 import (
 	"testing"
 
+	edr "github.com/openhs/internal/cards/edr"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/game/test"
 )
+
+var card *game.Card
+
+func init() {
+	(&edr.ScorchingObserver{}).Register(game.GetCardManager())
+	card, _ = game.GetCardManager().CreateCardInstance("Scorching Observer")
+}
 
 // TestScorchingObserverProperties tests that Scorching Observer has the correct properties
 func TestScorchingObserverProperties(t *testing.T) {
@@ -17,30 +25,25 @@ func TestScorchingObserverProperties(t *testing.T) {
 	player := g.Players[0]
 
 	// Create a Scorching Observer entity
-	scorchingObserver := test.CreateTestMinionEntity(player,
-		test.WithName("Scorching Observer"),
-		test.WithCost(9),
-		test.WithAttack(7),
-		test.WithHealth(9),
-		test.WithTag(game.TAG_LIFESTEAL, true),
-		test.WithTag(game.TAG_RUSH, true))
+	entity := game.NewEntity(card, g, player)
+	player.Field = append(player.Field, entity)
 
 	// Verify the properties
-	if scorchingObserver.Card.Cost != 9 {
-		t.Errorf("Expected Scorching Observer cost to be 9, got %d", scorchingObserver.Card.Cost)
+	if entity.Card.Cost != 9 {
+		t.Errorf("Expected Scorching Observer cost to be 9, got %d", entity.Card.Cost)
 	}
-	if scorchingObserver.Attack != 7 {
-		t.Errorf("Expected Scorching Observer attack to be 7, got %d", scorchingObserver.Attack)
+	if entity.Attack != 7 {
+		t.Errorf("Expected Scorching Observer attack to be 7, got %d", entity.Attack)
 	}
-	if scorchingObserver.Health != 9 {
-		t.Errorf("Expected Scorching Observer health to be 9, got %d", scorchingObserver.Health)
+	if entity.Health != 9 {
+		t.Errorf("Expected Scorching Observer health to be 9, got %d", entity.Health)
 	}
 
 	// Verify the tags
-	if !game.HasTag(scorchingObserver.Tags, game.TAG_LIFESTEAL) {
+	if !game.HasTag(entity.Tags, game.TAG_LIFESTEAL) {
 		t.Error("Expected Scorching Observer to have Lifesteal")
 	}
-	if !game.HasTag(scorchingObserver.Tags, game.TAG_RUSH) {
+	if !game.HasTag(entity.Tags, game.TAG_RUSH) {
 		t.Error("Expected Scorching Observer to have Rush")
 	}
 }
@@ -56,20 +59,14 @@ func TestScorchingObserverRush(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a Scorching Observer entity for the hand
-		scorchingObserver := test.CreateTestMinionEntity(player,
-			test.WithName("Scorching Observer"),
-			test.WithCost(9),
-			test.WithAttack(7),
-			test.WithHealth(9),
-			test.WithTag(game.TAG_LIFESTEAL, true),
-			test.WithTag(game.TAG_RUSH, true))
+		entity := game.NewEntity(card, g, player)
 
 		// Add to player's hand
-		player.Hand = []*game.Entity{scorchingObserver}
+		player.Hand = []*game.Entity{entity}
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinion := test.CreateTestMinionEntity(opponent,
+		targetMinion := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(5),
 			test.WithHealth(10))
@@ -124,16 +121,10 @@ func TestScorchingObserverRush(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a Scorching Observer entity for the hand
-		scorchingObserver := test.CreateTestMinionEntity(player,
-			test.WithName("Scorching Observer"),
-			test.WithCost(9),
-			test.WithAttack(7),
-			test.WithHealth(9),
-			test.WithTag(game.TAG_LIFESTEAL, true),
-			test.WithTag(game.TAG_RUSH, true))
+		entity := game.NewEntity(card, g, player)
 
 		// Add to player's hand
-		player.Hand = []*game.Entity{scorchingObserver}
+		player.Hand = []*game.Entity{entity}
 		player.Mana = 10 // Ensure enough mana
 
 		// Play the Scorching Observer
@@ -165,26 +156,20 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 	opponent := g.Players[1]
 
 	// Create a Scorching Observer entity
-	scorchingObserver := test.CreateTestMinionEntity(player,
-		test.WithName("Scorching Observer"),
-		test.WithCost(9),
-		test.WithAttack(7),
-		test.WithHealth(9),
-		test.WithTag(game.TAG_LIFESTEAL, true),
-		test.WithTag(game.TAG_RUSH, true))
+	entity := game.NewEntity(card, g, player)
 
 	// Add to player's field directly
-	player.Field = append(player.Field, scorchingObserver)
+	player.Field = append(player.Field, entity)
 
 	// Set NumTurnInPlay to 1 (not the first turn anymore)
-	scorchingObserver.NumTurnInPlay = 1
+	entity.NumTurnInPlay = 1
 
 	// Reset exhausted state for the turn
-	scorchingObserver.Exhausted = false
-	scorchingObserver.NumAttackThisTurn = 0
+	entity.Exhausted = false
+	entity.NumAttackThisTurn = 0
 
 	// Create a target minion for the opponent
-	targetMinion := test.CreateTestMinionEntity(opponent,
+	targetMinion := test.CreateTestMinionEntity(g, opponent,
 		test.WithName("Target Minion"),
 		test.WithAttack(4),
 		test.WithHealth(8))
@@ -197,14 +182,14 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 	player.Hero.MaxHealth = 30
 
 	// Perform attack
-	err := engine.Attack(scorchingObserver, targetMinion, false)
+	err := engine.Attack(entity, targetMinion, false)
 	if err != nil {
 		t.Errorf("Attack failed: %v", err)
 	}
 
 	// Verify damage was done to both minions
-	if scorchingObserver.Health != 5 { // 9 - 4 = 5
-		t.Errorf("Expected Scorching Observer health to be 5, got %d", scorchingObserver.Health)
+	if entity.Health != 5 { // 9 - 4 = 5
+		t.Errorf("Expected Scorching Observer health to be 5, got %d", entity.Health)
 	}
 	if targetMinion.Health != 1 { // 8 - 7 = 1
 		t.Errorf("Expected target minion health to be 1, got %d", targetMinion.Health)
@@ -226,20 +211,14 @@ func TestScorchingObserverCombined(t *testing.T) {
 	opponent := g.Players[1]
 
 	// Create a Scorching Observer entity for the hand
-	scorchingObserver := test.CreateTestMinionEntity(player,
-		test.WithName("Scorching Observer"),
-		test.WithCost(9),
-		test.WithAttack(7),
-		test.WithHealth(9),
-		test.WithTag(game.TAG_LIFESTEAL, true),
-		test.WithTag(game.TAG_RUSH, true))
+	entity := game.NewEntity(card, g, player)
 
 	// Add to player's hand
-	player.Hand = []*game.Entity{scorchingObserver}
+	player.Hand = []*game.Entity{entity}
 	player.Mana = 10 // Ensure enough mana
 
 	// Create a target minion for the opponent
-	targetMinion := test.CreateTestMinionEntity(opponent,
+	targetMinion := test.CreateTestMinionEntity(g, opponent,
 		test.WithName("Target Minion"),
 		test.WithAttack(3),
 		test.WithHealth(8))

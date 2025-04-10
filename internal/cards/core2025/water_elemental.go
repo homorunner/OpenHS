@@ -1,6 +1,8 @@
 package cards
 
-import "github.com/openhs/internal/game"
+import (
+	"github.com/openhs/internal/game"
+)
 
 type WaterElemental struct{}
 
@@ -12,7 +14,6 @@ func (w *WaterElemental) Register(cm *game.CardManager) {
 		Attack: 3,
 		Health: 6,
 		Type:   game.Minion,
-		Tags:   []game.Tag{},
 	}
 
 	cm.RegisterCard(card)
