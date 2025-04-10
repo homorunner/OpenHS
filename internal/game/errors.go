@@ -27,4 +27,4 @@ func NewCardError(code CardErrorCode, message string) *CardError {
 		Code:    code,
 		Message: message,
 	}
-} 
+}

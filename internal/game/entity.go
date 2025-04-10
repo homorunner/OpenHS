@@ -16,20 +16,24 @@ type Entity struct {
 }
 
 // NewEntity creates a new entity from a card
-func NewEntity(card *Card, owner *Player) *Entity {
+func NewEntity(card *Card, game *Game, owner *Player) *Entity {
 	entity := &Entity{
 		Card:      card,
 		Owner:     owner,
 		Health:    card.Health,
-		MaxHealth: card.MaxHealth,
+		MaxHealth: card.Health,
 		Attack:    card.Attack,
 		Tags:      make([]Tag, 0, len(card.Tags)), // Preallocate capacity
 		Buffs:     make([]Buff, 0),
-		Exhausted: false,
 	}
 
 	// Copy tags from card to entity
 	entity.Tags = append(entity.Tags, card.Tags...)
+
+	// Load card effects
+	if card.Load != nil {
+		card.Load(game, entity)
+	}
 
 	return entity
 }

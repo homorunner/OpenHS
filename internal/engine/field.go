@@ -10,4 +10,3 @@ func (e *Engine) removeEntityFromBoard(player *game.Player, entity *game.Entity)
 		}
 	}
 }
-

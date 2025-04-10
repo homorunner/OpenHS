@@ -51,7 +51,7 @@ func TestDrawCard(t *testing.T) {
 	// Test 2: Drawing from an empty deck should trigger fatigue damage
 	// Create a test hero card and entity
 	emptyPlayer := game.NewPlayer()
-	emptyPlayer.Hero = test.CreateTestHeroEntity(emptyPlayer, test.WithName("Test Hero"), test.WithHealth(30))
+	emptyPlayer.Hero = test.CreateTestHeroEntity(g, emptyPlayer, test.WithName("Test Hero"), test.WithHealth(30))
 
 	// Try to draw from empty deck
 	drawn := e.DrawCard(emptyPlayer)
@@ -93,8 +93,8 @@ func TestDrawSpecificCard(t *testing.T) {
 	player := g.Players[0]
 
 	// Add some specific cards to test
-	player.Deck = append(player.Deck, test.CreateTestMinionEntity(player, test.WithName("Special Card 1")))
-	player.Deck = append(player.Deck, test.CreateTestMinionEntity(player, test.WithName("Special Card 2")))
+	player.Deck = append(player.Deck, test.CreateTestMinionEntity(g, player, test.WithName("Special Card 1")))
+	player.Deck = append(player.Deck, test.CreateTestMinionEntity(g, player, test.WithName("Special Card 2")))
 
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
@@ -156,11 +156,11 @@ func TestAddCardToHand(t *testing.T) {
 	player.HandSize = 3 // Small hand size for testing
 
 	// Add cards until one away from full
-	test.AddToHand(player, test.CreateTestMinionEntity(player, test.WithName("Hand Card 1")))
-	test.AddToHand(player, test.CreateTestMinionEntity(player, test.WithName("Hand Card 2")))
+	test.AddToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Hand Card 1")))
+	test.AddToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Hand Card 2")))
 
 	// Test 1: Add card to hand with space available
-	newEntity := test.CreateTestMinionEntity(player, test.WithName("New Card"))
+	newEntity := test.CreateTestMinionEntity(g, player, test.WithName("New Card"))
 	success := e.AddCardToHand(player, newEntity)
 
 	// Verify card was added successfully
@@ -177,7 +177,7 @@ func TestAddCardToHand(t *testing.T) {
 	}
 
 	// Test 2: Add card to full hand
-	overflowEntity := test.CreateTestMinionEntity(player, test.WithName("Overflow Card"))
+	overflowEntity := test.CreateTestMinionEntity(g, player, test.WithName("Overflow Card"))
 	success = e.AddCardToHand(player, overflowEntity)
 
 	// Verify card was not added

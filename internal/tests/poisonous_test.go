@@ -18,14 +18,14 @@ func TestPoisonous(t *testing.T) {
 		player2 := g.Players[1]
 
 		// Create attacker with poisonous tag
-		attackerEntity := test.CreateTestMinionEntity(player1,
+		attackerEntity := test.CreateTestMinionEntity(g, player1,
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(1),
 			test.WithHealth(3),
 			test.WithTag(game.TAG_POISONOUS, true))
 
 		// Create defender with high health for opponent
-		defenderEntity := test.CreateTestMinionEntity(player2,
+		defenderEntity := test.CreateTestMinionEntity(g, player2,
 			test.WithName("Tough Minion"),
 			test.WithAttack(2),
 			test.WithHealth(10))
@@ -80,13 +80,13 @@ func TestPoisonous(t *testing.T) {
 		player2 := g.Players[1]
 
 		// Create minions with poisonous for different players
-		attackerEntity := test.CreateTestMinionEntity(player1,
+		attackerEntity := test.CreateTestMinionEntity(g, player1,
 			test.WithName("Poisonous Attacker"),
 			test.WithAttack(1),
 			test.WithHealth(2),
 			test.WithTag(game.TAG_POISONOUS, true))
 
-		defenderEntity := test.CreateTestMinionEntity(player2,
+		defenderEntity := test.CreateTestMinionEntity(g, player2,
 			test.WithName("Poisonous Defender"),
 			test.WithAttack(1),
 			test.WithHealth(3),
@@ -150,7 +150,7 @@ func TestPoisonous(t *testing.T) {
 		player2 := g.Players[1]
 
 		// Create poisonous minion
-		minionEntity := test.CreateTestMinionEntity(player1,
+		minionEntity := test.CreateTestMinionEntity(g, player1,
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(2),
 			test.WithHealth(2),

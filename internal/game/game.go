@@ -14,6 +14,7 @@ type Game struct {
 	CurrentTurn        int
 	CurrentPlayerIndex int
 	Phase              GamePhase
+	TriggerManager     *TriggerManager
 }
 
 type GamePhase int
@@ -94,9 +95,10 @@ func (p GamePhase) String() string {
 
 func NewGame() *Game {
 	return &Game{
-		Players:     make([]*Player, 0),
-		CurrentTurn: 0,
-		Phase:       InvalidPhase,
+		Players:        make([]*Player, 0),
+		CurrentTurn:    0,
+		Phase:          InvalidPhase,
+		TriggerManager: NewTriggerManager(),
 	}
 }
 
@@ -110,26 +112,26 @@ func LoadGame(config *GameConfig) (*Game, error) {
 
 		// Load hero card
 		cardManager := GetCardManager()
-		heroCardTemplate, err := cardManager.CreateCard(playerConfig.Hero)
+		heroCardTemplate, err := cardManager.CreateCardInstance(playerConfig.Hero)
 		if err != nil {
 			logger.Error("Failed to load hero card: " + err.Error())
 			return nil, err
 		}
-		
+
 		// Create hero entity
-		heroEntity := NewEntity(heroCardTemplate, player)
+		heroEntity := NewEntity(heroCardTemplate, g, player)
 		player.Hero = heroEntity
 
 		// Load deck cards
 		for _, cardName := range playerConfig.Deck {
-			cardTemplate, err := cardManager.CreateCard(cardName)
+			cardTemplate, err := cardManager.CreateCardInstance(cardName)
 			if err != nil {
 				logger.Error("Failed to load card: " + err.Error())
 				return nil, err
 			}
-			
+
 			// Create card entity for deck
-			cardEntity := NewEntity(cardTemplate, player)
+			cardEntity := NewEntity(cardTemplate, g, player)
 			player.Deck = append(player.Deck, cardEntity)
 		}
 

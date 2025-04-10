@@ -18,18 +18,18 @@ func TestWindfury(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create attacker with windfury
-		attackerEntity := test.CreateTestMinionEntity(player,
+		attackerEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Windfury Minion"),
 			test.WithAttack(3),
 			test.WithHealth(4),
 			test.WithTag(game.TAG_WINDFURY, true))
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(opponent,
+		defender1 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(opponent,
+		defender2 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))
@@ -89,17 +89,17 @@ func TestWindfury(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create normal attacker without windfury
-		attackerEntity := test.CreateTestMinionEntity(player,
+		attackerEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Normal Minion"),
 			test.WithAttack(3),
 			test.WithHealth(4))
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(opponent,
+		defender1 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(opponent,
+		defender2 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))
@@ -143,7 +143,7 @@ func TestWindfury(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a windfury weapon and equip it
-		weapon := test.CreateTestWeaponEntity(player,
+		weapon := test.CreateTestWeaponEntity(g, player,
 			test.WithName("Windfury Weapon"),
 			test.WithAttack(2),
 			test.WithHealth(2),
@@ -155,11 +155,11 @@ func TestWindfury(t *testing.T) {
 		player.Hero.Attack = weapon.Attack
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(opponent,
+		defender1 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 1"),
 			test.WithAttack(2),
 			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(opponent,
+		defender2 := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Defender 2"),
 			test.WithAttack(1),
 			test.WithHealth(5))

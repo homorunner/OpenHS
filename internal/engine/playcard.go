@@ -94,6 +94,18 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 		entity.Exhausted = true
 	}
 
+	logger.Info("Minion played", logger.String("name", entity.Card.Name))
+
+	// Trigger card played event
+	cardPlayedCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: entity,
+		TargetEntity: target,
+		Phase:        e.game.Phase,
+		ExtraData:    map[string]interface{}{"card_type": game.Minion},
+	}
+	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
+
 	// Add minion to the field at the specified position
 	if fieldPos < 0 || fieldPos > len(player.Field) {
 		// Auto-position at the end
@@ -103,7 +115,13 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 		player.Field = append(player.Field[:fieldPos], append([]*game.Entity{entity}, player.Field[fieldPos:]...)...)
 	}
 
-	logger.Info("Minion played", logger.String("name", entity.Card.Name))
+	// Trigger minion summoned event
+	minionSummonedCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: entity,
+		Phase:        e.game.Phase,
+	}
+	e.game.TriggerManager.ActivateTrigger(game.TriggerMinionSummoned, minionSummonedCtx)
 
 	// TODO: Process battlecry, triggers, etc.
 
@@ -115,6 +133,18 @@ func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *gam
 	// TODO: Add spell counters to Player struct
 
 	logger.Info("Spell played", logger.String("name", entity.Card.Name))
+
+	// Create context for card played trigger
+	cardPlayedCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: entity,
+		TargetEntity: target,
+		Phase:        e.game.Phase,
+		ExtraData:    map[string]interface{}{"card_type": game.Spell},
+	}
+
+	// Trigger card played event
+	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
 
 	// TODO: Process spell effects
 

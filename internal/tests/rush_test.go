@@ -18,7 +18,7 @@ func TestRush(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a rush minion entity for the hand
-		rushMinionEntity := test.CreateTestMinionEntity(player,
+		rushMinionEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Rush Minion"),
 			test.WithAttack(3),
 			test.WithHealth(2),
@@ -30,7 +30,7 @@ func TestRush(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(opponent,
+		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(2),
 			test.WithHealth(4))
@@ -90,7 +90,7 @@ func TestRush(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a rush minion entity for the hand
-		rushMinionEntity := test.CreateTestMinionEntity(player,
+		rushMinionEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Rush Minion"),
 			test.WithAttack(3),
 			test.WithHealth(2),
@@ -133,7 +133,7 @@ func TestRush(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a rush minion entity for the field
-		rushMinionEntity := test.CreateTestMinionEntity(player,
+		rushMinionEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Rush Minion"),
 			test.WithAttack(3),
 			test.WithHealth(2),

@@ -167,6 +167,16 @@ func (e *Engine) processGraveyard() bool {
 				destroyed = true
 				e.removeEntityFromBoard(player, minion)
 
+				// Create context for minion death trigger
+				deathCtx := game.TriggerContext{
+					Game:         e.game,
+					SourceEntity: minion,
+					Phase:        e.game.Phase,
+				}
+
+				// Trigger minion death event
+				e.game.TriggerManager.ActivateTrigger(game.TriggerMinionDeath, deathCtx)
+
 				// TODO: trigger death, deathrattle, infuse, add to reborn list, etc.
 
 				// add to graveyard
@@ -179,4 +189,86 @@ func (e *Engine) processGraveyard() bool {
 }
 
 func (e *Engine) processReborn() {
+}
+
+// ProcessAttack handles an attack from one entity to another
+func (e *Engine) ProcessAttack(attacker, defender *game.Entity) error {
+	// Create context for attack triggers
+	beforeAttackCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: attacker,
+		TargetEntity: defender,
+		Phase:        e.game.Phase,
+	}
+
+	// Activate before attack triggers
+	e.game.TriggerManager.ActivateTrigger(game.TriggerBeforeAttack, beforeAttackCtx)
+
+	// Use the existing Attack method with skipValidation=false
+	err := e.Attack(attacker, defender, false)
+	if err != nil {
+		return err
+	}
+
+	// Create context for after attack triggers
+	afterAttackCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: attacker,
+		TargetEntity: defender,
+		Phase:        e.game.Phase,
+	}
+
+	// Activate after attack triggers
+	e.game.TriggerManager.ActivateTrigger(game.TriggerAfterAttack, afterAttackCtx)
+
+	return nil
+}
+
+// CanAttack checks if an entity can attack a target
+func (e *Engine) CanAttack(attacker, defender *game.Entity) error {
+	// Reuse the existing validation logic
+	return e.validateAttack(attacker, defender)
+}
+
+// CanBeAttacked checks if an entity can be attacked
+func (e *Engine) CanBeAttacked(defender *game.Entity) error {
+	// Check if defender is a valid target
+	if defender == nil {
+		return errors.New("invalid defender")
+	}
+
+	// Check if defender is a valid target type
+	if defender.Card.Type != game.Minion && defender.Card.Type != game.Hero {
+		return errors.New("defender must be a minion or hero")
+	}
+
+	// Check for special tags that prevent attacking
+	if game.HasTag(defender.Tags, game.TAG_STEALTH) {
+		return errors.New("stealthed entities cannot be attacked")
+	}
+
+	// TODO: Check for taunt minions on the board
+	// If there are taunt minions and the defender is not one of them,
+	// return an error
+
+	return nil
+}
+
+// ShouldExhaustAfterAttack determines if an entity should be exhausted after attacking
+func (e *Engine) ShouldExhaustAfterAttack(entity *game.Entity) bool {
+	// Check for windfury which allows two attacks per turn
+	expectedAttacks := 1
+	if game.HasTag(entity.Tags, game.TAG_WINDFURY) {
+		expectedAttacks = 2
+	}
+
+	// If entity is a hero and has a weapon with windfury
+	if entity.Card.Type == game.Hero && entity.Owner != nil && entity.Owner.Weapon != nil {
+		if game.HasTag(entity.Owner.Weapon.Tags, game.TAG_WINDFURY) {
+			expectedAttacks = 2
+		}
+	}
+
+	// Entity should be exhausted if it has reached its attack limit
+	return entity.NumAttackThisTurn >= expectedAttacks
 }

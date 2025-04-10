@@ -3,16 +3,18 @@ package game
 // Card represents a card in the game
 // An empty card is a 0/0 minion with no cost and no effects
 type Card struct {
-	Name      string
-	ZhName    string
-	ID        string
-	Cost      int
-	Attack    int
-	Health    int
-	MaxHealth int
-	Type      CardType
-	Effects   []Effect
-	Tags      []Tag // Card tags like Taunt, Divine Shield, etc.
+	Name        string
+	ZhName      string
+	ID          string
+	Description string
+	Cost        int
+	Attack      int
+	Health      int
+	Type        CardType
+	Effects     []Effect
+	Tags        []Tag // Card tags like Taunt, Divine Shield, etc.
+	Load        func(g *Game, e *Entity)
+	Unload      func(g *Game, e *Entity)
 }
 
 // CardType represents the type of a card

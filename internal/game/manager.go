@@ -12,14 +12,11 @@ var globalCardManager *CardManager
 
 // GetCardManager returns the global card manager instance
 func GetCardManager() *CardManager {
+	if globalCardManager == nil {
+		logger.Info("Initializing card manager")
+		globalCardManager = NewCardManager()
+	}
 	return globalCardManager
-}
-
-// InitializeCardManager initializes the global card manager
-func InitializeCardManager() error {
-	globalCardManager = NewCardManager()
-	logger.Info("Card manager initialized")
-	return nil
 }
 
 // CardManager handles card creation and management
@@ -40,8 +37,8 @@ func (cm *CardManager) RegisterCard(card Card) {
 	cm.cardTemplates[card.Name] = card
 }
 
-// CreateCard creates a new instance of a card from a template
-func (cm *CardManager) CreateCard(name string) (*Card, error) {
+// CreateCardInstance creates a new instance of a card from a template
+func (cm *CardManager) CreateCardInstance(name string) (*Card, error) {
 	logger.Debug("Creating card instance", logger.String("name", name))
 	template, exists := cm.cardTemplates[name]
 	if !exists {

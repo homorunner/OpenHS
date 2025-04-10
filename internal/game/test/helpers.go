@@ -2,13 +2,13 @@ package test
 
 import "github.com/openhs/internal/game"
 
-func CreateTestPlayer() *game.Player {
+func CreateTestPlayer(g *game.Game) *game.Player {
 	player := game.NewPlayer()
-	player.Hero = CreateTestHeroEntity(player)
+	player.Hero = CreateTestHeroEntity(g, player)
 
 	deck := []*game.Entity{}
 	for i := 0; i < 10; i++ {
-		deck = append(deck, CreateTestMinionEntity(player, WithName("Test Card")))
+		deck = append(deck, CreateTestMinionEntity(g, player, WithName("Test Card")))
 	}
 	player.Deck = deck
 
@@ -19,33 +19,32 @@ func CreateTestPlayer() *game.Player {
 func CreateTestGame() *game.Game {
 	g := game.NewGame()
 
-	player1 := CreateTestPlayer()
-	player2 := CreateTestPlayer()
+	player1 := CreateTestPlayer(g)
+	player2 := CreateTestPlayer(g)
 
 	g.Players = append(g.Players, player1, player2)
 	return g
 }
 
 // CreateTestMinionEntity creates a test minion with customizable properties
-func CreateTestMinionEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+func CreateTestMinionEntity(g *game.Game, player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name:      "Test Minion",
-		Type:      game.Minion,
-		Cost:      2,
-		Attack:    2,
-		Health:    3,
-		MaxHealth: 3,
+		Name:   "Test Minion",
+		Type:   game.Minion,
+		Cost:   2,
+		Attack: 2,
+		Health: 3,
 	}
 	// Apply any option functions
 	for _, opt := range opts {
 		opt(card)
 	}
 
-	return game.NewEntity(card, player)
+	return game.NewEntity(card, g, player)
 }
 
 // CreateTestSpellEntity creates a test spell with customizable properties
-func CreateTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+func CreateTestSpellEntity(g *game.Game, player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
 		Name: "Test Spell",
 		Type: game.Spell,
@@ -57,18 +56,17 @@ func CreateTestSpellEntity(player *game.Player, opts ...func(*game.Card)) *game.
 		opt(card)
 	}
 
-	return game.NewEntity(card, player)
+	return game.NewEntity(card, g, player)
 }
 
 // CreateTestWeaponEntity creates a test weapon with customizable properties
-func CreateTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+func CreateTestWeaponEntity(g *game.Game, player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name:      "Test Weapon",
-		Type:      game.Weapon,
-		Cost:      1,
-		Attack:    1,
-		Health:    4,
-		MaxHealth: 4,
+		Name:   "Test Weapon",
+		Type:   game.Weapon,
+		Cost:   1,
+		Attack: 1,
+		Health: 4,
 	}
 
 	// Apply any option functions
@@ -76,17 +74,16 @@ func CreateTestWeaponEntity(player *game.Player, opts ...func(*game.Card)) *game
 		opt(card)
 	}
 
-	return game.NewEntity(card, player)
+	return game.NewEntity(card, g, player)
 }
 
 // CreateTestHeroEntity creates a test hero with customizable properties
-func CreateTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.Entity {
+func CreateTestHeroEntity(g *game.Game, player *game.Player, opts ...func(*game.Card)) *game.Entity {
 	card := &game.Card{
-		Name:      "Test Hero",
-		Type:      game.Hero,
-		Attack:    0,
-		Health:    30,
-		MaxHealth: 30,
+		Name:   "Test Hero",
+		Type:   game.Hero,
+		Attack: 0,
+		Health: 30,
 	}
 
 	// Apply any option functions
@@ -94,7 +91,7 @@ func CreateTestHeroEntity(player *game.Player, opts ...func(*game.Card)) *game.E
 		opt(card)
 	}
 
-	return game.NewEntity(card, player)
+	return game.NewEntity(card, g, player)
 }
 
 // Helper functions for common entity customizations
@@ -119,7 +116,6 @@ func WithAttack(attack int) func(*game.Card) {
 func WithHealth(health int) func(*game.Card) {
 	return func(c *game.Card) {
 		c.Health = health
-		c.MaxHealth = health
 	}
 }
 

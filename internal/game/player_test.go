@@ -22,4 +22,4 @@ func TestNewPlayerManaInitialization(t *testing.T) {
 	if player.TotalMana != DefaultStartingMana {
 		t.Errorf("Expected TotalMana to be %d, got %d", DefaultStartingMana, player.TotalMana)
 	}
-} 
+}

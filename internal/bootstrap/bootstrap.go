@@ -21,11 +21,6 @@ func Initialize(configPath string) error {
 		return err
 	}
 
-	// Initialize card manager
-	if err := game.InitializeCardManager(); err != nil {
-		return err
-	}
-
 	// Register all cards
 	cards.RegisterAllCards(game.GetCardManager())
 

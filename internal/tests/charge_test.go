@@ -18,7 +18,7 @@ func TestCharge(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a charge minion entity for the hand
-		chargeMinionEntity := test.CreateTestMinionEntity(player,
+		chargeMinionEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Charge Minion"),
 			test.WithAttack(3),
 			test.WithHealth(2),
@@ -30,7 +30,7 @@ func TestCharge(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(opponent,
+		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(2),
 			test.WithHealth(4))
@@ -85,7 +85,7 @@ func TestCharge(t *testing.T) {
 		opponent := g.Players[1]
 
 		// Create a regular minion entity for the hand
-		regularMinionEntity := test.CreateTestMinionEntity(player,
+		regularMinionEntity := test.CreateTestMinionEntity(g, player,
 			test.WithName("Regular Minion"),
 			test.WithAttack(3),
 			test.WithHealth(2),
@@ -96,7 +96,7 @@ func TestCharge(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(opponent,
+		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
 			test.WithName("Target Minion"),
 			test.WithAttack(2),
 			test.WithHealth(4))

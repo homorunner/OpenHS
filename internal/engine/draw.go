@@ -57,6 +57,17 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		return nil
 	}
 
+	// Create context for card drawn trigger
+	cardDrawnCtx := game.TriggerContext{
+		Game:         e.game,
+		SourceEntity: entity,
+		TargetEntity: player.Hero, // Associate with the player's hero
+		Phase:        e.game.Phase,
+	}
+
+	// Trigger card drawn event
+	e.game.TriggerManager.ActivateTrigger(game.TriggerCardDrawn, cardDrawnCtx)
+
 	return entity
 }
 

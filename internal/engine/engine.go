@@ -234,7 +234,14 @@ func (e *Engine) mainStartTriggers() error {
 	logger.Debug("Phase: Main Start Triggers")
 
 	// Process start-of-turn triggers
-	// TODO: Implement trigger system
+	if e.game.CurrentPlayer != nil {
+		ctx := game.TriggerContext{
+			Game:         e.game,
+			SourceEntity: e.game.CurrentPlayer.Hero,
+			Phase:        e.game.Phase,
+		}
+		e.game.TriggerManager.ActivateTrigger(game.TriggerTurnStart, ctx)
+	}
 
 	// Set next phase
 	e.nextPhase = game.MainResource
@@ -295,8 +302,15 @@ func (e *Engine) mainAction() error {
 func (e *Engine) mainEnd() error {
 	logger.Debug("Phase: Main End")
 
-	// Process end-of-turn triggers
-	// TODO: Implement end-of-turn logic
+	// Activate turn end triggers
+	if e.game.CurrentPlayer != nil {
+		ctx := game.TriggerContext{
+			Game:         e.game,
+			SourceEntity: e.game.CurrentPlayer.Hero,
+			Phase:        e.game.Phase,
+		}
+		e.game.TriggerManager.ActivateTrigger(game.TriggerTurnEnd, ctx)
+	}
 
 	// Set next phase
 	e.nextPhase = game.MainCleanup

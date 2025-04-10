@@ -14,7 +14,7 @@ func TestHealCard(t *testing.T) {
 
 	// Test 1: Healing with valid amount
 	player := g.Players[0]
-	entity := test.CreateTestMinionEntity(player, test.WithHealth(20))
+	entity := test.CreateTestMinionEntity(g, player, test.WithHealth(20))
 	entity.Health = 10 // Set current health to 10
 
 	e.Heal(nil, entity, 5)
