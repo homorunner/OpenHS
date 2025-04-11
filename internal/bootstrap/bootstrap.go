@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"github.com/openhs/internal/cards"
+	"github.com/openhs/cards"
 	"github.com/openhs/internal/config"
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"

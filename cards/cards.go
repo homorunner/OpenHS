@@ -1,8 +1,8 @@
 package cards
 
 import (
-	core "github.com/openhs/internal/cards/core2025"
-	edr "github.com/openhs/internal/cards/edr"
+	core "github.com/openhs/cards/core2025"
+	edr "github.com/openhs/cards/edr"
 	"github.com/openhs/internal/game"
 )
 

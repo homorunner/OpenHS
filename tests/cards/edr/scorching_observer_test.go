@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	edr "github.com/openhs/internal/cards/edr"
+	edr "github.com/openhs/cards/edr"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/game/test"

@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	core2025 "github.com/openhs/internal/cards/core2025"
+	core2025 "github.com/openhs/cards/core2025"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/game/test"
