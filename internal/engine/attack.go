@@ -152,6 +152,7 @@ func (e *Engine) processDestroyedWeapons() bool {
 	for _, player := range e.game.Players {
 		if player.Weapon != nil && (player.Weapon.Health <= 0 || player.Weapon.IsDestroyed) {
 			player.Graveyard = append(player.Graveyard, player.Weapon)
+			player.Weapon.CurrentZone = game.ZONE_GRAVEYARD
 			player.Weapon = nil
 			destroyed = true
 		}
@@ -181,6 +182,7 @@ func (e *Engine) processGraveyard() bool {
 
 				// add to graveyard
 				player.Graveyard = append(player.Graveyard, minion)
+				minion.CurrentZone = game.ZONE_GRAVEYARD
 			}
 		}
 	}

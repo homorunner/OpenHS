@@ -52,8 +52,14 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		player.Deck = player.Deck[:len(player.Deck)-1]
 	}
 
+	// Update entity zone (moving from deck to hand)
+	entity.CurrentZone = game.ZONE_NONE // Temporarily set to NONE while in transition
+
 	// Add entity to hand if space is available
 	if !e.AddCardToHand(player, entity) {
+		// Card couldn't be added to hand (usually due to full hand)
+		// It should go to graveyard or be removed from game
+		entity.CurrentZone = game.ZONE_REMOVEDFROMGAME
 		return nil
 	}
 
@@ -81,6 +87,9 @@ func (e *Engine) AddCardToHand(player *game.Player, entity *game.Entity) bool {
 
 	// Add entity to hand
 	player.Hand = append(player.Hand, entity)
+
+	// Update the entity's zone
+	entity.CurrentZone = game.ZONE_HAND
 
 	return true
 }

@@ -5,10 +5,13 @@ import "github.com/openhs/internal/game"
 func CreateTestPlayer(g *game.Game) *game.Player {
 	player := game.NewPlayer()
 	player.Hero = CreateTestHeroEntity(g, player)
+	player.Hero.CurrentZone = game.ZONE_PLAY
 
 	deck := []*game.Entity{}
 	for i := 0; i < 10; i++ {
-		deck = append(deck, CreateTestMinionEntity(g, player, WithName("Test Card")))
+		entity := CreateTestMinionEntity(g, player, WithName("Test Card"))
+		entity.CurrentZone = game.ZONE_DECK
+		deck = append(deck, entity)
 	}
 	player.Deck = deck
 
@@ -128,9 +131,11 @@ func WithTag(tagType game.TagType, value interface{}) func(*game.Card) {
 // AddToHand adds an entity to player's hand
 func AddToHand(player *game.Player, entity *game.Entity) {
 	player.Hand = append(player.Hand, entity)
+	entity.CurrentZone = game.ZONE_HAND
 }
 
 // AddToField adds a minion to player's field
 func AddToField(player *game.Player, entity *game.Entity) {
 	player.Field = append(player.Field, entity)
+	entity.CurrentZone = game.ZONE_PLAY
 }

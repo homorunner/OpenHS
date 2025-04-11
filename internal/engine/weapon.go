@@ -12,11 +12,13 @@ func (e *Engine) playWeapon(player *game.Player, entity *game.Entity, target *ga
 	// If player already has a weapon, move it to graveyard
 	if player.Weapon != nil {
 		player.Graveyard = append(player.Graveyard, player.Weapon)
+		player.Weapon.CurrentZone = game.ZONE_GRAVEYARD
 		logger.Debug("Weapon moved to graveyard", logger.String("name", player.Weapon.Card.Name))
 	}
 
 	// Equip the new weapon
 	player.Weapon = entity
+	entity.CurrentZone = game.ZONE_PLAY
 	logger.Debug("Weapon equipped", logger.String("name", entity.Card.Name))
 
 	return nil

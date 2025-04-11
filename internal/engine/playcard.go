@@ -48,6 +48,9 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entit
 	// Remove entity from hand
 	player.Hand = append(player.Hand[:handIndex], player.Hand[handIndex+1:]...)
 
+	// Update entity zone (temporarily set to NONE while in transition)
+	entity.CurrentZone = game.ZONE_NONE
+
 	// Process based on card type
 	switch entity.Card.Type {
 	case game.Minion:
@@ -63,7 +66,7 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entit
 	}
 }
 
-// canPlayCard checks if a card can be played
+// testPlayCard checks if a card can be played
 func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
 	// Basic checks
 	if entity.Card.Cost > player.Mana {
@@ -115,6 +118,9 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 		player.Field = append(player.Field[:fieldPos], append([]*game.Entity{entity}, player.Field[fieldPos:]...)...)
 	}
 
+	// Update the entity's zone
+	entity.CurrentZone = game.ZONE_PLAY
+
 	// Trigger minion summoned event
 	minionSummonedCtx := game.TriggerContext{
 		Game:         e.game,
@@ -151,6 +157,9 @@ func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *gam
 	// Move to graveyard after use
 	player.Graveyard = append(player.Graveyard, entity)
 
+	// Update the entity's zone
+	entity.CurrentZone = game.ZONE_GRAVEYARD
+
 	return nil
 }
 
@@ -159,6 +168,8 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 	// Store the old hero in graveyard
 	if player.Hero != nil {
 		player.Graveyard = append(player.Graveyard, player.Hero)
+		// Update the old hero's zone
+		player.Hero.CurrentZone = game.ZONE_GRAVEYARD
 	}
 
 	// Copy the old hero's state of attacking
@@ -168,6 +179,9 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 
 	// Set the new hero
 	player.Hero = entity
+
+	// Update the entity's zone
+	entity.CurrentZone = game.ZONE_PLAY
 
 	logger.Info("Hero replaced", logger.String("name", entity.Card.Name))
 
