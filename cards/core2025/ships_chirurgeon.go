@@ -35,6 +35,10 @@ func (s *ShipsChirurgeon) Unload(g *game.Game, self *game.Entity) {
 }
 
 func (s *ShipsChirurgeon) OnSummon(ctx *game.TriggerContext, self *game.Entity) {
+	if self.CurrentZone != game.ZONE_PLAY { // only work when self is in play
+		return
+	}
+
 	summonedMinion := ctx.SourceEntity
 	if summonedMinion == nil {
 		return
@@ -48,7 +52,6 @@ func (s *ShipsChirurgeon) OnSummon(ctx *game.TriggerContext, self *game.Entity) 
 	if summonedMinion.Owner != self.Owner { // only work on friendly minion
 		return
 	}
-	// TODO: check if self is in battle and not silenced
 
 	summonedMinion.Health++
 	summonedMinion.MaxHealth++

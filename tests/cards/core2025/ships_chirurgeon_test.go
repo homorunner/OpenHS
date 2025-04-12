@@ -231,4 +231,70 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 			t.Errorf("Expected test minion max health to be 5 (3 + 1 + 1), got %d", playedMinion.MaxHealth)
 		}
 	})
+
+	t.Run("Ship's Chirurgeon effect doesn't work when not in play zone", func(t *testing.T) {
+		// Setup
+		g := test.CreateTestGame()
+		engine := engine.NewEngine(g)
+		engine.StartGame()
+		player := g.Players[0]
+
+		// Create Ship's Chirurgeon entity
+		chirurgeon := game.NewEntity(card, g, player)
+
+		// Create two test minions
+		testMinion1 := test.CreateTestMinionEntity(g, player,
+			test.WithName("Test Minion 1"),
+			test.WithCost(1),
+			test.WithAttack(2),
+			test.WithHealth(3))
+
+		testMinion2 := test.CreateTestMinionEntity(g, player,
+			test.WithName("Test Minion 2"),
+			test.WithCost(1),
+			test.WithAttack(2),
+			test.WithHealth(3))
+
+		// Add cards to player's hand
+		player.Hand = []*game.Entity{chirurgeon, testMinion1, testMinion2}
+		player.Mana = 10 // Ensure enough mana
+
+		// Play Ship's Chirurgeon
+		err := engine.PlayCard(player, 0, nil, -1, 0)
+		if err != nil {
+			t.Fatalf("Failed to play Ship's Chirurgeon: %v", err)
+		}
+
+		// Play first test minion (should get +1 health)
+		err = engine.PlayCard(player, 0, nil, -1, 0)
+		if err != nil {
+			t.Fatalf("Failed to play first test minion: %v", err)
+		}
+
+		// Verify the first minion got +1 health
+		firstMinion := player.Field[1]
+		if firstMinion.Health != 4 || firstMinion.MaxHealth != 4 {
+			t.Errorf("Expected first minion health to be 4 (3+1), got Health: %d, MaxHealth: %d",
+				firstMinion.Health, firstMinion.MaxHealth)
+		}
+
+		// Remove Ship's Chirurgeon from play (return to hand)
+		chirurgeonEntity := player.Field[0]
+		chirurgeonEntity.CurrentZone = game.ZONE_HAND
+		player.Field = player.Field[1:]                     // Remove from field
+		player.Hand = append(player.Hand, chirurgeonEntity) // Add back to hand
+
+		// Play second test minion (should NOT get +1 health since chirurgeon is no longer in play)
+		err = engine.PlayCard(player, 0, nil, -1, 0)
+		if err != nil {
+			t.Fatalf("Failed to play second test minion: %v", err)
+		}
+
+		// Verify the second minion did NOT get +1 health
+		secondMinion := player.Field[1]
+		if secondMinion.Health != 3 || secondMinion.MaxHealth != 3 {
+			t.Errorf("Expected second minion health to be 3 (unchanged), got Health: %d, MaxHealth: %d",
+				secondMinion.Health, secondMinion.MaxHealth)
+		}
+	})
 }
