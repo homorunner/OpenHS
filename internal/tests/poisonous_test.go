@@ -22,7 +22,8 @@ func TestPoisonous(t *testing.T) {
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(1),
 			test.WithHealth(3),
-			test.WithTag(game.TAG_POISONOUS, true))
+			test.WithTag(game.TAG_POISONOUS, true),
+			test.WithTag(game.TAG_RUSH, true))
 
 		// Create defender with high health for opponent
 		defenderEntity := test.CreateTestMinionEntity(g, player2,
@@ -31,8 +32,8 @@ func TestPoisonous(t *testing.T) {
 			test.WithHealth(10))
 
 		// Add minions to respective players' fields
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -84,7 +85,8 @@ func TestPoisonous(t *testing.T) {
 			test.WithName("Poisonous Attacker"),
 			test.WithAttack(1),
 			test.WithHealth(2),
-			test.WithTag(game.TAG_POISONOUS, true))
+			test.WithTag(game.TAG_POISONOUS, true),
+			test.WithTag(game.TAG_RUSH, true))
 
 		defenderEntity := test.CreateTestMinionEntity(g, player2,
 			test.WithName("Poisonous Defender"),
@@ -93,8 +95,8 @@ func TestPoisonous(t *testing.T) {
 			test.WithTag(game.TAG_POISONOUS, true))
 
 		// Add them to their respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -154,10 +156,11 @@ func TestPoisonous(t *testing.T) {
 			test.WithName("Poisonous Minion"),
 			test.WithAttack(2),
 			test.WithHealth(2),
-			test.WithTag(game.TAG_POISONOUS, true))
+			test.WithTag(game.TAG_POISONOUS, true),
+			test.WithTag(game.TAG_CHARGE, true))
 
 		// Add minion to player's field
-		player1.Field = append(player1.Field, minionEntity)
+		engine.AddEntityToField(player1, minionEntity, -1)
 
 		// Get opponent's hero entity
 		heroEntity := player2.Hero

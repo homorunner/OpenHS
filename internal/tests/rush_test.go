@@ -16,6 +16,7 @@ func TestRush(t *testing.T) {
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
+		player.Mana = 10 // Ensure enough mana
 
 		// Create a rush minion entity for the hand
 		rushMinionEntity := test.CreateTestMinionEntity(g, player,
@@ -24,10 +25,13 @@ func TestRush(t *testing.T) {
 			test.WithHealth(2),
 			test.WithCost(3),
 			test.WithTag(game.TAG_RUSH, true))
-
-		// Add rush minion to player's hand
 		player.Hand = []*game.Entity{rushMinionEntity}
-		player.Mana = 10 // Ensure enough mana
+
+		// Play the rush minion
+		err := engine.PlayCard(player, 0, nil, -1, 0)
+		if err != nil {
+			t.Fatalf("Failed to play rush minion: %v", err)
+		}
 
 		// Create a target minion for the opponent
 		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
@@ -36,13 +40,7 @@ func TestRush(t *testing.T) {
 			test.WithHealth(4))
 
 		// Add target minion to opponent's field
-		opponent.Field = append(opponent.Field, targetMinionEntity)
-
-		// Play the rush minion
-		err := engine.PlayCard(player, 0, nil, -1, 0)
-		if err != nil {
-			t.Fatalf("Failed to play rush minion: %v", err)
-		}
+		engine.AddEntityToField(opponent, targetMinionEntity, -1)
 
 		// Check that the minion is on the field
 		if len(player.Field) != 1 {
@@ -88,6 +86,7 @@ func TestRush(t *testing.T) {
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
+		player.Mana = 10 // Ensure enough mana
 
 		// Create a rush minion entity for the hand
 		rushMinionEntity := test.CreateTestMinionEntity(g, player,
@@ -96,10 +95,7 @@ func TestRush(t *testing.T) {
 			test.WithHealth(2),
 			test.WithCost(3),
 			test.WithTag(game.TAG_RUSH, true))
-
-		// Add rush minion to player's hand
 		player.Hand = []*game.Entity{rushMinionEntity}
-		player.Mana = 10 // Ensure enough mana
 
 		// Play the rush minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)
@@ -141,22 +137,23 @@ func TestRush(t *testing.T) {
 			test.WithTag(game.TAG_RUSH, true))
 
 		// Add rush minion to player's field directly (not from hand)
-		player.Field = append(player.Field, rushMinionEntity)
+		engine.AddEntityToField(player, rushMinionEntity, -1)
 
-		// Set NumTurnInPlay to 1 (not the first turn anymore)
-		rushMinionEntity.NumTurnInPlay = 1
+		// Check if now the rush minion cannot attack the hero
+		err := engine.Attack(rushMinionEntity, opponent.Hero, false)
+		if err == nil {
+			t.Error("Expected rush minion to not be able to attack hero after first turn, but it succeeded")
+		}
 
-		// Reset exhausted state for the turn
-		rushMinionEntity.Exhausted = false
-		rushMinionEntity.NumAttackThisTurn = 0
+		// Go to next turn
+		engine.EndPlayerTurn()
+		engine.EndPlayerTurn()
 
 		// Store hero's initial health
 		initialHeroHealth := opponent.Hero.Health
 
 		// Attempt to attack the opponent's hero with the rush minion
-		err := engine.Attack(rushMinionEntity, opponent.Hero, false)
-
-		// Assert attack succeeds
+		err = engine.Attack(rushMinionEntity, opponent.Hero, false)
 		if err != nil {
 			t.Errorf("Expected attack with rush minion against a hero to succeed after first turn, got error: %v", err)
 		}

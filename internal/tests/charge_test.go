@@ -36,7 +36,7 @@ func TestCharge(t *testing.T) {
 			test.WithHealth(4))
 
 		// Add target minion to opponent's field
-		opponent.Field = append(opponent.Field, targetMinionEntity)
+		engine.AddEntityToField(opponent, targetMinionEntity, -1)
 
 		// Play the charge minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)
@@ -102,7 +102,7 @@ func TestCharge(t *testing.T) {
 			test.WithHealth(4))
 
 		// Add target minion to opponent's field
-		opponent.Field = append(opponent.Field, targetMinionEntity)
+		engine.AddEntityToField(opponent, targetMinionEntity, -1)
 
 		// Play the regular minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)

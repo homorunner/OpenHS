@@ -133,9 +133,3 @@ func AddToHand(player *game.Player, entity *game.Entity) {
 	player.Hand = append(player.Hand, entity)
 	entity.CurrentZone = game.ZONE_HAND
 }
-
-// AddToField adds a minion to player's field
-func AddToField(player *game.Player, entity *game.Entity) {
-	player.Field = append(player.Field, entity)
-	entity.CurrentZone = game.ZONE_PLAY
-}

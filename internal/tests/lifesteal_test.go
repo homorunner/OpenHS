@@ -126,7 +126,7 @@ func TestWeaponLifesteal(t *testing.T) {
 		test.WithHealth(8))
 
 	// Add target to the opponent's field
-	test.AddToField(player2, target)
+	e.AddEntityToField(player2, target, -1)
 
 	// Reduce hero health for testing healing
 	player1.Hero.Health = 15
@@ -171,7 +171,7 @@ func TestWeaponLifesteal(t *testing.T) {
 		test.WithAttack(0),
 		test.WithHealth(6))
 
-	test.AddToField(player2, target2)
+	e.AddEntityToField(player2, target2, -1)
 
 	// Attack with the non-lifesteal weapon
 	err = e.Attack(player1.Hero, target2, true)
@@ -211,8 +211,8 @@ func TestLifestealDuringAttack(t *testing.T) {
 		test.WithAttack(2),
 		test.WithHealth(6))
 
-	test.AddToField(player1, attacker)
-	test.AddToField(player2, defender)
+	e.AddEntityToField(player1, attacker, -1)
+	e.AddEntityToField(player2, defender, -1)
 
 	// Set hero health
 	player1.Hero.Health = 20

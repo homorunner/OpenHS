@@ -35,8 +35,9 @@ func TestWindfury(t *testing.T) {
 			test.WithHealth(5))
 
 		// Add minions to respective player fields
-		player.Field = append(player.Field, attackerEntity)
-		opponent.Field = append(opponent.Field, defender1, defender2)
+		engine.AddEntityToField(player, attackerEntity, -1)
+		engine.AddEntityToField(opponent, defender1, -1)
+		engine.AddEntityToField(opponent, defender2, -1)
 
 		// Make sure minion isn't exhausted
 		attackerEntity.Exhausted = false
@@ -105,8 +106,9 @@ func TestWindfury(t *testing.T) {
 			test.WithHealth(5))
 
 		// Add minions to respective player fields
-		player.Field = append(player.Field, attackerEntity)
-		opponent.Field = append(opponent.Field, defender1, defender2)
+		engine.AddEntityToField(player, attackerEntity, -1)
+		engine.AddEntityToField(opponent, defender1, -1)
+		engine.AddEntityToField(opponent, defender2, -1)
 
 		// Make sure minion isn't exhausted
 		attackerEntity.Exhausted = false
@@ -165,7 +167,8 @@ func TestWindfury(t *testing.T) {
 			test.WithHealth(5))
 
 		// Add minions to opponent's field
-		opponent.Field = append(opponent.Field, defender1, defender2)
+		engine.AddEntityToField(opponent, defender1, -1)
+		engine.AddEntityToField(opponent, defender2, -1)
 
 		// Make sure hero isn't exhausted
 		player.Hero.Exhausted = false

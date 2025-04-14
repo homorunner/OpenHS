@@ -80,23 +80,6 @@ func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *
 
 // playMinion handles playing a minion card
 func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *game.Entity, fieldPos int, chooseOne int) error {
-	// The minion is exhausted when it enters play, unless it has charge
-	// Note: exhausted and sleeping are not the same state, but for now we use the same flag
-	entity.NumAttackThisTurn = 0
-	entity.NumTurnInPlay = 0 // First turn in play
-
-	if game.HasTag(entity.Tags, game.TAG_CHARGE) {
-		// Minions with charge can attack immediately
-		entity.Exhausted = false
-		logger.Info("Charge effect activated", logger.String("name", entity.Card.Name))
-	} else if game.HasTag(entity.Tags, game.TAG_RUSH) {
-		// Minions with rush can attack minions immediately, but not heroes
-		entity.Exhausted = false
-		logger.Info("Rush effect activated", logger.String("name", entity.Card.Name))
-	} else {
-		entity.Exhausted = true
-	}
-
 	logger.Info("Minion played", logger.String("name", entity.Card.Name))
 
 	// Trigger card played event
@@ -110,24 +93,9 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
 
 	// Add minion to the field at the specified position
-	if fieldPos < 0 || fieldPos > len(player.Field) {
-		// Auto-position at the end
-		player.Field = append(player.Field, entity)
-	} else {
-		// Insert at specified position
-		player.Field = append(player.Field[:fieldPos], append([]*game.Entity{entity}, player.Field[fieldPos:]...)...)
+	if err := e.AddEntityToField(player, entity, fieldPos); err != nil {
+		return err
 	}
-
-	// Update the entity's zone
-	entity.CurrentZone = game.ZONE_PLAY
-
-	// Trigger minion summoned event
-	minionSummonedCtx := game.TriggerContext{
-		Game:         e.game,
-		SourceEntity: entity,
-		Phase:        e.game.Phase,
-	}
-	e.game.TriggerManager.ActivateTrigger(game.TriggerMinionSummoned, minionSummonedCtx)
 
 	// TODO: Process battlecry, triggers, etc.
 

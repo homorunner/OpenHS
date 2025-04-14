@@ -17,12 +17,12 @@ func TestBasicAttack(t *testing.T) {
 		player2 := g.Players[1]
 
 		// Create attacker and defender entities for different players
-		attackerEntity := test.CreateTestMinionEntity(g, player1, test.WithName("Test Attacker"), test.WithAttack(3), test.WithHealth(4))
+		attackerEntity := test.CreateTestMinionEntity(g, player1, test.WithName("Test Attacker"), test.WithAttack(3), test.WithHealth(4), test.WithTag(game.TAG_RUSH, true))
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -55,8 +55,8 @@ func TestBasicAttack(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -80,8 +80,8 @@ func TestBasicAttack(t *testing.T) {
 		validDefender := test.CreateTestMinionEntity(g, player2, test.WithName("Valid Defender"), test.WithAttack(1), test.WithHealth(1))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, validAttacker)
-		player2.Field = append(player2.Field, validDefender)
+		engine.AddEntityToField(player1, validAttacker, -1)
+		engine.AddEntityToField(player2, validDefender, -1)
 
 		// Perform attack with nil attacker
 		err := engine.Attack(nil, validDefender, false)
@@ -113,8 +113,8 @@ func TestBasicAttack(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack with skipValidation=true
 		err := engine.Attack(attackerEntity, defenderEntity, true)
@@ -144,12 +144,12 @@ func TestBasicAttack(t *testing.T) {
 		player2 := g.Players[1]
 
 		// Create entities with just enough health to be killed for different players
-		attackerEntity := test.CreateTestMinionEntity(g, player1, test.WithName("Lethal Attacker"), test.WithAttack(5), test.WithHealth(2))
+		attackerEntity := test.CreateTestMinionEntity(g, player1, test.WithName("Lethal Attacker"), test.WithAttack(5), test.WithHealth(2), test.WithTag(game.TAG_RUSH, true))
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Fragile Defender"), test.WithAttack(2), test.WithHealth(2))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -183,8 +183,8 @@ func TestBasicAttack(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Perform attack
 		_ = engine.Attack(attackerEntity, defenderEntity, false)
@@ -209,7 +209,7 @@ func TestBasicAttack(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add defender to opponent's field
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Set hero's attack value to match weapon's attack
 		player1.Hero.Attack = player1.Weapon.Attack
@@ -253,7 +253,8 @@ func TestBasicAttack(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player, test.WithName("Same Player Defender"), test.WithAttack(1), test.WithHealth(30))
 
 		// Add minions to player's field
-		player.Field = append(player.Field, attackerEntity, defenderEntity)
+		engine.AddEntityToField(player, attackerEntity, -1)
+		engine.AddEntityToField(player, defenderEntity, -1)
 
 		// Attempt to attack own minion with validation (should fail)
 		err := engine.Attack(attackerEntity, defenderEntity, false)
@@ -301,7 +302,9 @@ func TestProcessDestroyAndUpdateAura(t *testing.T) {
 		minion3 := test.CreateTestMinionEntity(g, player, test.WithName("Alive Minion"), test.WithAttack(1), test.WithHealth(2))
 
 		// Add minions to the field
-		player.Field = append(player.Field, minion1, minion2, minion3)
+		engine.AddEntityToField(player, minion1, -1)
+		engine.AddEntityToField(player, minion2, -1)
+		engine.AddEntityToField(player, minion3, -1)
 		initialFieldSize := len(player.Field)
 
 		// Process deaths
@@ -335,7 +338,7 @@ func TestProcessDestroyAndUpdateAura(t *testing.T) {
 		minion.IsDestroyed = true
 
 		// Add minion to the field
-		player.Field = append(player.Field, minion)
+		engine.AddEntityToField(player, minion, -1)
 
 		// Process deaths
 		engine.processDestroyAndUpdateAura()
@@ -415,7 +418,8 @@ func TestProcessDestroyAndUpdateAura(t *testing.T) {
 		minion2 := test.CreateTestMinionEntity(g, player, test.WithName("Alive Minion"), test.WithAttack(1), test.WithHealth(2))
 
 		// Add minions to the field
-		player.Field = append(player.Field, minion1, minion2)
+		engine.AddEntityToField(player, minion1, -1)
+		engine.AddEntityToField(player, minion2, -1)
 
 		// Also add a weapon
 		weapon := test.CreateTestWeaponEntity(g, player, test.WithName("Broken Weapon"), test.WithAttack(3), test.WithHealth(0))
@@ -453,8 +457,8 @@ func TestAttackRestrictions(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Set attacker as exhausted
 		attackerEntity.Exhausted = true
@@ -481,8 +485,8 @@ func TestAttackRestrictions(t *testing.T) {
 		defenderEntity := test.CreateTestMinionEntity(g, player2, test.WithName("Test Defender"), test.WithAttack(2), test.WithHealth(5))
 
 		// Add minions to respective player's field
-		player1.Field = append(player1.Field, attackerEntity)
-		player2.Field = append(player2.Field, defenderEntity)
+		engine.AddEntityToField(player1, attackerEntity, -1)
+		engine.AddEntityToField(player2, defenderEntity, -1)
 
 		// Set attacker as ready to attack
 		attackerEntity.Exhausted = false
@@ -518,7 +522,7 @@ func TestAttackRestrictions(t *testing.T) {
 		attackerEntity.Exhausted = true
 
 		// Add minion to player's field
-		player.Field = append(player.Field, attackerEntity)
+		engine.AddEntityToField(player, attackerEntity, -1)
 
 		// End the turn twice to reset the attack counters
 		engine.EndPlayerTurn()
@@ -550,7 +554,7 @@ func TestAttackRestrictions(t *testing.T) {
 
 		// Create a defender for opponent
 		defenderEntity := test.CreateTestMinionEntity(g, opponent, test.WithName("Test Defender"), test.WithAttack(1), test.WithHealth(1))
-		opponent.Field = append(opponent.Field, defenderEntity)
+		engine.AddEntityToField(opponent, defenderEntity, -1)
 
 		// Play the minion
 		err := engine.PlayCard(player, 0, nil, -1, 0)

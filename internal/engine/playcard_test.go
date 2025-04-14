@@ -146,7 +146,8 @@ func TestPlayCardWithFullField(t *testing.T) {
 	// Setup a full field
 	player.FieldSize = 7 // Max field size
 	for i := 0; i < player.FieldSize; i++ {
-		test.AddToField(player, test.CreateTestMinionEntity(g, player, test.WithName("Field Minion")))
+		minion := test.CreateTestMinionEntity(g, player, test.WithName("Field Minion"))
+		e.AddEntityToField(player, minion, -1)
 	}
 
 	// Add a minion card to hand
@@ -174,8 +175,10 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 	player := g.Players[0]
 
 	// Add some minions to the field
-	test.AddToField(player, test.CreateTestMinionEntity(g, player, test.WithName("Field Minion 1")))
-	test.AddToField(player, test.CreateTestMinionEntity(g, player, test.WithName("Field Minion 2")))
+	minion1 := test.CreateTestMinionEntity(g, player, test.WithName("Field Minion 1"))
+	minion2 := test.CreateTestMinionEntity(g, player, test.WithName("Field Minion 2"))
+	e.AddEntityToField(player, minion1, -1)
+	e.AddEntityToField(player, minion2, -1)
 
 	// Add a minion card to hand
 	player.Hand = nil

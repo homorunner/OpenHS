@@ -251,7 +251,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 		test.WithName("Attacker"),
 		test.WithAttack(5),
 		test.WithHealth(5))
-	test.AddToField(player1, attacker)
+	e.AddEntityToField(player1, attacker, -1)
 	attacker.Exhausted = false // Allow it to attack
 
 	// Create defending minion for player 2 that will die from the attack
@@ -259,7 +259,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 		test.WithName("Defender"),
 		test.WithAttack(2),
 		test.WithHealth(3))
-	test.AddToField(player2, defender)
+	e.AddEntityToField(player2, defender, -1)
 
 	// Verify both are in PLAY zone
 	if attacker.CurrentZone != game.ZONE_PLAY {
@@ -303,14 +303,14 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 		test.WithName("Minion1"),
 		test.WithAttack(4),
 		test.WithHealth(3))
-	test.AddToField(player1, minion1)
+	e.AddEntityToField(player1, minion1, -1)
 	minion1.Exhausted = false // Allow it to attack
 
 	minion2 := test.CreateTestMinionEntity(g, player2,
 		test.WithName("Minion2"),
 		test.WithAttack(3),
 		test.WithHealth(4))
-	test.AddToField(player2, minion2)
+	e.AddEntityToField(player2, minion2, -1)
 
 	// Execute attack
 	err = e.ProcessAttack(minion1, minion2)
@@ -367,7 +367,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 		test.WithAttack(1),
 		test.WithHealth(1))
 	poisonous.Tags = append(poisonous.Tags, game.NewTag(game.TAG_POISONOUS, true))
-	test.AddToField(player1, poisonous)
+	e.AddEntityToField(player1, poisonous, -1)
 	poisonous.Exhausted = false
 
 	// Create a big target
@@ -375,7 +375,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 		test.WithName("Big Target"),
 		test.WithAttack(1),
 		test.WithHealth(10))
-	test.AddToField(player2, bigTarget)
+	e.AddEntityToField(player2, bigTarget, -1)
 
 	// Execute attack
 	err = e.ProcessAttack(poisonous, bigTarget)

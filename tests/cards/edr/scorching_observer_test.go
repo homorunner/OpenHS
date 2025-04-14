@@ -26,7 +26,7 @@ func TestScorchingObserverProperties(t *testing.T) {
 
 	// Create a Scorching Observer entity
 	entity := game.NewEntity(card, g, player)
-	player.Field = append(player.Field, entity)
+	engine.AddEntityToField(player, entity, -1)
 
 	// Verify the properties
 	if entity.Card.Cost != 9 {
@@ -72,7 +72,7 @@ func TestScorchingObserverRush(t *testing.T) {
 			test.WithHealth(10))
 
 		// Add target minion to opponent's field
-		opponent.Field = append(opponent.Field, targetMinion)
+		engine.AddEntityToField(opponent, targetMinion, -1)
 
 		// Play the Scorching Observer
 		err := engine.PlayCard(player, 0, nil, -1, 0)
@@ -159,14 +159,7 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 	entity := game.NewEntity(card, g, player)
 
 	// Add to player's field directly
-	player.Field = append(player.Field, entity)
-
-	// Set NumTurnInPlay to 1 (not the first turn anymore)
-	entity.NumTurnInPlay = 1
-
-	// Reset exhausted state for the turn
-	entity.Exhausted = false
-	entity.NumAttackThisTurn = 0
+	engine.AddEntityToField(player, entity, -1)
 
 	// Create a target minion for the opponent
 	targetMinion := test.CreateTestMinionEntity(g, opponent,
@@ -175,7 +168,7 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 		test.WithHealth(8))
 
 	// Add target minion to opponent's field
-	opponent.Field = append(opponent.Field, targetMinion)
+	engine.AddEntityToField(opponent, targetMinion, -1)
 
 	// Set hero health for testing healing
 	player.Hero.Health = 20
@@ -224,7 +217,7 @@ func TestScorchingObserverCombined(t *testing.T) {
 		test.WithHealth(8))
 
 	// Add target minion to opponent's field
-	opponent.Field = append(opponent.Field, targetMinion)
+	engine.AddEntityToField(opponent, targetMinion, -1)
 
 	// Set hero health for testing healing
 	player.Hero.Health = 20
