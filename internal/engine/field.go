@@ -1,26 +1,22 @@
 package engine
 
 import (
-	"errors"
-
 	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
 )
 
-// Field-related errors
-var (
-	ErrBattlefieldFull  = errors.New("battlefield is full")
-	ErrInvalidHandIndex = errors.New("invalid hand index")
-	ErrInvalidDeckIndex = errors.New("invalid deck index")
-)
-
 // AddEntityToField adds a new entity to a player's field at the specified position
 // If fieldPos is -1, it will be added to the end
-// Returns an error if the field is full
-func (e *Engine) AddEntityToField(player *game.Player, entity *game.Entity, fieldPos int) error {
+// If field is full, the entity is moved to ZONE_NONE and returns false
+func (e *Engine) AddEntityToField(player *game.Player, entity *game.Entity, fieldPos int) bool {
 	// Check if field is full
 	if len(player.Field) >= player.FieldSize {
-		return ErrBattlefieldFull
+		entity.CurrentZone = game.ZONE_NONE
+		return false
+	}
+
+	if fieldPos == -1 {
+		fieldPos = len(player.Field)
 	}
 
 	// Set the entity's zone to PLAY
@@ -45,7 +41,7 @@ func (e *Engine) AddEntityToField(player *game.Player, entity *game.Entity, fiel
 	}
 
 	// Add entity to field at the specified position
-	if fieldPos < 0 || fieldPos > len(player.Field) {
+	if fieldPos == len(player.Field) {
 		// Auto-position at the end
 		player.Field = append(player.Field, entity)
 	} else {
@@ -63,24 +59,40 @@ func (e *Engine) AddEntityToField(player *game.Player, entity *game.Entity, fiel
 		e.game.TriggerManager.ActivateTrigger(game.TriggerMinionSummoned, minionSummonedCtx)
 	}
 
-	return nil
+	return true
+}
+
+// AddEntityToHand adds an entity to player's hand at the specified position
+// If handPos is -1, it will be added to the end
+// If hand is full, the entity is moved to ZONE_REMOVEDFROMGAME and returns false
+func (e *Engine) AddEntityToHand(player *game.Player, entity *game.Entity, handPos int) (*game.Entity, bool) {
+	if handPos == -1 {
+		handPos = len(player.Hand)
+	}
+
+	if len(player.Hand) >= player.HandSize {
+		entity.CurrentZone = game.ZONE_REMOVEDFROMGAME
+		return nil, false
+	}
+
+	// Set the entity's zone to HAND
+	entity.CurrentZone = game.ZONE_HAND
+
+	// Add entity to hand at the specified position
+	if handPos == len(player.Hand) {
+		player.Hand = append(player.Hand, entity)
+	} else {
+		player.Hand = append(player.Hand[:handPos], append([]*game.Entity{entity}, player.Hand[handPos:]...)...)
+	}
+
+	return entity, true
 }
 
 // MoveFromHandToField moves an entity from a player's hand to their field
 // handIndex is the index in the hand
 // fieldPos is the position on the field (-1 for end)
-// Returns an error if the field is full or the hand index is invalid
-func (e *Engine) MoveFromHandToField(player *game.Player, handIndex, fieldPos int) error {
-	// Validate hand index
-	if handIndex < 0 || handIndex >= len(player.Hand) {
-		return ErrInvalidHandIndex
-	}
-
-	// Check if field is full
-	if len(player.Field) >= player.FieldSize {
-		return ErrBattlefieldFull
-	}
-
+// Returns true if the entity is moved to the field, false if it is discarded
+func (e *Engine) MoveFromHandToField(player *game.Player, handIndex, fieldPos int) bool {
 	// Get the entity from hand
 	entity := player.Hand[handIndex]
 
@@ -94,18 +106,8 @@ func (e *Engine) MoveFromHandToField(player *game.Player, handIndex, fieldPos in
 // MoveFromDeckToField moves an entity from a player's deck to their field
 // deckIndex is the index in the deck
 // fieldPos is the position on the field (-1 for end)
-// Returns an error if the field is full or the deck index is invalid
-func (e *Engine) MoveFromDeckToField(player *game.Player, deckIndex, fieldPos int) error {
-	// Validate deck index
-	if deckIndex < 0 || deckIndex >= len(player.Deck) {
-		return ErrInvalidDeckIndex
-	}
-
-	// Check if field is full
-	if len(player.Field) >= player.FieldSize {
-		return ErrBattlefieldFull
-	}
-
+// Returns true if the entity is moved to the field, false if it is discarded
+func (e *Engine) MoveFromDeckToField(player *game.Player, deckIndex, fieldPos int) bool {
 	// Get the entity from deck
 	entity := player.Deck[deckIndex]
 
@@ -114,6 +116,21 @@ func (e *Engine) MoveFromDeckToField(player *game.Player, deckIndex, fieldPos in
 
 	// Add to field
 	return e.AddEntityToField(player, entity, fieldPos)
+}
+
+// MoveFromDeckToHand moves an entity from a player's deck to their hand
+// deckIndex is the index in the deck
+// handPos is the position in the hand (-1 for end)
+// Returns true if the entity is moved to the hand, false if it is discarded
+func (e *Engine) MoveFromDeckToHand(player *game.Player, deckIndex, handPos int) (*game.Entity, bool) {
+	// Get the entity from deck
+	entity := player.Deck[deckIndex]
+
+	// Remove from deck
+	player.Deck = append(player.Deck[:deckIndex], player.Deck[deckIndex+1:]...)
+
+	// Add to hand
+	return e.AddEntityToHand(player, entity, handPos)
 }
 
 func (e *Engine) removeEntityFromBoard(player *game.Player, entity *game.Entity) {

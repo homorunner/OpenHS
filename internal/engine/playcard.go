@@ -92,12 +92,12 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 	}
 	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
 
-	// Add minion to the field at the specified position
-	if err := e.AddEntityToField(player, entity, fieldPos); err != nil {
-		return err
-	}
+	// Try to add minion to the field at the specified position
+	if e.AddEntityToField(player, entity, fieldPos) {
+		// TODO: Process battlecry, triggers, etc.
 
-	// TODO: Process battlecry, triggers, etc.
+		return nil
+	}
 
 	return nil
 }

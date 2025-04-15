@@ -46,7 +46,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Add a test card to hand with known cost
 	testCard := test.CreateTestMinionEntity(g, player, test.WithName("Test Zone Minion"), test.WithCost(2))
-	test.AddToHand(player, testCard)
+	e.AddEntityToHand(player, testCard, -1)
 
 	// Verify it has HAND zone
 	if testCard.CurrentZone != game.ZONE_HAND {
@@ -68,7 +68,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	// Test 5: Verify zone changes when playing spells
 	// Add a test spell to hand
 	testSpell := test.CreateTestSpellEntity(g, player, test.WithName("Test Zone Spell"), test.WithCost(1))
-	test.AddToHand(player, testSpell)
+	e.AddEntityToHand(player, testSpell, -1)
 
 	// Play the spell
 	handIndex = len(player.Hand) - 1
@@ -85,7 +85,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	// Test 6: Verify zone changes when equipping weapons
 	// Add a test weapon to hand
 	testWeapon := test.CreateTestWeaponEntity(g, player, test.WithName("Test Zone Weapon"), test.WithCost(1))
-	test.AddToHand(player, testWeapon)
+	e.AddEntityToHand(player, testWeapon, -1)
 
 	// Play the weapon
 	handIndex = len(player.Hand) - 1
@@ -101,7 +101,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Add another weapon to hand
 	replacementWeapon := test.CreateTestWeaponEntity(g, player, test.WithName("Replacement Weapon"), test.WithCost(1))
-	test.AddToHand(player, replacementWeapon)
+	e.AddEntityToHand(player, replacementWeapon, -1)
 
 	// Play the second weapon
 	handIndex = len(player.Hand) - 1
@@ -147,7 +147,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	for i := 0; i < player.HandSize; i++ {
 		filler := test.CreateTestMinionEntity(g, player, test.WithName("Filler Card"))
-		test.AddToHand(player, filler)
+		e.AddEntityToHand(player, filler, -1)
 	}
 
 	// Try to draw with full hand
@@ -192,7 +192,7 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 		test.WithHealth(15))
 
 	// Add to hand
-	test.AddToHand(player, newHero)
+	e.AddEntityToHand(player, newHero, -1)
 
 	// Verify it's in HAND zone
 	if newHero.CurrentZone != game.ZONE_HAND {

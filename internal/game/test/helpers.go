@@ -127,9 +127,3 @@ func WithTag(tagType game.TagType, value interface{}) func(*game.Card) {
 		c.Tags = append(c.Tags, game.NewTag(tagType, value))
 	}
 }
-
-// AddToHand adds an entity to player's hand
-func AddToHand(player *game.Player, entity *game.Entity) {
-	player.Hand = append(player.Hand, entity)
-	entity.CurrentZone = game.ZONE_HAND
-}

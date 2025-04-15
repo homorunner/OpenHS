@@ -18,14 +18,16 @@ func (e *Engine) DrawCard(player *game.Player) *game.Entity {
 func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.Entity {
 	// Check if the deck is empty
 	if len(player.Deck) == 0 {
-		player.FatigueDamage++
+		if cardToDraw == "" {
+			logger.Info("Player taking fatigue damage", logger.Int("damage", player.FatigueDamage))
+			player.FatigueDamage++
+			e.DealDamage(nil, player.Hero, player.FatigueDamage)
+		}
 
-		logger.Info("Player taking fatigue damage", logger.Int("damage", player.FatigueDamage))
-		e.DealDamage(nil, player.Hero, player.FatigueDamage)
 		return nil
 	}
 
-	var entity *game.Entity
+	var drawIndex int
 
 	// If a specific card is requested, find and draw it
 	if cardToDraw != "" {
@@ -34,8 +36,7 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		for i, deckEntity := range player.Deck {
 			if deckEntity.Card.Name == cardToDraw {
 				// Get the entity and remove it from the deck
-				entity = player.Deck[i]
-				player.Deck = append(player.Deck[:i], player.Deck[i+1:]...)
+				drawIndex = i
 				found = true
 				break
 			}
@@ -48,18 +49,12 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 		}
 	} else {
 		// Get the top entity from the deck
-		entity = player.Deck[len(player.Deck)-1]
-		player.Deck = player.Deck[:len(player.Deck)-1]
+		drawIndex = len(player.Deck) - 1
 	}
 
-	// Update entity zone (moving from deck to hand)
-	entity.CurrentZone = game.ZONE_NONE // Temporarily set to NONE while in transition
-
-	// Add entity to hand if space is available
-	if !e.AddCardToHand(player, entity) {
-		// Card couldn't be added to hand (usually due to full hand)
-		// It should go to graveyard or be removed from game
-		entity.CurrentZone = game.ZONE_REMOVEDFROMGAME
+	// Try to add entity to hand
+	entity, ok := e.MoveFromDeckToHand(player, drawIndex, -1)
+	if !ok {
 		return nil
 	}
 
@@ -75,21 +70,4 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 	e.game.TriggerManager.ActivateTrigger(game.TriggerCardDrawn, cardDrawnCtx)
 
 	return entity
-}
-
-// AddCardToHand adds a card to the player's hand
-// Returns true if successful, false if hand is full
-func (e *Engine) AddCardToHand(player *game.Player, entity *game.Entity) bool {
-	if len(player.Hand) >= player.HandSize {
-		logger.Info("Hand is full, card discarded", logger.String("card", entity.Card.Name))
-		return false
-	}
-
-	// Add entity to hand
-	player.Hand = append(player.Hand, entity)
-
-	// Update the entity's zone
-	entity.CurrentZone = game.ZONE_HAND
-
-	return true
 }

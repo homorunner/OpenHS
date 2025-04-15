@@ -15,10 +15,10 @@ func TestPlayCard(t *testing.T) {
 
 	// Add different types of cards to the player's hand for testing
 	player.Hand = nil
-	test.AddToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Foo")))
-	test.AddToHand(player, test.CreateTestSpellEntity(g, player))
-	test.AddToHand(player, test.CreateTestWeaponEntity(g, player, test.WithName("Bar")))
-	test.AddToHand(player, test.CreateTestMinionEntity(g, player, test.WithCost(10)))
+	e.AddEntityToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Foo")), -1)
+	e.AddEntityToHand(player, test.CreateTestSpellEntity(g, player), -1)
+	e.AddEntityToHand(player, test.CreateTestWeaponEntity(g, player, test.WithName("Bar")), -1)
+	e.AddEntityToHand(player, test.CreateTestMinionEntity(g, player, test.WithCost(10)), -1)
 
 	// Setup player resources
 	player.Mana = 5
@@ -151,7 +151,7 @@ func TestPlayCardWithFullField(t *testing.T) {
 	}
 
 	// Add a minion card to hand
-	test.AddToHand(player, test.CreateTestMinionEntity(g, player))
+	e.AddEntityToHand(player, test.CreateTestMinionEntity(g, player), -1)
 
 	player.Mana = 10
 
@@ -182,7 +182,7 @@ func TestPlayCardWithSpecificPosition(t *testing.T) {
 
 	// Add a minion card to hand
 	player.Hand = nil
-	test.AddToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Test Minion")))
+	e.AddEntityToHand(player, test.CreateTestMinionEntity(g, player, test.WithName("Test Minion")), -1)
 
 	player.Mana = 10
 
@@ -221,7 +221,7 @@ func TestReplaceWeapon(t *testing.T) {
 
 	// Add a new weapon to hand
 	player.Hand = nil
-	test.AddToHand(player, test.CreateTestWeaponEntity(g, player, test.WithName("New Weapon")))
+	e.AddEntityToHand(player, test.CreateTestWeaponEntity(g, player, test.WithName("New Weapon")), -1)
 
 	player.Mana = 10
 
