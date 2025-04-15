@@ -11,10 +11,9 @@ type Card struct {
 	Attack      int
 	Health      int
 	Type        CardType
-	Effects     []Effect
-	Tags        []Tag // Card tags like Taunt, Divine Shield, etc.
-	Load        func(g *Game, e *Entity)
-	Unload      func(g *Game, e *Entity)
+	Tags        []Tag                    // Card tags like Taunt, Divine Shield, etc.
+	Load        func(g *Game, e *Entity) // Load functions register triggers to Game for Entity of this card
+	Unload      func(g *Game, e *Entity) // Unload functions remove triggers from Game when Entity is removed/silenced/...
 }
 
 // CardType represents the type of a card
@@ -61,58 +60,4 @@ func (c CardType) ZhString() string {
 	default:
 		return "未知"
 	}
-}
-
-// Effect represents a card effect or ability
-type Effect struct {
-	Trigger    Trigger
-	Action     Action
-	Conditions []Condition
-}
-
-// Trigger represents when an effect should activate
-type Trigger int
-
-const (
-	OnPlay Trigger = iota
-	OnDeath
-	OnDamage
-	OnHeal
-	OnTurnStart
-	OnTurnEnd
-)
-
-// Action represents what an effect does
-type Action interface {
-	Execute(*Card)
-}
-
-// Condition represents a requirement for an effect to trigger
-type Condition interface {
-	IsMet(*Card) bool
-}
-
-// CardConfig represents the configuration for a card
-type CardConfig struct {
-	Name    string         `json:"name"`
-	ZhName  string         `json:"zh_name"`
-	Cost    int            `json:"cost"`
-	Attack  int            `json:"attack"`
-	Health  int            `json:"health"`
-	Type    CardType       `json:"type"`
-	Effects []EffectConfig `json:"effects,omitempty"`
-	Tags    []TagConfig    `json:"tags,omitempty"`
-}
-
-// TagConfig represents the configuration for a card tag
-type TagConfig struct {
-	Type  string      `json:"type"`
-	Value interface{} `json:"value,omitempty"`
-}
-
-// EffectConfig represents the configuration for a card effect
-type EffectConfig struct {
-	Trigger    Trigger  `json:"trigger"`
-	Conditions []string `json:"conditions,omitempty"`
-	Action     string   `json:"action"`
 }
