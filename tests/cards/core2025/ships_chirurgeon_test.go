@@ -6,7 +6,6 @@ import (
 	core2025 "github.com/openhs/cards/core2025"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 var card *game.Card
@@ -19,7 +18,7 @@ func init() {
 // TestShipsChirurgeonProperties tests that Ship's Chirurgeon has the correct properties
 func TestShipsChirurgeonProperties(t *testing.T) {
 	// Setup
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	engine := engine.NewEngine(g)
 	engine.StartGame()
 	player := g.Players[0]
@@ -43,7 +42,7 @@ func TestShipsChirurgeonProperties(t *testing.T) {
 func TestShipsChirurgeonEffect(t *testing.T) {
 	t.Run("Ship's Chirurgeon gives +1 health to friendly minions when summoned", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -52,11 +51,11 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 		entity := game.NewEntity(card, g, player)
 
 		// Create a test minion to be played after Ship's Chirurgeon
-		testMinion := test.CreateTestMinionEntity(g, player,
-			test.WithName("Test Minion"),
-			test.WithCost(1),
-			test.WithAttack(2),
-			test.WithHealth(3))
+		testMinion := game.CreateTestMinionEntity(g, player,
+			game.WithName("Test Minion"),
+			game.WithCost(1),
+			game.WithAttack(2),
+			game.WithHealth(3))
 
 		// Add cards to player's hand
 		player.Hand = []*game.Entity{entity, testMinion}
@@ -98,7 +97,7 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 
 	t.Run("Ship's Chirurgeon doesn't give +1 health to opponent's minions", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -108,11 +107,11 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 		entity := game.NewEntity(card, g, player)
 
 		// Create a test minion for the opponent
-		opponentMinion := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Opponent Minion"),
-			test.WithCost(1),
-			test.WithAttack(2),
-			test.WithHealth(3))
+		opponentMinion := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Opponent Minion"),
+			game.WithCost(1),
+			game.WithAttack(2),
+			game.WithHealth(3))
 
 		// Add Ship's Chirurgeon to player's hand
 		player.Hand = []*game.Entity{entity}
@@ -150,7 +149,7 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 
 	t.Run("Ship's Chirurgeon effect doesn't apply to itself", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -182,7 +181,7 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 
 	t.Run("Multiple Ship's Chirurgeons give multiple +1 health bonuses", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -192,11 +191,11 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 		entity2 := game.NewEntity(card, g, player)
 
 		// Create a test minion
-		testMinion := test.CreateTestMinionEntity(g, player,
-			test.WithName("Test Minion"),
-			test.WithCost(1),
-			test.WithAttack(2),
-			test.WithHealth(3))
+		testMinion := game.CreateTestMinionEntity(g, player,
+			game.WithName("Test Minion"),
+			game.WithCost(1),
+			game.WithAttack(2),
+			game.WithHealth(3))
 
 		// Add cards to player's hand
 		player.Hand = []*game.Entity{entity1, entity2, testMinion}
@@ -234,7 +233,7 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 
 	t.Run("Ship's Chirurgeon effect doesn't work when not in play zone", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -243,17 +242,17 @@ func TestShipsChirurgeonEffect(t *testing.T) {
 		chirurgeon := game.NewEntity(card, g, player)
 
 		// Create two test minions
-		testMinion1 := test.CreateTestMinionEntity(g, player,
-			test.WithName("Test Minion 1"),
-			test.WithCost(1),
-			test.WithAttack(2),
-			test.WithHealth(3))
+		testMinion1 := game.CreateTestMinionEntity(g, player,
+			game.WithName("Test Minion 1"),
+			game.WithCost(1),
+			game.WithAttack(2),
+			game.WithHealth(3))
 
-		testMinion2 := test.CreateTestMinionEntity(g, player,
-			test.WithName("Test Minion 2"),
-			test.WithCost(1),
-			test.WithAttack(2),
-			test.WithHealth(3))
+		testMinion2 := game.CreateTestMinionEntity(g, player,
+			game.WithName("Test Minion 2"),
+			game.WithCost(1),
+			game.WithAttack(2),
+			game.WithHealth(3))
 
 		// Add cards to player's hand
 		player.Hand = []*game.Entity{chirurgeon, testMinion1, testMinion2}

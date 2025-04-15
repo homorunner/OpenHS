@@ -4,19 +4,18 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 // TestEntityZoneTracking tests that entity zones are correctly tracked across various operations
 func TestEntityZoneTracking(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 
 	player := g.Players[0]
 
 	// Test 1: Verify new entities have zone set to NONE
-	newEntity := test.CreateTestMinionEntity(g, player)
+	newEntity := game.CreateTestMinionEntity(g, player)
 	if newEntity.CurrentZone != game.ZONE_NONE {
 		t.Errorf("New entity should have zone NONE, got %s", newEntity.CurrentZone)
 	}
@@ -45,7 +44,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	player.Mana = 10
 
 	// Add a test card to hand with known cost
-	testCard := test.CreateTestMinionEntity(g, player, test.WithName("Test Zone Minion"), test.WithCost(2))
+	testCard := game.CreateTestMinionEntity(g, player, game.WithName("Test Zone Minion"), game.WithCost(2))
 	e.AddEntityToHand(player, testCard, -1)
 
 	// Verify it has HAND zone
@@ -67,7 +66,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Test 5: Verify zone changes when playing spells
 	// Add a test spell to hand
-	testSpell := test.CreateTestSpellEntity(g, player, test.WithName("Test Zone Spell"), test.WithCost(1))
+	testSpell := game.CreateTestSpellEntity(g, player, game.WithName("Test Zone Spell"), game.WithCost(1))
 	e.AddEntityToHand(player, testSpell, -1)
 
 	// Play the spell
@@ -84,7 +83,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Test 6: Verify zone changes when equipping weapons
 	// Add a test weapon to hand
-	testWeapon := test.CreateTestWeaponEntity(g, player, test.WithName("Test Zone Weapon"), test.WithCost(1))
+	testWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Test Zone Weapon"), game.WithCost(1))
 	e.AddEntityToHand(player, testWeapon, -1)
 
 	// Play the weapon
@@ -100,7 +99,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Add another weapon to hand
-	replacementWeapon := test.CreateTestWeaponEntity(g, player, test.WithName("Replacement Weapon"), test.WithCost(1))
+	replacementWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Replacement Weapon"), game.WithCost(1))
 	e.AddEntityToHand(player, replacementWeapon, -1)
 
 	// Play the second weapon
@@ -146,7 +145,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	player.Hand = nil   // Clear hand
 
 	for i := 0; i < player.HandSize; i++ {
-		filler := test.CreateTestMinionEntity(g, player, test.WithName("Filler Card"))
+		filler := game.CreateTestMinionEntity(g, player, game.WithName("Filler Card"))
 		e.AddEntityToHand(player, filler, -1)
 	}
 
@@ -172,7 +171,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 // TestZoneTrackingDuringHeroReplacement tests that entity zones are properly updated when replacing heroes
 func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 
@@ -187,9 +186,9 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 	}
 
 	// Create a hero card to replace the current one
-	newHero := test.CreateTestHeroEntity(g, player,
-		test.WithName("Replacement Hero"),
-		test.WithHealth(15))
+	newHero := game.CreateTestHeroEntity(g, player,
+		game.WithName("Replacement Hero"),
+		game.WithHealth(15))
 
 	// Add to hand
 	e.AddEntityToHand(player, newHero, -1)
@@ -239,7 +238,7 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 
 // TestZoneTrackingDuringCombat tests that entity zones are properly updated during combat
 func TestZoneTrackingDuringCombat(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 
@@ -247,18 +246,18 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	player2 := g.Players[1]
 
 	// Create attacking minion for player 1
-	attacker := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Attacker"),
-		test.WithAttack(5),
-		test.WithHealth(5))
+	attacker := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Attacker"),
+		game.WithAttack(5),
+		game.WithHealth(5))
 	e.AddEntityToField(player1, attacker, -1)
 	attacker.Exhausted = false // Allow it to attack
 
 	// Create defending minion for player 2 that will die from the attack
-	defender := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Defender"),
-		test.WithAttack(2),
-		test.WithHealth(3))
+	defender := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Defender"),
+		game.WithAttack(2),
+		game.WithHealth(3))
 	e.AddEntityToField(player2, defender, -1)
 
 	// Verify both are in PLAY zone
@@ -299,17 +298,17 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 
 	// Test mutual destruction scenario
 	// Create two minions that will kill each other
-	minion1 := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Minion1"),
-		test.WithAttack(4),
-		test.WithHealth(3))
+	minion1 := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Minion1"),
+		game.WithAttack(4),
+		game.WithHealth(3))
 	e.AddEntityToField(player1, minion1, -1)
 	minion1.Exhausted = false // Allow it to attack
 
-	minion2 := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Minion2"),
-		test.WithAttack(3),
-		test.WithHealth(4))
+	minion2 := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Minion2"),
+		game.WithAttack(3),
+		game.WithHealth(4))
 	e.AddEntityToField(player2, minion2, -1)
 
 	// Execute attack
@@ -328,10 +327,10 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 
 	// Test weapon destruction
 	// Create a weapon for player1
-	weapon := test.CreateTestWeaponEntity(g, player1,
-		test.WithName("Testing Weapon"),
-		test.WithAttack(2),
-		test.WithHealth(1)) // 1 durability
+	weapon := game.CreateTestWeaponEntity(g, player1,
+		game.WithName("Testing Weapon"),
+		game.WithAttack(2),
+		game.WithHealth(1)) // 1 durability
 
 	player1.Weapon = weapon
 	player1.Hero.Attack = 1
@@ -362,19 +361,19 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 
 	// Test poisonous effect
 	// Create a poisonous minion
-	poisonous := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Poisonous Minion"),
-		test.WithAttack(1),
-		test.WithHealth(1))
+	poisonous := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Poisonous Minion"),
+		game.WithAttack(1),
+		game.WithHealth(1))
 	poisonous.Tags = append(poisonous.Tags, game.NewTag(game.TAG_POISONOUS, true))
 	e.AddEntityToField(player1, poisonous, -1)
 	poisonous.Exhausted = false
 
 	// Create a big target
-	bigTarget := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Big Target"),
-		test.WithAttack(1),
-		test.WithHealth(10))
+	bigTarget := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Big Target"),
+		game.WithAttack(1),
+		game.WithHealth(10))
 	e.AddEntityToField(player2, bigTarget, -1)
 
 	// Execute attack

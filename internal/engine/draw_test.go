@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 // TestDrawCard tests the DrawCard helper function
 func TestDrawCard(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 
@@ -51,7 +50,7 @@ func TestDrawCard(t *testing.T) {
 	// Test 2: Drawing from an empty deck should trigger fatigue damage
 	// Create a test hero card and entity
 	emptyPlayer := game.NewPlayer()
-	emptyPlayer.Hero = test.CreateTestHeroEntity(g, emptyPlayer, test.WithName("Test Hero"), test.WithHealth(30))
+	emptyPlayer.Hero = game.CreateTestHeroEntity(g, emptyPlayer, game.WithName("Test Hero"), game.WithHealth(30))
 
 	// Try to draw from empty deck
 	drawn := e.DrawCard(emptyPlayer)
@@ -87,14 +86,14 @@ func TestDrawCard(t *testing.T) {
 
 // TestDrawSpecificCard tests drawing a specific card from the deck
 func TestDrawSpecificCard(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 	e.StartGame()
 	player := g.Players[0]
 
 	// Add some specific cards to test
-	player.Deck = append(player.Deck, test.CreateTestMinionEntity(g, player, test.WithName("Special Card 1")))
-	player.Deck = append(player.Deck, test.CreateTestMinionEntity(g, player, test.WithName("Special Card 2")))
+	player.Deck = append(player.Deck, game.CreateTestMinionEntity(g, player, game.WithName("Special Card 1")))
+	player.Deck = append(player.Deck, game.CreateTestMinionEntity(g, player, game.WithName("Special Card 2")))
 
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)

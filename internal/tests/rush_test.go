@@ -5,13 +5,12 @@ import (
 
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 func TestRush(t *testing.T) {
 	t.Run("Minion with rush can attack a minion the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -19,12 +18,12 @@ func TestRush(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a rush minion entity for the hand
-		rushMinionEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Rush Minion"),
-			test.WithAttack(3),
-			test.WithHealth(2),
-			test.WithCost(3),
-			test.WithTag(game.TAG_RUSH, true))
+		rushMinionEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Rush Minion"),
+			game.WithAttack(3),
+			game.WithHealth(2),
+			game.WithCost(3),
+			game.WithTag(game.TAG_RUSH, true))
 		player.Hand = []*game.Entity{rushMinionEntity}
 
 		// Play the rush minion
@@ -34,10 +33,10 @@ func TestRush(t *testing.T) {
 		}
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Target Minion"),
-			test.WithAttack(2),
-			test.WithHealth(4))
+		targetMinionEntity := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Target Minion"),
+			game.WithAttack(2),
+			game.WithHealth(4))
 
 		// Add target minion to opponent's field
 		engine.AddEntityToField(opponent, targetMinionEntity, -1)
@@ -81,7 +80,7 @@ func TestRush(t *testing.T) {
 
 	t.Run("Minion with rush cannot attack a hero the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -89,12 +88,12 @@ func TestRush(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a rush minion entity for the hand
-		rushMinionEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Rush Minion"),
-			test.WithAttack(3),
-			test.WithHealth(2),
-			test.WithCost(3),
-			test.WithTag(game.TAG_RUSH, true))
+		rushMinionEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Rush Minion"),
+			game.WithAttack(3),
+			game.WithHealth(2),
+			game.WithCost(3),
+			game.WithTag(game.TAG_RUSH, true))
 		player.Hand = []*game.Entity{rushMinionEntity}
 
 		// Play the rush minion
@@ -122,19 +121,19 @@ func TestRush(t *testing.T) {
 
 	t.Run("Minion with rush can attack a hero after one turn", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create a rush minion entity for the field
-		rushMinionEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Rush Minion"),
-			test.WithAttack(3),
-			test.WithHealth(2),
-			test.WithCost(3),
-			test.WithTag(game.TAG_RUSH, true))
+		rushMinionEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Rush Minion"),
+			game.WithAttack(3),
+			game.WithHealth(2),
+			game.WithCost(3),
+			game.WithTag(game.TAG_RUSH, true))
 
 		// Add rush minion to player's field directly (not from hand)
 		engine.AddEntityToField(player, rushMinionEntity, -1)

@@ -5,31 +5,30 @@ import (
 
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 func TestPoisonous(t *testing.T) {
 	t.Run("Attack with poisonous effect destroys minions", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player1 := g.Players[0]
 		player2 := g.Players[1]
 
 		// Create attacker with poisonous tag
-		attackerEntity := test.CreateTestMinionEntity(g, player1,
-			test.WithName("Poisonous Minion"),
-			test.WithAttack(1),
-			test.WithHealth(3),
-			test.WithTag(game.TAG_POISONOUS, true),
-			test.WithTag(game.TAG_RUSH, true))
+		attackerEntity := game.CreateTestMinionEntity(g, player1,
+			game.WithName("Poisonous Minion"),
+			game.WithAttack(1),
+			game.WithHealth(3),
+			game.WithTag(game.TAG_POISONOUS, true),
+			game.WithTag(game.TAG_RUSH, true))
 
 		// Create defender with high health for opponent
-		defenderEntity := test.CreateTestMinionEntity(g, player2,
-			test.WithName("Tough Minion"),
-			test.WithAttack(2),
-			test.WithHealth(10))
+		defenderEntity := game.CreateTestMinionEntity(g, player2,
+			game.WithName("Tough Minion"),
+			game.WithAttack(2),
+			game.WithHealth(10))
 
 		// Add minions to respective players' fields
 		engine.AddEntityToField(player1, attackerEntity, -1)
@@ -74,25 +73,25 @@ func TestPoisonous(t *testing.T) {
 
 	t.Run("Mutual poisonous attack destroys both minions", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player1 := g.Players[0]
 		player2 := g.Players[1]
 
 		// Create minions with poisonous for different players
-		attackerEntity := test.CreateTestMinionEntity(g, player1,
-			test.WithName("Poisonous Attacker"),
-			test.WithAttack(1),
-			test.WithHealth(2),
-			test.WithTag(game.TAG_POISONOUS, true),
-			test.WithTag(game.TAG_RUSH, true))
+		attackerEntity := game.CreateTestMinionEntity(g, player1,
+			game.WithName("Poisonous Attacker"),
+			game.WithAttack(1),
+			game.WithHealth(2),
+			game.WithTag(game.TAG_POISONOUS, true),
+			game.WithTag(game.TAG_RUSH, true))
 
-		defenderEntity := test.CreateTestMinionEntity(g, player2,
-			test.WithName("Poisonous Defender"),
-			test.WithAttack(1),
-			test.WithHealth(3),
-			test.WithTag(game.TAG_POISONOUS, true))
+		defenderEntity := game.CreateTestMinionEntity(g, player2,
+			game.WithName("Poisonous Defender"),
+			game.WithAttack(1),
+			game.WithHealth(3),
+			game.WithTag(game.TAG_POISONOUS, true))
 
 		// Add them to their respective player's field
 		engine.AddEntityToField(player1, attackerEntity, -1)
@@ -145,19 +144,19 @@ func TestPoisonous(t *testing.T) {
 
 	t.Run("Poisonous doesn't affect heroes", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player1 := g.Players[0]
 		player2 := g.Players[1]
 
 		// Create poisonous minion
-		minionEntity := test.CreateTestMinionEntity(g, player1,
-			test.WithName("Poisonous Minion"),
-			test.WithAttack(2),
-			test.WithHealth(2),
-			test.WithTag(game.TAG_POISONOUS, true),
-			test.WithTag(game.TAG_CHARGE, true))
+		minionEntity := game.CreateTestMinionEntity(g, player1,
+			game.WithName("Poisonous Minion"),
+			game.WithAttack(2),
+			game.WithHealth(2),
+			game.WithTag(game.TAG_POISONOUS, true),
+			game.WithTag(game.TAG_CHARGE, true))
 
 		// Add minion to player's field
 		engine.AddEntityToField(player1, minionEntity, -1)

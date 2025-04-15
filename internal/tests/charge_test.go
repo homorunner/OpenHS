@@ -5,35 +5,34 @@ import (
 
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 func TestCharge(t *testing.T) {
 	t.Run("Minion with charge can attack the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create a charge minion entity for the hand
-		chargeMinionEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Charge Minion"),
-			test.WithAttack(3),
-			test.WithHealth(2),
-			test.WithCost(3),
-			test.WithTag(game.TAG_CHARGE, true))
+		chargeMinionEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Charge Minion"),
+			game.WithAttack(3),
+			game.WithHealth(2),
+			game.WithCost(3),
+			game.WithTag(game.TAG_CHARGE, true))
 
 		// Add charge minion to player's hand
 		player.Hand = []*game.Entity{chargeMinionEntity}
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Target Minion"),
-			test.WithAttack(2),
-			test.WithHealth(4))
+		targetMinionEntity := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Target Minion"),
+			game.WithAttack(2),
+			game.WithHealth(4))
 
 		// Add target minion to opponent's field
 		engine.AddEntityToField(opponent, targetMinionEntity, -1)
@@ -78,28 +77,28 @@ func TestCharge(t *testing.T) {
 
 	t.Run("Regular minion cannot attack the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create a regular minion entity for the hand
-		regularMinionEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Regular Minion"),
-			test.WithAttack(3),
-			test.WithHealth(2),
-			test.WithCost(3))
+		regularMinionEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Regular Minion"),
+			game.WithAttack(3),
+			game.WithHealth(2),
+			game.WithCost(3))
 
 		// Add regular minion to player's hand
 		player.Hand = append(player.Hand, regularMinionEntity)
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinionEntity := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Target Minion"),
-			test.WithAttack(2),
-			test.WithHealth(4))
+		targetMinionEntity := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Target Minion"),
+			game.WithAttack(2),
+			game.WithHealth(4))
 
 		// Add target minion to opponent's field
 		engine.AddEntityToField(opponent, targetMinionEntity, -1)

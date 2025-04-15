@@ -6,7 +6,6 @@ import (
 	edr "github.com/openhs/cards/edr"
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 var card *game.Card
@@ -19,7 +18,7 @@ func init() {
 // TestScorchingObserverProperties tests that Scorching Observer has the correct properties
 func TestScorchingObserverProperties(t *testing.T) {
 	// Setup
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	engine := engine.NewEngine(g)
 	engine.StartGame()
 	player := g.Players[0]
@@ -52,7 +51,7 @@ func TestScorchingObserverProperties(t *testing.T) {
 func TestScorchingObserverRush(t *testing.T) {
 	t.Run("Scorching Observer can attack a minion the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -66,10 +65,10 @@ func TestScorchingObserverRush(t *testing.T) {
 		player.Mana = 10 // Ensure enough mana
 
 		// Create a target minion for the opponent
-		targetMinion := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Target Minion"),
-			test.WithAttack(5),
-			test.WithHealth(10))
+		targetMinion := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Target Minion"),
+			game.WithAttack(5),
+			game.WithHealth(10))
 
 		// Add target minion to opponent's field
 		engine.AddEntityToField(opponent, targetMinion, -1)
@@ -114,7 +113,7 @@ func TestScorchingObserverRush(t *testing.T) {
 
 	t.Run("Scorching Observer cannot attack a hero the same turn it is played", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
@@ -149,7 +148,7 @@ func TestScorchingObserverRush(t *testing.T) {
 // TestScorchingObserverLifesteal tests the Lifesteal ability of Scorching Observer
 func TestScorchingObserverLifesteal(t *testing.T) {
 	// Setup
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	engine := engine.NewEngine(g)
 	engine.StartGame()
 	player := g.Players[0]
@@ -162,10 +161,10 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 	engine.AddEntityToField(player, entity, -1)
 
 	// Create a target minion for the opponent
-	targetMinion := test.CreateTestMinionEntity(g, opponent,
-		test.WithName("Target Minion"),
-		test.WithAttack(4),
-		test.WithHealth(8))
+	targetMinion := game.CreateTestMinionEntity(g, opponent,
+		game.WithName("Target Minion"),
+		game.WithAttack(4),
+		game.WithHealth(8))
 
 	// Add target minion to opponent's field
 	engine.AddEntityToField(opponent, targetMinion, -1)
@@ -197,7 +196,7 @@ func TestScorchingObserverLifesteal(t *testing.T) {
 // TestScorchingObserverCombined tests both Rush and Lifesteal together
 func TestScorchingObserverCombined(t *testing.T) {
 	// Setup
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	engine := engine.NewEngine(g)
 	engine.StartGame()
 	player := g.Players[0]
@@ -211,10 +210,10 @@ func TestScorchingObserverCombined(t *testing.T) {
 	player.Mana = 10 // Ensure enough mana
 
 	// Create a target minion for the opponent
-	targetMinion := test.CreateTestMinionEntity(g, opponent,
-		test.WithName("Target Minion"),
-		test.WithAttack(3),
-		test.WithHealth(8))
+	targetMinion := game.CreateTestMinionEntity(g, opponent,
+		game.WithName("Target Minion"),
+		game.WithAttack(3),
+		game.WithHealth(8))
 
 	// Add target minion to opponent's field
 	engine.AddEntityToField(opponent, targetMinion, -1)

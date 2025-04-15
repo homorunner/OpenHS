@@ -5,13 +5,12 @@ import (
 
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 // TestLifesteal tests that entities with lifesteal heal their controller's hero
 // when they deal damage
 func TestLifesteal(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := engine.NewEngine(g)
 	e.StartGame()
 
@@ -20,16 +19,16 @@ func TestLifesteal(t *testing.T) {
 
 	// Test 1: Entity with lifesteal deals damage
 	// Set up a minion with lifesteal
-	source := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Lifesteal Minion"),
-		test.WithAttack(3),
-		test.WithHealth(3),
-		test.WithTag(game.TAG_LIFESTEAL, true))
+	source := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Lifesteal Minion"),
+		game.WithAttack(3),
+		game.WithHealth(3),
+		game.WithTag(game.TAG_LIFESTEAL, true))
 
 	// Set up target and damage it
-	target := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Target Minion"),
-		test.WithHealth(5))
+	target := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Target Minion"),
+		game.WithHealth(5))
 
 	// Reduce hero health for testing healing
 	player1.Hero.Health = 20
@@ -49,13 +48,13 @@ func TestLifesteal(t *testing.T) {
 	}
 
 	// Test 2: Entity without lifesteal doesn't heal
-	normalSource := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Normal Minion"),
-		test.WithAttack(2))
+	normalSource := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Normal Minion"),
+		game.WithAttack(2))
 
-	target2 := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Target Minion 2"),
-		test.WithHealth(4))
+	target2 := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Target Minion 2"),
+		game.WithHealth(4))
 
 	// Set hero health again
 	player1.Hero.Health = 20
@@ -85,8 +84,8 @@ func TestLifesteal(t *testing.T) {
 	}
 
 	// Test 4: Test nil source (shouldn't panic)
-	targetForNil := test.CreateTestMinionEntity(g, player2,
-		test.WithHealth(5))
+	targetForNil := game.CreateTestMinionEntity(g, player2,
+		game.WithHealth(5))
 
 	// This should not panic and should just deal damage
 	e.DealDamage(nil, targetForNil, 2)
@@ -99,7 +98,7 @@ func TestLifesteal(t *testing.T) {
 // TestWeaponLifesteal tests that weapons with lifesteal heal their controller's hero
 // when the hero attacks with the weapon
 func TestWeaponLifesteal(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := engine.NewEngine(g)
 	e.StartGame()
 
@@ -107,11 +106,11 @@ func TestWeaponLifesteal(t *testing.T) {
 	player2 := g.Players[1]
 
 	// Set up a weapon with lifesteal
-	weapon := test.CreateTestWeaponEntity(g, player1,
-		test.WithName("Lifesteal Weapon"),
-		test.WithAttack(4),
-		test.WithHealth(2), // Durability
-		test.WithTag(game.TAG_LIFESTEAL, true))
+	weapon := game.CreateTestWeaponEntity(g, player1,
+		game.WithName("Lifesteal Weapon"),
+		game.WithAttack(4),
+		game.WithHealth(2), // Durability
+		game.WithTag(game.TAG_LIFESTEAL, true))
 
 	// Equip the weapon
 	player1.Weapon = weapon
@@ -120,10 +119,10 @@ func TestWeaponLifesteal(t *testing.T) {
 	player1.Hero.Attack = weapon.Attack
 
 	// Set up target minion
-	target := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Target Minion"),
-		test.WithAttack(0),
-		test.WithHealth(8))
+	target := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Target Minion"),
+		game.WithAttack(0),
+		game.WithHealth(8))
 
 	// Add target to the opponent's field
 	e.AddEntityToField(player2, target, -1)
@@ -157,19 +156,19 @@ func TestWeaponLifesteal(t *testing.T) {
 	player1.Hero.Health = 15 // Reset hero health
 
 	// Replace with a normal weapon without lifesteal
-	normalWeapon := test.CreateTestWeaponEntity(g, player1,
-		test.WithName("Normal Weapon"),
-		test.WithAttack(3),
-		test.WithHealth(2)) // Durability
+	normalWeapon := game.CreateTestWeaponEntity(g, player1,
+		game.WithName("Normal Weapon"),
+		game.WithAttack(3),
+		game.WithHealth(2)) // Durability
 
 	player1.Weapon = normalWeapon
 	player1.Hero.Attack = normalWeapon.Attack
 
 	// Create a new target
-	target2 := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Target Minion 2"),
-		test.WithAttack(0),
-		test.WithHealth(6))
+	target2 := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Target Minion 2"),
+		game.WithAttack(0),
+		game.WithHealth(6))
 
 	e.AddEntityToField(player2, target2, -1)
 
@@ -192,7 +191,7 @@ func TestWeaponLifesteal(t *testing.T) {
 
 // TestLifestealDuringAttack tests that lifesteal works during combat
 func TestLifestealDuringAttack(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := engine.NewEngine(g)
 	e.StartGame()
 
@@ -200,16 +199,16 @@ func TestLifestealDuringAttack(t *testing.T) {
 	player2 := g.Players[1]
 
 	// Add minions to the board
-	attacker := test.CreateTestMinionEntity(g, player1,
-		test.WithName("Lifesteal Attacker"),
-		test.WithAttack(4),
-		test.WithHealth(5),
-		test.WithTag(game.TAG_LIFESTEAL, true))
+	attacker := game.CreateTestMinionEntity(g, player1,
+		game.WithName("Lifesteal Attacker"),
+		game.WithAttack(4),
+		game.WithHealth(5),
+		game.WithTag(game.TAG_LIFESTEAL, true))
 
-	defender := test.CreateTestMinionEntity(g, player2,
-		test.WithName("Defender"),
-		test.WithAttack(2),
-		test.WithHealth(6))
+	defender := game.CreateTestMinionEntity(g, player2,
+		game.WithName("Defender"),
+		game.WithAttack(2),
+		game.WithHealth(6))
 
 	e.AddEntityToField(player1, attacker, -1)
 	e.AddEntityToField(player2, defender, -1)

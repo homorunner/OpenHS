@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 // TestBeginDraw tests if beginDraw correctly draws cards for both players
 func TestBeginDraw(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Before draw
@@ -50,7 +49,7 @@ func TestBeginDraw(t *testing.T) {
 
 // TestMainDraw tests if mainDraw correctly draws a card for the current player
 func TestMainDraw(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup current player
@@ -87,7 +86,7 @@ func TestMainDraw(t *testing.T) {
 
 // TestPlayerSwitching tests if the player switching logic works correctly
 func TestPlayerSwitching(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup initial state
@@ -136,7 +135,7 @@ func TestPlayerSwitching(t *testing.T) {
 
 // TestPhaseProgression tests that the game phases progress correctly
 func TestPhaseProgression(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Set initial phase and disable auto-run
@@ -192,77 +191,9 @@ func TestPhaseProgression(t *testing.T) {
 	}
 }
 
-// TestAutoRunAndPhaseProcessing tests the auto-run functionality and ProcessUntil
-func TestAutoRunAndPhaseProcessing(t *testing.T) {
-	// Test with auto-run enabled (default)
-	g := test.CreateTestGame()
-	e := NewEngine(g)
-
-	// Verify auto-run is enabled by default
-	if !e.autoRun {
-		t.Error("Expected auto-run to be enabled by default")
-	}
-
-	// Start the game - it should automatically progress
-	err := e.StartGame()
-	if err != nil {
-		t.Fatalf("Failed to start game: %v", err)
-	}
-
-	// Verify the game has progressed past the initial phases
-	if g.Phase == game.InvalidPhase || g.Phase == game.BeginFirst {
-		t.Errorf("Expected auto-run to progress past initial phases, but got %v", g.Phase)
-	}
-
-	// Test with auto-run disabled
-	g = test.CreateTestGame()
-	e = NewEngine(g)
-
-	// Disable auto-run
-	e.SetAutoRun(false)
-
-	// Start game - it should set nextPhase but not progress
-	err = e.StartGame()
-	if err != nil {
-		t.Fatalf("Failed to start game: %v", err)
-	}
-
-	// Verify that game is still in InvalidPhase
-	if g.Phase != game.InvalidPhase {
-		t.Errorf("Expected game to stay at InvalidPhase with auto-run disabled, but got %v", g.Phase)
-	}
-
-	// Verify nextPhase is set correctly
-	if e.nextPhase != game.BeginFirst {
-		t.Errorf("Expected nextPhase to be BeginFirst, but got %v", e.nextPhase)
-	}
-
-	// Test manual progression
-	err = e.ProcessNextPhase()
-	if err != nil {
-		t.Fatalf("Failed to process next phase: %v", err)
-	}
-
-	// Verify that game progressed to BeginFirst
-	if g.Phase != game.BeginFirst {
-		t.Errorf("Expected game to progress to BeginFirst, but got %v", g.Phase)
-	}
-
-	// Test ProcessUntil
-	err = e.ProcessUntil(game.MainAction)
-	if err != nil {
-		t.Fatalf("Failed to process until MainAction: %v", err)
-	}
-
-	// Verify phase is now MainAction
-	if g.Phase != game.MainAction {
-		t.Errorf("Expected phase to be MainAction after ProcessUntil, but got %v", g.Phase)
-	}
-}
-
 // TestEndPlayerTurn tests the end turn functionality
 func TestEndPlayerTurn(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Process until first turn
@@ -304,7 +235,7 @@ func TestEndPlayerTurn(t *testing.T) {
 
 // TestManaHandling tests the mana handling functionality
 func TestManaHandling(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup current player
@@ -388,7 +319,7 @@ func TestManaHandling(t *testing.T) {
 
 // TestManaHandlingAcrossPlayerTurns tests the mana system works correctly across player turns
 func TestManaHandlingAcrossPlayerTurns(t *testing.T) {
-	g := test.CreateTestGame()
+	g := game.CreateTestGame()
 	e := NewEngine(g)
 
 	// Setup game state

@@ -5,34 +5,33 @@ import (
 
 	"github.com/openhs/internal/engine"
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/game/test"
 )
 
 func TestWindfury(t *testing.T) {
 	t.Run("Minion with windfury can attack twice", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create attacker with windfury
-		attackerEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Windfury Minion"),
-			test.WithAttack(3),
-			test.WithHealth(4),
-			test.WithTag(game.TAG_WINDFURY, true))
+		attackerEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Windfury Minion"),
+			game.WithAttack(3),
+			game.WithHealth(4),
+			game.WithTag(game.TAG_WINDFURY, true))
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 1"),
-			test.WithAttack(2),
-			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 2"),
-			test.WithAttack(1),
-			test.WithHealth(5))
+		defender1 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 1"),
+			game.WithAttack(2),
+			game.WithHealth(3))
+		defender2 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 2"),
+			game.WithAttack(1),
+			game.WithHealth(5))
 
 		// Add minions to respective player fields
 		engine.AddEntityToField(player, attackerEntity, -1)
@@ -83,27 +82,27 @@ func TestWindfury(t *testing.T) {
 
 	t.Run("Normal minion can only attack once", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create normal attacker without windfury
-		attackerEntity := test.CreateTestMinionEntity(g, player,
-			test.WithName("Normal Minion"),
-			test.WithAttack(3),
-			test.WithHealth(4))
+		attackerEntity := game.CreateTestMinionEntity(g, player,
+			game.WithName("Normal Minion"),
+			game.WithAttack(3),
+			game.WithHealth(4))
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 1"),
-			test.WithAttack(2),
-			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 2"),
-			test.WithAttack(1),
-			test.WithHealth(5))
+		defender1 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 1"),
+			game.WithAttack(2),
+			game.WithHealth(3))
+		defender2 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 2"),
+			game.WithAttack(1),
+			game.WithHealth(5))
 
 		// Add minions to respective player fields
 		engine.AddEntityToField(player, attackerEntity, -1)
@@ -138,18 +137,18 @@ func TestWindfury(t *testing.T) {
 
 	t.Run("Hero with windfury weapon can attack twice", func(t *testing.T) {
 		// Setup
-		g := test.CreateTestGame()
+		g := game.CreateTestGame()
 		engine := engine.NewEngine(g)
 		engine.StartGame()
 		player := g.Players[0]
 		opponent := g.Players[1]
 
 		// Create a windfury weapon and equip it
-		weapon := test.CreateTestWeaponEntity(g, player,
-			test.WithName("Windfury Weapon"),
-			test.WithAttack(2),
-			test.WithHealth(2),
-			test.WithTag(game.TAG_WINDFURY, true))
+		weapon := game.CreateTestWeaponEntity(g, player,
+			game.WithName("Windfury Weapon"),
+			game.WithAttack(2),
+			game.WithHealth(2),
+			game.WithTag(game.TAG_WINDFURY, true))
 
 		player.Weapon = weapon
 
@@ -157,14 +156,14 @@ func TestWindfury(t *testing.T) {
 		player.Hero.Attack = weapon.Attack
 
 		// Create two defender entities for the opponent
-		defender1 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 1"),
-			test.WithAttack(2),
-			test.WithHealth(3))
-		defender2 := test.CreateTestMinionEntity(g, opponent,
-			test.WithName("Defender 2"),
-			test.WithAttack(1),
-			test.WithHealth(5))
+		defender1 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 1"),
+			game.WithAttack(2),
+			game.WithHealth(3))
+		defender2 := game.CreateTestMinionEntity(g, opponent,
+			game.WithName("Defender 2"),
+			game.WithAttack(1),
+			game.WithHealth(5))
 
 		// Add minions to opponent's field
 		engine.AddEntityToField(opponent, defender1, -1)
