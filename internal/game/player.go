@@ -7,7 +7,7 @@ const (
 
 // Player represents a player in the game
 type Player struct {
-	Deck      []*Entity // Using Entity for deck since cards can be modified even in the deck
+	Deck      []*Entity
 	Hand      []*Entity
 	Field     []*Entity
 	Graveyard []*Entity

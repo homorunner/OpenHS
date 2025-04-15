@@ -11,7 +11,7 @@ type Entity struct {
 	Buffs             []Buff // Track any modifications specific to this instance
 	IsDestroyed       bool
 	NumAttackThisTurn int  // Tracks how many times this entity has attacked this turn
-	Exhausted         bool // Indicates if the entity can attack or not
+	Exhausted         bool // Indicates if the entity can attack or not this turn
 	NumTurnInPlay     int  // Tracks how many turns the entity has been in field (0 = first turn)
 	CurrentZone       Zone // Tracks which zone the entity is in
 }
@@ -24,7 +24,7 @@ func NewEntity(card *Card, game *Game, owner *Player) *Entity {
 		Health:      card.Health,
 		MaxHealth:   card.Health,
 		Attack:      card.Attack,
-		Tags:        make([]Tag, 0, len(card.Tags)), // Preallocate capacity
+		Tags:        make([]Tag, 0, len(card.Tags)),
 		Buffs:       make([]Buff, 0),
 		CurrentZone: ZONE_NONE, // Initial zone is NONE until placed somewhere
 	}

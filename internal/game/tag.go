@@ -39,7 +39,7 @@ func NewTag(tagType TagType, value interface{}) Tag {
 	}
 }
 
-// Common tag helper functions
+// HasTag checks if a tag exists in a list of tags
 func HasTag(tags []Tag, tagType TagType) bool {
 	for _, tag := range tags {
 		if tag.Type == tagType {

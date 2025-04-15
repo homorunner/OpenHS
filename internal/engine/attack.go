@@ -24,7 +24,7 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 		logger.String("attacker", attacker.Card.Name),
 		logger.String("defender", defender.Card.Name))
 
-	// Process pre-attack triggers or effects if needed
+	// TODO: Process pre-attack triggers
 
 	// Get attack values
 	attackerDamage := attacker.Attack
@@ -38,7 +38,6 @@ func (e *Engine) Attack(attacker *game.Entity, defender *game.Entity, skipValida
 	}
 
 	// Deal damage simultaneously
-	// TODO: maybe merge the poisonous logic to DealDamage function
 	if attackerDamage > 0 {
 		e.DealDamage(attacker, defender, attackerDamage)
 
