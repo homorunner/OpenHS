@@ -6,32 +6,34 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
 
 - **Game Engine Framework**:
   - Core game loop with phase management (BeginFirst, BeginShuffle, BeginDraw, etc.)
+  - Turn-based gameplay flow with player switching
 - **Card System**: 
   - Card template loading from JSON configurations
   - Basic card types (Minion, Spell, Weapon, Hero, HeroPower)
   - Card effect framework with triggers and conditions
-- **Player Management**: Player state tracking including hero, deck, hand, and board
+  - Card tags implementation (Poisonous, Rush, Windfury, etc.)
+- **Player Management**:
+  - Player state tracking including hero, deck, hand, and board
 - **Game Mechanics**:
   - Initial game setup with card drawing
-  - Turn management
-  - Card drawing mechanism
-  - Playing cards from hand
-  - Basic damage system
+  - Turn management with phase transitions
+  - Card drawing mechanism with fatigue damage
+  - Playing cards from hand to the field
+  - Full combat system with minion/hero attacks
+  - Mana crystal management
+  - Death processing and graveyard management
 
 ## TODO List
 
 - **Game Mechanics**:
   - Complete mulligan phase implementation
-  - Full combat system with minion attacks
-  - Mana crystal management
-  - Death processing and graveyard management
   - Hero powers implementation
+  - More tags implementation (See `docs/tags.md`)
   - More advanced card effects and interactions
-  - Secretes and auras
+  - Secrets and auras implementation
 
 - **Card Library**:
   - Implement more cards from the basic and classic sets
-  - Add card mechanic tags (Taunt, Charge, Divine Shield, etc.)
   - Add card rarity and classes
 
 - **Game Features**:
@@ -44,9 +46,9 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
 
 ```
 openhs/
-├── cmd/                    # Main applications
-│   └── openhs/            # Main entry point
-├── internal/              # Private application and library code
+├── cmd/                  # Main applications
+│   └── openhs/           # Main entry point
+├── internal/             # Private application and library code
 │   ├── game/             # Core game mechanics
 │   ├── card/             # Card system implementation
 │   ├── engine/           # Game rules engine
@@ -55,10 +57,10 @@ openhs/
 │   ├── logger/           # Logging utilities
 │   ├── bootstrap/        # Application initialization
 │   └── util/             # Utility functions
-├── cards/                 # Card definition files
-├── config/                # Configuration files
-├── games/                 # Game scenario definitions
-├── tests/                 # Test files and utilities
+├── cards/                # Card definition files
+├── config/               # Configuration files
+├── games/                # Game scenario definitions
+├── tests/                # Test files and utilities
 └── third_party/          # Third-party dependencies
 ```
 
