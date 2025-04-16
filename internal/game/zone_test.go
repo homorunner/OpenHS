@@ -1,34 +1,30 @@
-package engine
+package game
 
 import (
 	"testing"
-
-	"github.com/openhs/internal/game"
 )
 
 // TestEntityZoneTracking tests that entity zones are correctly tracked across various operations
 func TestEntityZoneTracking(t *testing.T) {
-	g := game.CreateTestGame()
-	e := NewEngine(g)
-	e.StartGame()
+	g := CreateTestGame()
 
 	player := g.Players[0]
 
 	// Test 1: Verify new entities have zone set to NONE
-	newEntity := game.CreateTestMinionEntity(g, player)
-	if newEntity.CurrentZone != game.ZONE_NONE {
+	newEntity := CreateTestMinionEntity(g, player)
+	if newEntity.CurrentZone != ZONE_NONE {
 		t.Errorf("New entity should have zone NONE, got %s", newEntity.CurrentZone)
 	}
 
 	// Test 2: Verify entities created in deck have zone set to DECK
 	deckEntity := player.Deck[0]
-	if deckEntity.CurrentZone != game.ZONE_DECK {
+	if deckEntity.CurrentZone != ZONE_DECK {
 		t.Errorf("Deck entity should have zone DECK, got %s", deckEntity.CurrentZone)
 	}
 
 	// Test 3: Verify zone changes when drawing cards
 	drawnEntity := g.DrawCard(player)
-	if drawnEntity.CurrentZone != game.ZONE_HAND {
+	if drawnEntity.CurrentZone != ZONE_HAND {
 		t.Errorf("Drawn entity should have zone HAND, got %s", drawnEntity.CurrentZone)
 	}
 
@@ -44,11 +40,11 @@ func TestEntityZoneTracking(t *testing.T) {
 	player.Mana = 10
 
 	// Add a test card to hand with known cost
-	testCard := game.CreateTestMinionEntity(g, player, game.WithName("Test Zone Minion"), game.WithCost(2))
+	testCard := CreateTestMinionEntity(g, player, WithName("Test Zone Minion"), WithCost(2))
 	g.AddEntityToHand(player, testCard, -1)
 
 	// Verify it has HAND zone
-	if testCard.CurrentZone != game.ZONE_HAND {
+	if testCard.CurrentZone != ZONE_HAND {
 		t.Errorf("Test card should have zone HAND, got %s", testCard.CurrentZone)
 	}
 
@@ -60,13 +56,13 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Verify it has PLAY zone
-	if testCard.CurrentZone != game.ZONE_PLAY {
+	if testCard.CurrentZone != ZONE_PLAY {
 		t.Errorf("Played minion should have zone PLAY, got %s", testCard.CurrentZone)
 	}
 
 	// Test 5: Verify zone changes when playing spells
 	// Add a test spell to hand
-	testSpell := game.CreateTestSpellEntity(g, player, game.WithName("Test Zone Spell"), game.WithCost(1))
+	testSpell := CreateTestSpellEntity(g, player, WithName("Test Zone Spell"), WithCost(1))
 	g.AddEntityToHand(player, testSpell, -1)
 
 	// Play the spell
@@ -77,13 +73,13 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Verify it went to GRAVEYARD
-	if testSpell.CurrentZone != game.ZONE_GRAVEYARD {
+	if testSpell.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Played spell should have zone GRAVEYARD, got %s", testSpell.CurrentZone)
 	}
 
 	// Test 6: Verify zone changes when equipping weapons
 	// Add a test weapon to hand
-	testWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Test Zone Weapon"), game.WithCost(1))
+	testWeapon := CreateTestWeaponEntity(g, player, WithName("Test Zone Weapon"), WithCost(1))
 	g.AddEntityToHand(player, testWeapon, -1)
 
 	// Play the weapon
@@ -94,12 +90,12 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Verify it has PLAY zone
-	if testWeapon.CurrentZone != game.ZONE_PLAY {
+	if testWeapon.CurrentZone != ZONE_PLAY {
 		t.Errorf("Equipped weapon should have zone PLAY, got %s", testWeapon.CurrentZone)
 	}
 
 	// Add another weapon to hand
-	replacementWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Replacement Weapon"), game.WithCost(1))
+	replacementWeapon := CreateTestWeaponEntity(g, player, WithName("Replacement Weapon"), WithCost(1))
 	g.AddEntityToHand(player, replacementWeapon, -1)
 
 	// Play the second weapon
@@ -110,12 +106,12 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Verify first weapon went to GRAVEYARD
-	if testWeapon.CurrentZone != game.ZONE_GRAVEYARD {
+	if testWeapon.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Replaced weapon should have zone GRAVEYARD, got %s", testWeapon.CurrentZone)
 	}
 
 	// Verify new weapon is in PLAY
-	if replacementWeapon.CurrentZone != game.ZONE_PLAY {
+	if replacementWeapon.CurrentZone != ZONE_PLAY {
 		t.Errorf("New weapon should have zone PLAY, got %s", replacementWeapon.CurrentZone)
 	}
 
@@ -130,12 +126,12 @@ func TestEntityZoneTracking(t *testing.T) {
 	g.ProcessGraveyard()
 
 	// Verify minion went to GRAVEYARD
-	if minion.CurrentZone != game.ZONE_GRAVEYARD {
+	if minion.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Dead minion should have zone GRAVEYARD, got %s", minion.CurrentZone)
 	}
 
 	// Test 8: Verify hero in PLAY zone
-	if player.Hero.CurrentZone != game.ZONE_PLAY {
+	if player.Hero.CurrentZone != ZONE_PLAY {
 		t.Errorf("Hero should have zone PLAY, got %s", player.Hero.CurrentZone)
 	}
 
@@ -145,7 +141,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	player.Hand = nil   // Clear hand
 
 	for i := 0; i < player.HandSize; i++ {
-		filler := game.CreateTestMinionEntity(g, player, game.WithName("Filler Card"))
+		filler := CreateTestMinionEntity(g, player, WithName("Filler Card"))
 		g.AddEntityToHand(player, filler, -1)
 	}
 
@@ -163,7 +159,7 @@ func TestEntityZoneTracking(t *testing.T) {
 		}
 
 		// Verify the card that would be drawn has zone REMOVEDFROMGAME
-		if toBurned.CurrentZone != game.ZONE_REMOVEDFROMGAME {
+		if toBurned.CurrentZone != ZONE_REMOVEDFROMGAME {
 			t.Errorf("Burned card should have zone REMOVEDFROMGAME, got %s", toBurned.CurrentZone)
 		}
 	}
@@ -171,9 +167,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 // TestZoneTrackingDuringHeroReplacement tests that entity zones are properly updated when replacing heroes
 func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
-	g := game.CreateTestGame()
-	e := NewEngine(g)
-	e.StartGame()
+	g := CreateTestGame()
 
 	player := g.Players[0]
 
@@ -181,20 +175,20 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 	originalHero := player.Hero
 
 	// Verify original hero is in PLAY zone
-	if originalHero.CurrentZone != game.ZONE_PLAY {
+	if originalHero.CurrentZone != ZONE_PLAY {
 		t.Errorf("Original hero should have zone PLAY, got %s", originalHero.CurrentZone)
 	}
 
 	// Create a hero card to replace the current one
-	newHero := game.CreateTestHeroEntity(g, player,
-		game.WithName("Replacement Hero"),
-		game.WithHealth(15))
+	newHero := CreateTestHeroEntity(g, player,
+		WithName("Replacement Hero"),
+		WithHealth(15))
 
 	// Add to hand
 	g.AddEntityToHand(player, newHero, -1)
 
 	// Verify it's in HAND zone
-	if newHero.CurrentZone != game.ZONE_HAND {
+	if newHero.CurrentZone != ZONE_HAND {
 		t.Errorf("New hero card should have zone HAND, got %s", newHero.CurrentZone)
 	}
 
@@ -206,7 +200,7 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 	}
 
 	// Verify new hero is in PLAY zone and is now the player's hero
-	if newHero.CurrentZone != game.ZONE_PLAY {
+	if newHero.CurrentZone != ZONE_PLAY {
 		t.Errorf("New hero should have zone PLAY, got %s", newHero.CurrentZone)
 	}
 	if player.Hero != newHero {
@@ -214,40 +208,38 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 	}
 
 	// Verify original hero is in GRAVEYARD
-	if originalHero.CurrentZone != game.ZONE_GRAVEYARD {
+	if originalHero.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Original hero should have zone GRAVEYARD, got %s", originalHero.CurrentZone)
 	}
 }
 
 // TestZoneTrackingDuringCombat tests that entity zones are properly updated during combat
 func TestZoneTrackingDuringCombat(t *testing.T) {
-	g := game.CreateTestGame()
-	e := NewEngine(g)
-	e.StartGame()
+	g := CreateTestGame()
 
 	player1 := g.Players[0]
 	player2 := g.Players[1]
 
 	// Create attacking minion for player 1
-	attacker := game.CreateTestMinionEntity(g, player1,
-		game.WithName("Attacker"),
-		game.WithAttack(5),
-		game.WithHealth(5))
-	e.AddEntityToField(player1, attacker, -1)
+	attacker := CreateTestMinionEntity(g, player1,
+		WithName("Attacker"),
+		WithAttack(5),
+		WithHealth(5))
+	g.AddEntityToField(player1, attacker, -1)
 	attacker.Exhausted = false // Allow it to attack
 
 	// Create defending minion for player 2 that will die from the attack
-	defender := game.CreateTestMinionEntity(g, player2,
-		game.WithName("Defender"),
-		game.WithAttack(2),
-		game.WithHealth(3))
-	e.AddEntityToField(player2, defender, -1)
+	defender := CreateTestMinionEntity(g, player2,
+		WithName("Defender"),
+		WithAttack(2),
+		WithHealth(3))
+	g.AddEntityToField(player2, defender, -1)
 
 	// Verify both are in PLAY zone
-	if attacker.CurrentZone != game.ZONE_PLAY {
+	if attacker.CurrentZone != ZONE_PLAY {
 		t.Errorf("Attacker should have zone PLAY, got %s", attacker.CurrentZone)
 	}
-	if defender.CurrentZone != game.ZONE_PLAY {
+	if defender.CurrentZone != ZONE_PLAY {
 		t.Errorf("Defender should have zone PLAY, got %s", defender.CurrentZone)
 	}
 
@@ -258,12 +250,12 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	}
 
 	// Verify defender died and went to GRAVEYARD
-	if defender.CurrentZone != game.ZONE_GRAVEYARD {
+	if defender.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Dead defender should have zone GRAVEYARD, got %s", defender.CurrentZone)
 	}
 
 	// Verify attacker survived and remained in PLAY
-	if attacker.CurrentZone != game.ZONE_PLAY {
+	if attacker.CurrentZone != ZONE_PLAY {
 		t.Errorf("Surviving attacker should have zone PLAY, got %s", attacker.CurrentZone)
 	}
 
@@ -281,18 +273,18 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 
 	// Test mutual destruction scenario
 	// Create two minions that will kill each other
-	minion1 := game.CreateTestMinionEntity(g, player1,
-		game.WithName("Minion1"),
-		game.WithAttack(4),
-		game.WithHealth(3))
-	e.AddEntityToField(player1, minion1, -1)
+	minion1 := CreateTestMinionEntity(g, player1,
+		WithName("Minion1"),
+		WithAttack(4),
+		WithHealth(3))
+	g.AddEntityToField(player1, minion1, -1)
 	minion1.Exhausted = false // Allow it to attack
 
-	minion2 := game.CreateTestMinionEntity(g, player2,
-		game.WithName("Minion2"),
-		game.WithAttack(3),
-		game.WithHealth(4))
-	e.AddEntityToField(player2, minion2, -1)
+	minion2 := CreateTestMinionEntity(g, player2,
+		WithName("Minion2"),
+		WithAttack(3),
+		WithHealth(4))
+	g.AddEntityToField(player2, minion2, -1)
 
 	// Execute attack
 	err = g.ProcessAttack(minion1, minion2)
@@ -301,23 +293,23 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	}
 
 	// Verify both died and went to GRAVEYARD
-	if minion1.CurrentZone != game.ZONE_GRAVEYARD {
+	if minion1.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Minion1 should have zone GRAVEYARD, got %s", minion1.CurrentZone)
 	}
-	if minion2.CurrentZone != game.ZONE_GRAVEYARD {
+	if minion2.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Minion2 should have zone GRAVEYARD, got %s", minion2.CurrentZone)
 	}
 
 	// Test weapon destruction
 	// Create a weapon for player1
-	weapon := game.CreateTestWeaponEntity(g, player1,
-		game.WithName("Testing Weapon"),
-		game.WithAttack(2),
-		game.WithHealth(1)) // 1 durability
+	weapon := CreateTestWeaponEntity(g, player1,
+		WithName("Testing Weapon"),
+		WithAttack(2),
+		WithHealth(1)) // 1 durability
 
 	player1.Weapon = weapon
 	player1.Hero.Attack = 1
-	weapon.CurrentZone = game.ZONE_PLAY
+	weapon.CurrentZone = ZONE_PLAY
 
 	// Have the hero attack to use the weapon
 	err = g.ProcessAttack(player1.Hero, player2.Hero)
@@ -326,7 +318,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	}
 
 	// Verify weapon was destroyed and went to GRAVEYARD
-	if weapon.CurrentZone != game.ZONE_GRAVEYARD {
+	if weapon.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Destroyed weapon should have zone GRAVEYARD, got %s", weapon.CurrentZone)
 	}
 
@@ -344,20 +336,20 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 
 	// Test poisonous effect
 	// Create a poisonous minion
-	poisonous := game.CreateTestMinionEntity(g, player1,
-		game.WithName("Poisonous Minion"),
-		game.WithAttack(1),
-		game.WithHealth(1))
-	poisonous.Tags = append(poisonous.Tags, game.NewTag(game.TAG_POISONOUS, true))
-	e.AddEntityToField(player1, poisonous, -1)
+	poisonous := CreateTestMinionEntity(g, player1,
+		WithName("Poisonous Minion"),
+		WithAttack(1),
+		WithHealth(1))
+	poisonous.Tags = append(poisonous.Tags, NewTag(TAG_POISONOUS, true))
+	g.AddEntityToField(player1, poisonous, -1)
 	poisonous.Exhausted = false
 
 	// Create a big target
-	bigTarget := game.CreateTestMinionEntity(g, player2,
-		game.WithName("Big Target"),
-		game.WithAttack(1),
-		game.WithHealth(10))
-	e.AddEntityToField(player2, bigTarget, -1)
+	bigTarget := CreateTestMinionEntity(g, player2,
+		WithName("Big Target"),
+		WithAttack(1),
+		WithHealth(10))
+	g.AddEntityToField(player2, bigTarget, -1)
 
 	// Execute attack
 	err = g.ProcessAttack(poisonous, bigTarget)
@@ -366,7 +358,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	}
 
 	// Verify poisonous killed the big minion
-	if bigTarget.CurrentZone != game.ZONE_GRAVEYARD {
+	if bigTarget.CurrentZone != ZONE_GRAVEYARD {
 		t.Errorf("Poisoned target should have zone GRAVEYARD, got %s", bigTarget.CurrentZone)
 	}
 }
