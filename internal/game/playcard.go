@@ -1,9 +1,8 @@
-package engine
+package game
 
 import (
 	"errors"
 
-	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
 )
 
@@ -14,7 +13,7 @@ import (
 // - target: Optional target for the card (can be nil)
 // - fieldPos: Position on the field for minions (-1 for auto-positioning)
 // - chooseOne: Index for choose one effects (0 for default choice)
-func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entity, fieldPos int, chooseOne int) error {
+func (g *Game) PlayCard(player *Player, handIndex int, target *Entity, fieldPos int, chooseOne int) error {
 	// Validate hand index
 	if handIndex < 0 || handIndex >= len(player.Hand) {
 		return errors.New("invalid hand index")
@@ -24,12 +23,12 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entit
 	entity := player.Hand[handIndex]
 
 	// Check if we can play this card
-	if err := e.testPlayCard(player, entity, target, chooseOne); err != nil {
+	if err := g.TestPlayCard(player, entity, target, chooseOne); err != nil {
 		return err
 	}
 
 	// Check field space for minions
-	if entity.Card.Type == game.Minion && len(player.Field) >= player.FieldSize {
+	if entity.Card.Type == Minion && len(player.Field) >= player.FieldSize {
 		return errors.New("battlefield is full")
 	}
 
@@ -49,25 +48,25 @@ func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entit
 	player.Hand = append(player.Hand[:handIndex], player.Hand[handIndex+1:]...)
 
 	// Update entity zone (temporarily set to NONE while in transition)
-	entity.CurrentZone = game.ZONE_NONE
+	entity.CurrentZone = ZONE_NONE
 
 	// Process based on card type
 	switch entity.Card.Type {
-	case game.Minion:
-		return e.playMinion(player, entity, target, fieldPos, chooseOne)
-	case game.Spell:
-		return e.playSpell(player, entity, target, chooseOne)
-	case game.Weapon:
-		return e.playWeapon(player, entity, target)
-	case game.Hero:
-		return e.playHero(player, entity, target, chooseOne)
+	case Minion:
+		return g.PlayMinion(player, entity, target, fieldPos, chooseOne)
+	case Spell:
+		return g.PlaySpell(player, entity, target, chooseOne)
+	case Weapon:
+		return g.PlayWeapon(player, entity, target)
+	case Hero:
+		return g.PlayHero(player, entity, target, chooseOne)
 	default:
 		return errors.New("invalid card type")
 	}
 }
 
-// testPlayCard checks if a card can be played
-func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
+// TestPlayCard checks if a card can be played
+func (g *Game) TestPlayCard(player *Player, entity *Entity, target *Entity, chooseOne int) error {
 	// Basic checks
 	if entity.Card.Cost > player.Mana {
 		return errors.New("not enough mana")
@@ -78,22 +77,22 @@ func (e *Engine) testPlayCard(player *game.Player, entity *game.Entity, target *
 	return nil
 }
 
-// playMinion handles playing a minion card
-func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *game.Entity, fieldPos int, chooseOne int) error {
+// PlayMinion handles playing a minion card
+func (g *Game) PlayMinion(player *Player, entity *Entity, target *Entity, fieldPos int, chooseOne int) error {
 	logger.Info("Minion played", logger.String("name", entity.Card.Name))
 
 	// Trigger card played event
-	cardPlayedCtx := game.TriggerContext{
-		Game:         e.game,
+	cardPlayedCtx := TriggerContext{
+		Game:         g,
 		SourceEntity: entity,
 		TargetEntity: target,
-		Phase:        e.game.Phase,
-		ExtraData:    map[string]interface{}{"card_type": game.Minion},
+		Phase:        g.Phase,
+		ExtraData:    map[string]interface{}{"card_type": Minion},
 	}
-	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
+	g.TriggerManager.ActivateTrigger(TriggerCardPlayed, cardPlayedCtx)
 
 	// Try to add minion to the field at the specified position
-	if e.AddEntityToField(player, entity, fieldPos) {
+	if g.AddEntityToField(player, entity, fieldPos) {
 		// TODO: Process battlecry, triggers, etc.
 
 		return nil
@@ -102,23 +101,23 @@ func (e *Engine) playMinion(player *game.Player, entity *game.Entity, target *ga
 	return nil
 }
 
-// playSpell handles playing a spell card
-func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
+// PlaySpell handles playing a spell card
+func (g *Game) PlaySpell(player *Player, entity *Entity, target *Entity, chooseOne int) error {
 	// TODO: Add spell counters to Player struct
 
 	logger.Info("Spell played", logger.String("name", entity.Card.Name))
 
 	// Create context for card played trigger
-	cardPlayedCtx := game.TriggerContext{
-		Game:         e.game,
+	cardPlayedCtx := TriggerContext{
+		Game:         g,
 		SourceEntity: entity,
 		TargetEntity: target,
-		Phase:        e.game.Phase,
-		ExtraData:    map[string]interface{}{"card_type": game.Spell},
+		Phase:        g.Phase,
+		ExtraData:    map[string]interface{}{"card_type": Spell},
 	}
 
 	// Trigger card played event
-	e.game.TriggerManager.ActivateTrigger(game.TriggerCardPlayed, cardPlayedCtx)
+	g.TriggerManager.ActivateTrigger(TriggerCardPlayed, cardPlayedCtx)
 
 	// TODO: Process spell effects
 
@@ -126,18 +125,18 @@ func (e *Engine) playSpell(player *game.Player, entity *game.Entity, target *gam
 	player.Graveyard = append(player.Graveyard, entity)
 
 	// Update the entity's zone
-	entity.CurrentZone = game.ZONE_GRAVEYARD
+	entity.CurrentZone = ZONE_GRAVEYARD
 
 	return nil
 }
 
-// playHero handles playing a hero card
-func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game.Entity, chooseOne int) error {
+// PlayHero handles playing a hero card
+func (g *Game) PlayHero(player *Player, entity *Entity, target *Entity, chooseOne int) error {
 	// Store the old hero in graveyard
 	if player.Hero != nil {
 		player.Graveyard = append(player.Graveyard, player.Hero)
 		// Update the old hero's zone
-		player.Hero.CurrentZone = game.ZONE_GRAVEYARD
+		player.Hero.CurrentZone = ZONE_GRAVEYARD
 	}
 
 	// Copy the old hero's state of attacking
@@ -149,11 +148,9 @@ func (e *Engine) playHero(player *game.Player, entity *game.Entity, target *game
 	player.Hero = entity
 
 	// Update the entity's zone
-	entity.CurrentZone = game.ZONE_PLAY
+	entity.CurrentZone = ZONE_PLAY
 
 	logger.Info("Hero replaced", logger.String("name", entity.Card.Name))
 
 	return nil
 }
-
-// playWeapon is implemented in weapon.go

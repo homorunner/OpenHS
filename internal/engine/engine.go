@@ -150,12 +150,12 @@ func (e *Engine) beginDraw() error {
 	if len(e.game.Players) >= 2 {
 		// Draw 3 cards for the first player
 		for i := 0; i < 3; i++ {
-			e.DrawCard(e.game.Players[0])
+			e.game.DrawCard(e.game.Players[0])
 		}
 
 		// Draw 4 cards for the second player
 		for i := 0; i < 4; i++ {
-			e.DrawCard(e.game.Players[1])
+			e.game.DrawCard(e.game.Players[1])
 		}
 	}
 
@@ -271,7 +271,7 @@ func (e *Engine) mainDraw() error {
 	logger.Debug("Phase: Main Draw")
 
 	// Draw a card for the current player
-	e.DrawCard(e.game.CurrentPlayer)
+	e.game.DrawCard(e.game.CurrentPlayer)
 
 	// Set next phase
 	e.nextPhase = game.MainStart
@@ -395,4 +395,19 @@ func (e *Engine) CheckGameOver() bool {
 	// return true
 
 	return false
+}
+
+// PlayCard delegates to Game.PlayCard
+func (e *Engine) PlayCard(player *game.Player, handIndex int, target *game.Entity, fieldPos int, chooseOne int) error {
+	return e.game.PlayCard(player, handIndex, target, fieldPos, chooseOne)
+}
+
+// AddEntityToField delegates to Game.AddEntityToField
+func (e *Engine) AddEntityToField(player *game.Player, entity *game.Entity, fieldPos int) bool {
+	return e.game.AddEntityToField(player, entity, fieldPos)
+}
+
+// decreaseWeaponDurability delegates to Game.DecreaseWeaponDurability
+func (e *Engine) decreaseWeaponDurability(player *game.Player) error {
+	return e.game.DecreaseWeaponDurability(player)
 }

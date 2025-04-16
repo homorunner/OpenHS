@@ -1,23 +1,20 @@
-package engine
+package game
 
 import (
 	"testing"
-
-	"github.com/openhs/internal/game"
 )
 
-// TestDrawCard tests the DrawCard helper function
+// TestDrawCard tests the Game.DrawCard function
 func TestDrawCard(t *testing.T) {
-	g := game.CreateTestGame()
-	e := NewEngine(g)
-	e.StartGame()
+	g := CreateTestGame()
+	// No need for StartGame, the test game is already set up
 
 	// Test 1: Normal card draw
 	player := g.Players[0]
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
 
-	drawnEntity := e.DrawCard(player)
+	drawnEntity := g.DrawCard(player)
 
 	// Verify hand increased by 1
 	if len(player.Hand) != initialHandSize+1 {
@@ -49,11 +46,11 @@ func TestDrawCard(t *testing.T) {
 
 	// Test 2: Drawing from an empty deck should trigger fatigue damage
 	// Create a test hero card and entity
-	emptyPlayer := game.NewPlayer()
-	emptyPlayer.Hero = game.CreateTestHeroEntity(g, emptyPlayer, game.WithName("Test Hero"), game.WithHealth(30))
+	emptyPlayer := NewPlayer()
+	emptyPlayer.Hero = CreateTestHeroEntity(g, emptyPlayer, WithName("Test Hero"), WithHealth(30))
 
 	// Try to draw from empty deck
-	drawn := e.DrawCard(emptyPlayer)
+	drawn := g.DrawCard(emptyPlayer)
 
 	// Verify nil is returned for an empty deck
 	if drawn != nil {
@@ -71,7 +68,7 @@ func TestDrawCard(t *testing.T) {
 	}
 
 	// Draw again to verify fatigue damage increases
-	e.DrawCard(emptyPlayer)
+	g.DrawCard(emptyPlayer)
 
 	// Verify fatigue damage increased
 	if emptyPlayer.FatigueDamage != 2 {
@@ -86,21 +83,20 @@ func TestDrawCard(t *testing.T) {
 
 // TestDrawSpecificCard tests drawing a specific card from the deck
 func TestDrawSpecificCard(t *testing.T) {
-	g := game.CreateTestGame()
-	e := NewEngine(g)
-	e.StartGame()
+	g := CreateTestGame()
+	// No need for StartGame, the test game is already set up
 	player := g.Players[0]
 
 	// Add some specific cards to test
-	player.Deck = append(player.Deck, game.CreateTestMinionEntity(g, player, game.WithName("Special Card 1")))
-	player.Deck = append(player.Deck, game.CreateTestMinionEntity(g, player, game.WithName("Special Card 2")))
+	player.Deck = append(player.Deck, CreateTestMinionEntity(g, player, WithName("Special Card 1")))
+	player.Deck = append(player.Deck, CreateTestMinionEntity(g, player, WithName("Special Card 2")))
 
 	initialHandSize := len(player.Hand)
 	initialDeckSize := len(player.Deck)
 
 	// Test 1: Draw a specific card
 	cardToDraw := "Special Card 1"
-	drawnEntity := e.DrawSpecificCard(player, cardToDraw)
+	drawnEntity := g.DrawSpecificCard(player, cardToDraw)
 
 	// Verify hand increased by 1
 	if len(player.Hand) != initialHandSize+1 {
@@ -130,7 +126,7 @@ func TestDrawSpecificCard(t *testing.T) {
 	}
 
 	// Test 2: Drawing a card that doesn't exist
-	nonExistentCard := e.DrawSpecificCard(player, "Non-existent Card")
+	nonExistentCard := g.DrawSpecificCard(player, "Non-existent Card")
 
 	// Verify hand size didn't change
 	if len(player.Hand) != initialHandSize+1 {
@@ -141,5 +137,53 @@ func TestDrawSpecificCard(t *testing.T) {
 	// Verify nil is returned for non-existent card
 	if nonExistentCard != nil {
 		t.Fatalf("Expected nil to be returned when drawing non-existent card, got %v", nonExistentCard)
+	}
+}
+
+// TestAddEntityToHand tests the Game.AddEntityToHand function
+func TestAddEntityToHand(t *testing.T) {
+	g := CreateTestGame()
+	player := g.Players[0]
+
+	// Test 1: Adding to hand normally
+	entity := CreateTestMinionEntity(g, player)
+	entity.CurrentZone = ZONE_DECK
+
+	result, ok := g.AddEntityToHand(player, entity, -1)
+
+	if !ok {
+		t.Errorf("Expected AddEntityToHand to return true")
+	}
+
+	if result != entity {
+		t.Errorf("Expected returned entity to be the same as input entity")
+	}
+
+	if entity.CurrentZone != ZONE_HAND {
+		t.Errorf("Entity should have zone HAND, got %s", entity.CurrentZone)
+	}
+
+	// Test 2: Adding to hand with full hand
+	// Fill the hand
+	for i := 0; i < player.HandSize; i++ {
+		player.Hand = append(player.Hand, CreateTestMinionEntity(g, player))
+	}
+
+	// Create an entity that should not be able to fit in hand
+	overflowEntity := CreateTestMinionEntity(g, player)
+	overflowEntity.CurrentZone = ZONE_DECK
+
+	result, ok = g.AddEntityToHand(player, overflowEntity, -1)
+
+	if ok {
+		t.Errorf("Expected AddEntityToHand to return false with full hand")
+	}
+
+	if result != nil {
+		t.Errorf("Expected nil result with full hand")
+	}
+
+	if overflowEntity.CurrentZone != ZONE_REMOVEDFROMGAME {
+		t.Errorf("Entity should have zone REMOVEDFROMGAME, got %s", overflowEntity.CurrentZone)
 	}
 }

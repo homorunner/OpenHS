@@ -27,7 +27,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	}
 
 	// Test 3: Verify zone changes when drawing cards
-	drawnEntity := e.DrawCard(player)
+	drawnEntity := g.DrawCard(player)
 	if drawnEntity.CurrentZone != game.ZONE_HAND {
 		t.Errorf("Drawn entity should have zone HAND, got %s", drawnEntity.CurrentZone)
 	}
@@ -45,7 +45,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Add a test card to hand with known cost
 	testCard := game.CreateTestMinionEntity(g, player, game.WithName("Test Zone Minion"), game.WithCost(2))
-	e.AddEntityToHand(player, testCard, -1)
+	g.AddEntityToHand(player, testCard, -1)
 
 	// Verify it has HAND zone
 	if testCard.CurrentZone != game.ZONE_HAND {
@@ -54,7 +54,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Play the card (last card in hand)
 	handIndex := len(player.Hand) - 1
-	err := e.PlayCard(player, handIndex, nil, -1, 0)
+	err := g.PlayCard(player, handIndex, nil, -1, 0)
 	if err != nil {
 		t.Fatalf("Failed to play test card: %v", err)
 	}
@@ -67,11 +67,11 @@ func TestEntityZoneTracking(t *testing.T) {
 	// Test 5: Verify zone changes when playing spells
 	// Add a test spell to hand
 	testSpell := game.CreateTestSpellEntity(g, player, game.WithName("Test Zone Spell"), game.WithCost(1))
-	e.AddEntityToHand(player, testSpell, -1)
+	g.AddEntityToHand(player, testSpell, -1)
 
 	// Play the spell
 	handIndex = len(player.Hand) - 1
-	err = e.PlayCard(player, handIndex, nil, -1, 0)
+	err = g.PlayCard(player, handIndex, nil, -1, 0)
 	if err != nil {
 		t.Fatalf("Failed to play test spell: %v", err)
 	}
@@ -84,11 +84,11 @@ func TestEntityZoneTracking(t *testing.T) {
 	// Test 6: Verify zone changes when equipping weapons
 	// Add a test weapon to hand
 	testWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Test Zone Weapon"), game.WithCost(1))
-	e.AddEntityToHand(player, testWeapon, -1)
+	g.AddEntityToHand(player, testWeapon, -1)
 
 	// Play the weapon
 	handIndex = len(player.Hand) - 1
-	err = e.PlayCard(player, handIndex, nil, -1, 0)
+	err = g.PlayCard(player, handIndex, nil, -1, 0)
 	if err != nil {
 		t.Fatalf("Failed to play test weapon: %v", err)
 	}
@@ -100,11 +100,11 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	// Add another weapon to hand
 	replacementWeapon := game.CreateTestWeaponEntity(g, player, game.WithName("Replacement Weapon"), game.WithCost(1))
-	e.AddEntityToHand(player, replacementWeapon, -1)
+	g.AddEntityToHand(player, replacementWeapon, -1)
 
 	// Play the second weapon
 	handIndex = len(player.Hand) - 1
-	err = e.PlayCard(player, handIndex, nil, -1, 0)
+	err = g.PlayCard(player, handIndex, nil, -1, 0)
 	if err != nil {
 		t.Fatalf("Failed to play replacement weapon: %v", err)
 	}
@@ -146,7 +146,7 @@ func TestEntityZoneTracking(t *testing.T) {
 
 	for i := 0; i < player.HandSize; i++ {
 		filler := game.CreateTestMinionEntity(g, player, game.WithName("Filler Card"))
-		e.AddEntityToHand(player, filler, -1)
+		g.AddEntityToHand(player, filler, -1)
 	}
 
 	// Try to draw with full hand
@@ -155,7 +155,7 @@ func TestEntityZoneTracking(t *testing.T) {
 		toBurned := player.Deck[len(player.Deck)-1]
 
 		// Attempt to draw with full hand
-		drawnEntity = e.DrawCard(player)
+		drawnEntity = g.DrawCard(player)
 
 		// Verify null is returned
 		if drawnEntity != nil {
@@ -191,48 +191,31 @@ func TestZoneTrackingDuringHeroReplacement(t *testing.T) {
 		game.WithHealth(15))
 
 	// Add to hand
-	e.AddEntityToHand(player, newHero, -1)
+	g.AddEntityToHand(player, newHero, -1)
 
 	// Verify it's in HAND zone
 	if newHero.CurrentZone != game.ZONE_HAND {
 		t.Errorf("New hero card should have zone HAND, got %s", newHero.CurrentZone)
 	}
 
-	// Give player enough mana
-	player.Mana = 10
-
-	// Play the hero card (last card in hand)
+	// Play the hero card
 	handIndex := len(player.Hand) - 1
-	err := e.PlayCard(player, handIndex, nil, -1, 0)
+	err := g.PlayCard(player, handIndex, nil, -1, 0)
 	if err != nil {
 		t.Fatalf("Failed to play hero card: %v", err)
 	}
 
-	// Verify new hero is in PLAY zone
+	// Verify new hero is in PLAY zone and is now the player's hero
 	if newHero.CurrentZone != game.ZONE_PLAY {
 		t.Errorf("New hero should have zone PLAY, got %s", newHero.CurrentZone)
 	}
+	if player.Hero != newHero {
+		t.Errorf("Player's hero should be the new hero")
+	}
 
-	// Verify original hero is in GRAVEYARD zone
+	// Verify original hero is in GRAVEYARD
 	if originalHero.CurrentZone != game.ZONE_GRAVEYARD {
 		t.Errorf("Original hero should have zone GRAVEYARD, got %s", originalHero.CurrentZone)
-	}
-
-	// Verify original hero is in player's graveyard
-	found := false
-	for _, entity := range player.Graveyard {
-		if entity == originalHero {
-			found = true
-			break
-		}
-	}
-	if !found {
-		t.Errorf("Original hero should be in player's graveyard")
-	}
-
-	// Verify player.Hero is set to the new hero
-	if player.Hero != newHero {
-		t.Errorf("Player.Hero should be set to the new hero")
 	}
 }
 

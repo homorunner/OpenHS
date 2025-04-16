@@ -1,27 +1,26 @@
-package engine
+package game
 
 import (
-	"github.com/openhs/internal/game"
 	"github.com/openhs/internal/logger"
 )
 
 // DrawCard draws a card from the player's deck to their hand
 // It returns the drawn entity or nil if no card was drawn
-func (e *Engine) DrawCard(player *game.Player) *game.Entity {
-	return e.DrawSpecificCard(player, "")
+func (g *Game) DrawCard(player *Player) *Entity {
+	return g.DrawSpecificCard(player, "")
 }
 
 // DrawSpecificCard allows drawing a specific card from the deck
 // If cardToDraw is nil, it draws the top card of the deck
 //
 // Returns the drawn entity or nil if no card was drawn
-func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.Entity {
+func (g *Game) DrawSpecificCard(player *Player, cardToDraw string) *Entity {
 	// Check if the deck is empty
 	if len(player.Deck) == 0 {
 		if cardToDraw == "" {
 			logger.Info("Player taking fatigue damage", logger.Int("damage", player.FatigueDamage))
 			player.FatigueDamage++
-			e.DealDamage(nil, player.Hero, player.FatigueDamage)
+			g.DealDamage(nil, player.Hero, player.FatigueDamage)
 		}
 
 		return nil
@@ -53,21 +52,21 @@ func (e *Engine) DrawSpecificCard(player *game.Player, cardToDraw string) *game.
 	}
 
 	// Try to add entity to hand
-	entity, ok := e.MoveFromDeckToHand(player, drawIndex, -1)
+	entity, ok := g.MoveFromDeckToHand(player, drawIndex, -1)
 	if !ok {
 		return nil
 	}
 
 	// Create context for card drawn trigger
-	cardDrawnCtx := game.TriggerContext{
-		Game:         e.game,
+	cardDrawnCtx := TriggerContext{
+		Game:         g,
 		SourceEntity: entity,
 		TargetEntity: player.Hero, // Associate with the player's hero
-		Phase:        e.game.Phase,
+		Phase:        g.Phase,
 	}
 
 	// Trigger card drawn event
-	e.game.TriggerManager.ActivateTrigger(game.TriggerCardDrawn, cardDrawnCtx)
+	g.TriggerManager.ActivateTrigger(TriggerCardDrawn, cardDrawnCtx)
 
 	return entity
 }
