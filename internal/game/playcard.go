@@ -119,7 +119,13 @@ func (g *Game) PlaySpell(player *Player, entity *Entity, target *Entity, chooseO
 	// Trigger card played event
 	g.TriggerManager.ActivateTrigger(TriggerCardPlayed, cardPlayedCtx)
 
-	// TODO: Process spell effects
+	// Process spell effects
+	for _, power := range entity.Card.Powers {
+		if power.Type == PowerTypeSpell {
+			power.Action(g, entity, target)
+		}
+	}
+	g.processDestroyAndUpdateAura()
 
 	// Move to graveyard after use
 	player.Graveyard = append(player.Graveyard, entity)

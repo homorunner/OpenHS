@@ -12,6 +12,7 @@ type Card struct {
 	Health      int
 	Type        CardType
 	Tags        []Tag                    // Card tags like Taunt, Divine Shield, etc.
+	Powers      []Power                  // Card powers
 	Load        func(g *Game, e *Entity) // Load functions register triggers to Game for Entity of this card
 	Unload      func(g *Game, e *Entity) // Unload functions remove triggers from Game when Entity is removed/silenced/...
 }
