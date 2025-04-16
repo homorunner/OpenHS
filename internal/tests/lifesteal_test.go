@@ -35,7 +35,7 @@ func TestLifesteal(t *testing.T) {
 	player1.Hero.MaxHealth = 30
 
 	// Deal damage with lifesteal minion
-	e.DealDamage(source, target, 3)
+	g.DealDamage(source, target, 3)
 
 	// Verify target took damage
 	if target.Health != 2 {
@@ -60,7 +60,7 @@ func TestLifesteal(t *testing.T) {
 	player1.Hero.Health = 20
 
 	// Deal damage with normal minion
-	e.DealDamage(normalSource, target2, 2)
+	g.DealDamage(normalSource, target2, 2)
 
 	// Verify target took damage
 	if target2.Health != 2 {
@@ -76,7 +76,7 @@ func TestLifesteal(t *testing.T) {
 	player1.Hero.Health = 28
 	player1.Hero.MaxHealth = 30
 
-	e.DealDamage(source, target, 3)
+	g.DealDamage(source, target, 3)
 
 	// Verify hero health is capped at max health
 	if player1.Hero.Health != 30 {
@@ -88,7 +88,7 @@ func TestLifesteal(t *testing.T) {
 		game.WithHealth(5))
 
 	// This should not panic and should just deal damage
-	e.DealDamage(nil, targetForNil, 2)
+	g.DealDamage(nil, targetForNil, 2)
 
 	if targetForNil.Health != 3 {
 		t.Errorf("Expected target health to be 3 after nil source damage, got %d", targetForNil.Health)

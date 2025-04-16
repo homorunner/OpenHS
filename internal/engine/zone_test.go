@@ -127,7 +127,7 @@ func TestEntityZoneTracking(t *testing.T) {
 	minion.Health = 0
 
 	// Process deaths
-	e.processGraveyard()
+	g.ProcessGraveyard()
 
 	// Verify minion went to GRAVEYARD
 	if minion.CurrentZone != game.ZONE_GRAVEYARD {
@@ -252,7 +252,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	}
 
 	// Execute attack
-	err := e.ProcessAttack(attacker, defender)
+	err := g.ProcessAttack(attacker, defender)
 	if err != nil {
 		t.Fatalf("Failed to process attack: %v", err)
 	}
@@ -295,7 +295,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	e.AddEntityToField(player2, minion2, -1)
 
 	// Execute attack
-	err = e.ProcessAttack(minion1, minion2)
+	err = g.ProcessAttack(minion1, minion2)
 	if err != nil {
 		t.Fatalf("Failed to process attack in mutual destruction scenario: %v", err)
 	}
@@ -320,7 +320,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	weapon.CurrentZone = game.ZONE_PLAY
 
 	// Have the hero attack to use the weapon
-	err = e.ProcessAttack(player1.Hero, player2.Hero)
+	err = g.ProcessAttack(player1.Hero, player2.Hero)
 	if err != nil {
 		t.Fatalf("Failed to process hero attack: %v", err)
 	}
@@ -360,7 +360,7 @@ func TestZoneTrackingDuringCombat(t *testing.T) {
 	e.AddEntityToField(player2, bigTarget, -1)
 
 	// Execute attack
-	err = e.ProcessAttack(poisonous, bigTarget)
+	err = g.ProcessAttack(poisonous, bigTarget)
 	if err != nil {
 		t.Fatalf("Failed to process poisonous attack: %v", err)
 	}

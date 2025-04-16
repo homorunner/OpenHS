@@ -24,7 +24,7 @@ func (g *Game) PlayWeapon(player *Player, entity *Entity, target *Entity) error 
 }
 
 // DecreaseWeaponDurability decreases the durability of the weapon
-// Note: this function will not destroy the weapon, that is handled in processGraveyard()
+// Note: this function will not destroy the weapon, that is handled in ProcessGraveyard()
 func (g *Game) DecreaseWeaponDurability(player *Player) error {
 	if player.Weapon == nil {
 		return errors.New("no weapon equipped")

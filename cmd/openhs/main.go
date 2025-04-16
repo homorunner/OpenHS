@@ -334,7 +334,7 @@ func handleAttack(e *engine.Engine, g *game.Game, parts []string) {
 	defender := opponent.Field[defenderIndex]
 
 	// Perform the attack
-	err = e.Attack(attacker, defender, false)
+	err = g.Attack(attacker, defender, false)
 	if err != nil {
 		fmt.Printf("Error performing attack: %v\n", err)
 		return

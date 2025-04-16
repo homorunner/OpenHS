@@ -129,3 +129,17 @@ func (g *Game) MoveFromDeckToField(player *Player, deckIndex, fieldPos int) bool
 	// Add to field
 	return g.AddEntityToField(player, entity, fieldPos)
 }
+
+// Helper to remove entity from board
+func (g *Game) removeEntityFromBoard(player *Player, entity *Entity) {
+	// Find the entity in the player's field and remove it
+	for i, fieldEntity := range player.Field {
+		if fieldEntity == entity {
+			// Remove the entity by replacing it with the last element and then trimming the slice
+			lastIdx := len(player.Field) - 1
+			player.Field[i] = player.Field[lastIdx]
+			player.Field = player.Field[:lastIdx]
+			break
+		}
+	}
+}
