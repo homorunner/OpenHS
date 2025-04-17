@@ -2,11 +2,9 @@ package cards
 
 import (
 	"github.com/openhs/internal/game"
-	"github.com/openhs/internal/logger"
 )
 
 type ShipsChirurgeon struct {
-	triggerId int
 }
 
 func (s *ShipsChirurgeon) Register(cm *game.CardManager) {
@@ -27,11 +25,11 @@ func (s *ShipsChirurgeon) Register(cm *game.CardManager) {
 }
 
 func (s *ShipsChirurgeon) Load(g *game.Game, self *game.Entity) {
-	s.triggerId = g.TriggerManager.RegisterTrigger(game.TriggerMinionSummoned, self, s.OnSummon, false)
+	g.TriggerManager.RegisterTrigger(game.TriggerMinionSummoned, self, s.OnSummon, false)
 }
 
 func (s *ShipsChirurgeon) Unload(g *game.Game, self *game.Entity) {
-	g.TriggerManager.UnregisterTrigger(s.triggerId)
+	g.TriggerManager.UnregisterAllForEntity(self)
 }
 
 func (s *ShipsChirurgeon) OnSummon(ctx *game.TriggerContext, self *game.Entity) {
@@ -43,9 +41,6 @@ func (s *ShipsChirurgeon) OnSummon(ctx *game.TriggerContext, self *game.Entity) 
 	if summonedMinion == nil {
 		return
 	}
-
-	logger.Info("ShipsChirurgeon OnSummon", logger.String("summonedMinion", summonedMinion.Card.Name))
-
 	if summonedMinion == self { // do not work on self
 		return
 	}

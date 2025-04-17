@@ -15,4 +15,4 @@ This document tracks all cards that have been implemented in the game.
 
 ## Classic
 
-- [ ] Water Elemental
+- [x] Water Elemental
