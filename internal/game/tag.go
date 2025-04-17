@@ -58,3 +58,16 @@ func GetTagValue(tags []Tag, tagType TagType) (interface{}, bool) {
 	}
 	return nil, false
 }
+
+// RemoveTag removes a tag of the specified type from a list of tags if it exists
+// Returns true if a tag was removed, false otherwise
+func RemoveTag(tags *[]Tag, tagType TagType) bool {
+	for i, tag := range *tags {
+		if tag.Type == tagType {
+			// Remove the tag by appending elements before and after it
+			*tags = append((*tags)[:i], (*tags)[i+1:]...)
+			return true
+		}
+	}
+	return false
+}

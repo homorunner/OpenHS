@@ -310,11 +310,40 @@ func (e *Engine) mainEnd() error {
 			Phase:        e.game.Phase,
 		}
 		e.game.TriggerManager.ActivateTrigger(game.TriggerTurnEnd, ctx)
+		
+		// Handle unfreezing at the end of the turn
+		player := e.game.CurrentPlayer
+		if player.Hero != nil {
+			e.handleUnfreeze(player.Hero)
+		}
+		for _, minion := range player.Field {
+			e.handleUnfreeze(minion)
+		}
 	}
 
 	// Set next phase
 	e.nextPhase = game.MainCleanup
 	return nil
+}
+
+// handleUnfreeze implements the logic to determine if a frozen entity should be unfrozen
+// Based on Hearthstone rules:
+// - If entity is Exhausted (has used up its attacks for the turn), it will remain frozen
+// - If entity is not Exhausted (still has attacks available), it will be unfrozen
+func (e *Engine) handleUnfreeze(entity *game.Entity) {
+	// If entity is not frozen, nothing to do
+	if !game.HasTag(entity.Tags, game.TAG_FROZEN) {
+		return
+	}
+	
+	// If entity is not exhausted (still has attacks available), unfreeze it
+	if !entity.Exhausted {
+		// Use the RemoveTag helper to remove the frozen tag
+		if game.RemoveTag(&entity.Tags, game.TAG_FROZEN) {
+			logger.Debug("Entity unfrozen at end of turn",
+				logger.String("entity", entity.Card.Name))
+		}
+	}
 }
 
 func (e *Engine) mainCleanup() error {

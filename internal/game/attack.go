@@ -108,6 +108,11 @@ func (g *Game) validateAttack(attacker *Entity, defender *Entity) error {
 		return errors.New("entity is exhausted and cannot attack this turn")
 	}
 
+	// Check if attacker is Frozen
+	if HasTag(attacker.Tags, TAG_FROZEN) {
+		return errors.New("frozen entities cannot attack")
+	}
+
 	// Check if defender is a valid target
 	// Only minion or hero of another player can be attack target
 	if defender.Card.Type != Minion && defender.Card.Type != Hero {
@@ -299,4 +304,14 @@ func (g *Game) decreaseWeaponDurability(player *Player) {
 	logger.Debug("Weapon durability decreased",
 		logger.String("weapon", player.Weapon.Card.Name),
 		logger.Int("remaining", player.Weapon.Health))
+}
+
+// Freeze marks an entity as frozen. Frozen entities miss their next possible attack.
+func (g *Game) Freeze(target *Entity) {
+	// Only apply freeze if target is not already frozen
+	if !HasTag(target.Tags, TAG_FROZEN) {
+		target.Tags = append(target.Tags, NewTag(TAG_FROZEN, true))
+		logger.Info("Entity frozen",
+			logger.String("target", target.Card.Name))
+	}
 }
