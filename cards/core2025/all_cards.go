@@ -5,5 +5,4 @@ var AllCards = []interface{}{
 	&Fireball{},
 	&Frostbolt{},
 	&Jaina{},
-	&WaterElemental{},
 }

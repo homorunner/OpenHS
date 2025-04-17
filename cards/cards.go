@@ -1,6 +1,7 @@
 package cards
 
 import (
+	classic "github.com/openhs/cards/classic"
 	core "github.com/openhs/cards/core2025"
 	edr "github.com/openhs/cards/edr"
 	"github.com/openhs/internal/game"
@@ -15,6 +16,9 @@ func RegisterAllCards(cm *game.CardManager) {
 		card.(CardDef).Register(cm)
 	}
 	for _, card := range edr.AllCards {
+		card.(CardDef).Register(cm)
+	}
+	for _, card := range classic.AllCards {
 		card.(CardDef).Register(cm)
 	}
 }

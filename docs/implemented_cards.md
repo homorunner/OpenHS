@@ -7,9 +7,12 @@ This document tracks all cards that have been implemented in the game.
 - [x] Fireball
 - [x] Arcane Intellect
 - [ ] Frostbolt
-- [ ] Water Elemental
 - [x] Ship's Chirurgeon
 
 ## EDR Set
 
 - [x] Scorching Observer
+
+## Classic
+
+- [ ] Water Elemental
