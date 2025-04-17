@@ -7,13 +7,16 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
 - **Game Engine Framework**:
   - Core game loop with phase management (BeginFirst, BeginShuffle, BeginDraw, etc.)
   - Turn-based gameplay flow with player switching
+
 - **Card System**: 
   - Card template loading from JSON configurations
   - Basic card types (Minion, Spell, Weapon, Hero, HeroPower)
   - Card effect framework with triggers and conditions
   - Card tags implementation (Poisonous, Rush, Windfury, etc.)
+
 - **Player Management**:
   - Player state tracking including hero, deck, hand, and board
+  
 - **Game Mechanics**:
   - Initial game setup with card drawing
   - Turn management with phase transitions
