@@ -4,5 +4,5 @@ var AllCards = []interface{}{
 	&ArcaneIntellect{},
 	&Fireball{},
 	&Frostbolt{},
-	&Jaina{},
+	&ShipsChirurgeon{},
 }

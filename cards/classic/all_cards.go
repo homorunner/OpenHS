@@ -1,5 +1,17 @@
 package cards
 
-var AllCards = []interface{}{
-	&WaterElemental{},
+var BasicHeros = []interface{}{
+	&Jaina{},
+	&Rexxar{},
+	&Anduin{},
+	&Garrosh{},
+	&Thrall{},
+	&Uther{},
+	&Valeera{},
+	&Malfurion{},
+	&Guldan{},
 }
+
+var AllCards = append(BasicHeros, []interface{}{
+	&WaterElemental{},
+}...)
