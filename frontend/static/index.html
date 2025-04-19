@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenHS - Web Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OpenHS - Hearthstone Simulator</h1>
+            <div class="game-info">
+                <span id="turn-info">Turn: 1</span>
+                <span id="phase-info">Phase: Main Action</span>
+            </div>
+        </header>
+
+        <div class="game-board">
+            <!-- Opponent's side -->
+            <div class="player-area opponent">
+                <div class="player-stats">
+                    <div class="hero">
+                        <div class="hero-art">
+                            <div class="hero-portrait">
+                                <div class="hero-icon">♛</div>
+                            </div>
+                        </div>
+                        <div class="hero-info">
+                            <span id="opponent-hero-name">Hero Name</span>
+                            <span id="opponent-hero-health">30 HP</span>
+                        </div>
+                    </div>
+                    <div class="mana-display">
+                        <span id="opponent-mana">0/0</span>
+                        <span class="mana-crystal">◆</span>
+                    </div>
+                </div>
+
+                <div class="hand" id="opponent-hand">
+                    <!-- Cards will be generated here -->
+                </div>
+
+                <div class="field" id="opponent-field">
+                    <!-- Minions will be generated here -->
+                </div>
+            </div>
+
+            <!-- Center area -->
+            <div class="center-area">
+                <div class="game-log" id="game-log">
+                    <p>Game started...</p>
+                </div>
+                
+                <div class="turn-button">
+                    <button id="end-turn">End Turn</button>
+                </div>
+            </div>
+
+            <!-- Player's side -->
+            <div class="player-area current-player">
+                <div class="field" id="player-field">
+                    <!-- Minions will be generated here -->
+                </div>
+
+                <div class="hand" id="player-hand">
+                    <!-- Cards will be generated here -->
+                </div>
+
+                <div class="player-stats">
+                    <div class="mana-display">
+                        <span id="player-mana">0/0</span>
+                        <span class="mana-crystal">◆</span>
+                    </div>
+                    <div class="hero">
+                        <div class="hero-art">
+                            <div class="hero-portrait">
+                                <div class="hero-icon">♛</div>
+                            </div>
+                        </div>
+                        <div class="hero-info">
+                            <span id="player-hero-name">Hero Name</span>
+                            <span id="player-hero-health">30 HP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card template (hidden) -->
+    <template id="card-template">
+        <div class="card" data-index="">
+            <div class="card-frame">
+                <div class="card-cost"></div>
+                <div class="card-name"></div>
+                <div class="card-art">
+                    <div class="card-icon"></div>
+                </div>
+                <div class="card-description"></div>
+                <div class="card-stats">
+                    <span class="card-attack"></span>
+                    <span class="card-health"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Minion template (hidden) -->
+    <template id="minion-template">
+        <div class="minion" data-index="">
+            <div class="minion-frame">
+                <div class="minion-name"></div>
+                <div class="minion-art">
+                    <div class="minion-icon">☺</div>
+                </div>
+                <div class="minion-stats">
+                    <span class="minion-attack"></span>
+                    <span class="minion-health"></span>
+                </div>
+                <div class="minion-tags"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Weapon template (hidden) -->
+    <template id="weapon-template">
+        <div class="weapon">
+            <div class="weapon-frame">
+                <div class="weapon-name"></div>
+                <div class="weapon-art">
+                    <div class="weapon-icon">⚔</div>
+                </div>
+                <div class="weapon-stats">
+                    <span class="weapon-attack"></span>
+                    <span class="weapon-durability"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html> 

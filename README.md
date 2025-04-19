@@ -26,6 +26,13 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
   - Mana crystal management
   - Death processing and graveyard management
 
+- **Web Frontend**:
+  - Text-based visual representation of the game
+  - Interactive game board with player and opponent areas
+  - Ability to play cards, attack with minions, and end turns
+  - Clean CSS-based card designs with simple icons
+  - Game log for tracking actions
+
 ## TODO List
 
 - **Game Mechanics**:
@@ -50,7 +57,11 @@ OpenHS is a simulator core for the game Hearthstone, implemented in Go. This pro
 ```
 openhs/
 ├── cmd/                  # Main applications
-│   └── openhs/           # Main entry point
+│   ├── openhs/           # CLI entry point
+│   └── frontend/         # Web interface entry point
+├── frontend/             # Web-based frontend
+│   ├── static/           # Static web files (HTML, CSS, JS)
+│   └── README.md         # Frontend documentation
 ├── internal/             # Private application and library code
 │   ├── game/             # Core game mechanics
 │   ├── card/             # Card system implementation
@@ -85,10 +96,16 @@ openhs/
    go mod download
    ```
 
-3. Run the project:
+3. Run the core CLI version:
    ```bash
    go run cmd/openhs
    ```
+
+4. Or run the web frontend:
+   ```bash
+   go run cmd/frontend/main.go
+   ```
+   Then open http://localhost:8080 in your browser.
 
 ## Development
 
