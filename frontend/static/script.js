@@ -3,6 +3,8 @@ let gameState = null;
 let selectedCard = null;
 let selectedMinion = null;
 let isAttacking = false;
+let prevPlayerHandCount = 0;
+let prevOpponentHandCount = 0;
 
 // Card type icons
 const cardIcons = {
@@ -70,17 +72,54 @@ function updateUI() {
     document.getElementById('player-mana').textContent = `${player.mana}/${player.totalMana}`;
     document.getElementById('opponent-mana').textContent = `${opponent.mana}/${opponent.totalMana}`;
     
+    // Update deck counts
+    const playerDeckElem = document.getElementById('player-deck');
+    const opponentDeckElem = document.getElementById('opponent-deck');
+    
+    if (player.deck) {
+        playerDeckElem.querySelector('.deck-count').textContent = player.deck.length;
+    }
+    
+    if (opponent.deck) {
+        opponentDeckElem.querySelector('.deck-count').textContent = opponent.deck.length;
+    }
+    
+    // Check for new cards drawn (player)
+    const playerDrawnCards = player.hand.length > prevPlayerHandCount;
+    
+    // Check for new cards drawn (opponent)
+    const opponentDrawnCards = opponent.hand.length > prevOpponentHandCount;
+    
+    // Animate deck if cards were drawn
+    if (playerDrawnCards) {
+        playerDeckElem.classList.add('deck-draw-animation');
+        setTimeout(() => {
+            playerDeckElem.classList.remove('deck-draw-animation');
+        }, 500);
+    }
+    
+    if (opponentDrawnCards) {
+        opponentDeckElem.classList.add('deck-draw-animation');
+        setTimeout(() => {
+            opponentDeckElem.classList.remove('deck-draw-animation');
+        }, 500);
+    }
+    
     // Update player's hand
-    updateHand('player-hand', player.hand);
+    updateHand('player-hand', player.hand, playerDrawnCards);
     
     // For opponent's hand, we show card backs only
-    updateOpponentHand('opponent-hand', opponent.hand.length);
+    updateOpponentHand('opponent-hand', opponent.hand.length, opponentDrawnCards);
     
     // Update player's field
     updateField('player-field', player.field, true);
     
     // Update opponent's field
     updateField('opponent-field', opponent.field, false);
+    
+    // Store current hand counts for next comparison
+    prevPlayerHandCount = player.hand.length;
+    prevOpponentHandCount = opponent.hand.length;
     
     // Reset selection states
     selectedCard = null;
@@ -89,18 +128,32 @@ function updateUI() {
 }
 
 // Update the player's hand display
-function updateHand(containerId, cards) {
+function updateHand(containerId, cards, drawnCards) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     
     cards.forEach((card, index) => {
         const cardElement = createCardElement(card, index);
+        
+        // Apply animation if new cards were drawn
+        if (drawnCards && index === cards.length - 1) {
+            cardElement.classList.add('card-draw-animation', 'player-card-draw');
+            
+            // Log the card draw
+            logMessage(`You drew ${card.name}.`);
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+                cardElement.classList.remove('card-draw-animation', 'player-card-draw');
+            }, 700);
+        }
+        
         container.appendChild(cardElement);
     });
 }
 
 // Update the opponent's hand display (card backs only)
-function updateOpponentHand(containerId, cardCount) {
+function updateOpponentHand(containerId, cardCount, drawnCards) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     
@@ -110,6 +163,19 @@ function updateOpponentHand(containerId, cardCount) {
         // Set card back appearance
         const cardIcon = cardElement.querySelector('.card-icon');
         cardIcon.textContent = "?";
+        
+        // Apply animation if new cards were drawn
+        if (drawnCards && i === cardCount - 1) {
+            cardElement.classList.add('card-draw-animation', 'opponent-card-draw');
+            
+            // Log the opponent's card draw
+            logMessage("Opponent drew a card.");
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+                cardElement.classList.remove('card-draw-animation', 'opponent-card-draw');
+            }, 700);
+        }
         
         container.appendChild(cardElement);
     }
